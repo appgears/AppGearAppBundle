@@ -1,0 +1,58 @@
+services:
+
+  appgear.controller.crud:
+    class: AppGear\AppBundle\Controller\CrudController
+    arguments:
+      - @appgear.storage
+      - @app_gear.core.model.manager
+      - @appgear.view.manager
+    calls:
+      - [setContainer, ['@service_container']]
+
+  appgear.storage:
+    class: AppGear\AppBundle\Storage\Storage
+    arguments:
+      - @app_gear.core.model.manager
+      - @appgear.storage.driver.doctrine_orm
+
+  appgear.storage.driver.doctrine_orm:
+    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
+    arguments:
+      - @doctrine.orm.entity_manager
+      - @app_gear.core.model.manager
+
+  appgear.storage.driver.doctrine_phpcr:
+    class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\Driver
+    arguments:
+      - @doctrine_phpcr
+      - @appgear.storage.driver.doctrine_phpcr.proxy_manager
+
+  appgear.storage.proxy_manager_abstract:
+    class: AppGear\AppBundle\Storage\ProxyManagerAbstract
+    abstract: true
+    arguments:
+     - %kernel.cache_dir%
+     - @app_gear.core.model.manager
+
+  appgear.storage.driver.doctrine_phpcr.proxy_manager:
+    class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\ProxyManager
+    parent: appgear.storage.proxy_manager_abstract
+
+  appgear.view.manager:
+    class: AppGear\AppBundle\View\ViewManager
+    arguments:
+      - @app_gear.core.model.manager
+      - @ag.service.tagged_manager
+      - @service_container
+
+  appgear.twig.translation_extension:
+      class: AppGear\AppBundle\Twig\TranslationExtension
+      tags:
+          - { name: twig.extension }
+
+  appgear.twig.view_extension:
+      class: AppGear\AppBundle\Twig\ViewExtension
+      arguments:
+          - @appgear.view.manager
+      tags:
+          - { name: twig.extension }

@@ -1,0 +1,14 @@
+{
+    "name": "appgear/appbundle",
+    "type": "library",
+    "description": "AppGearAppBundle",
+    "license": "MIT",
+    "require": {
+    },
+
+    "autoload": {
+        "psr-4": {
+            "AppGear\\AppBundle\\": "src/AppBundle/"
+        }
+    }
+}

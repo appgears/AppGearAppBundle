@@ -1,0 +1,27 @@
+services:
+
+  appgear.entity_service.view_service:
+    class: AppGear\AppBundle\EntityService\ViewService
+    arguments:
+      - @templating
+    tags:
+      - name: appgear.entity_service.view
+        model: app_gear.app_bundle.entity.view
+
+  appgear.entity_service.detail_view_service:
+    class: AppGear\AppBundle\EntityService\DetailViewService
+    arguments:
+      - @templating
+      - @appgear.storage
+      - @app_gear.core.model.manager
+    tags:
+      - name: appgear.entity_service.view
+        model: app_gear.app_bundle.entity.view.model_view.detail_view
+
+  appgear.entity_service.form_view_service:
+    class: AppGear\AppBundle\EntityService\FormViewService
+    arguments:
+      - @templating
+    tags:
+      - name: appgear.entity_service.view
+        model: app_gear.app_bundle.entity.view.model_view.form_view
