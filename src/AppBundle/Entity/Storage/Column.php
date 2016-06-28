@@ -21,14 +21,6 @@ class Column
     protected $inversedBy;
     
     /**
-     * Get identifier
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-    
-    /**
      * Set identifier
      */
     public function setIdentifier($identifier)
@@ -38,11 +30,11 @@ class Column
     }
     
     /**
-     * Get mappedBy
+     * Get identifier
      */
-    public function getMappedBy()
+    public function getIdentifier()
     {
-        return $this->mappedBy;
+        return $this->identifier;
     }
     
     /**
@@ -55,11 +47,11 @@ class Column
     }
     
     /**
-     * Get inversedBy
+     * Get mappedBy
      */
-    public function getInversedBy()
+    public function getMappedBy()
     {
-        return $this->inversedBy;
+        return $this->mappedBy;
     }
     
     /**
@@ -69,5 +61,13 @@ class Column
     {
         $this->inversedBy = $inversedBy;
         return $this;
+    }
+    
+    /**
+     * Get inversedBy
+     */
+    public function getInversedBy()
+    {
+        return $this->inversedBy;
     }
 }

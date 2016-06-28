@@ -11,19 +11,19 @@ class Translation
     protected $label;
     
     /**
-     * Get label
-     */
-    public function getLabel()
-    {
-        return $this->label;
-    }
-    
-    /**
      * Set label
      */
     public function setLabel($label)
     {
         $this->label = $label;
         return $this;
+    }
+    
+    /**
+     * Get label
+     */
+    public function getLabel()
+    {
+        return $this->label;
     }
 }

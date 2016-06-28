@@ -18,6 +18,13 @@ models:
         field:
           type: app_gear.core_bundle.entity.property.field.string
 
+  ui.sluggable:
+    parent: app_gear.core_bundle.entity.extension.property.computed
+    properties:
+      field:
+        field:
+          type: app_gear.core_bundle.entity.property.field.string
+
   view:
     properties:
       template:
