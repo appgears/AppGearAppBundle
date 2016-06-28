@@ -32,10 +32,10 @@ class Storage
     /**
      * CrudController constructor.
      *
-     * @param ModelManager   $manager Models manager
      * @param DriverAbstract $driver  Storage driver
+     * @param ModelManager   $manager Models manager
      */
-    public function __construct(ModelManager $manager, DriverAbstract $driver)
+    public function __construct(DriverAbstract $driver, ModelManager $manager)
     {
         $this->driver  = $driver;
         $this->manager = $manager;
@@ -58,7 +58,7 @@ class Storage
             return $this->repositories[$model->getName()];
         }
 
-        $repository                            = new Repository($model, $this->driver);
+        $repository                            = new Repository($this->driver, $model, $this->manager);
         $this->repositories[$model->getName()] = $repository;
 
         return $repository;

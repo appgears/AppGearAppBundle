@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage;
 
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Model\ModelManager;
 
 class Repository
 {
@@ -21,15 +22,24 @@ class Repository
     private $driver;
 
     /**
+     * Model manager
+     *
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    /**
      * CrudController constructor.
      *
-     * @param Model          $model  Model
-     * @param DriverAbstract $driver Storage driver
+     * @param DriverAbstract $driver       Storage driver
+     * @param Model          $model        Model
+     * @param ModelManager   $modelManager Model manager
      */
-    public function __construct(Model $model, DriverAbstract $driver)
+    public function __construct(DriverAbstract $driver, Model $model, ModelManager $modelManager)
     {
-        $this->model  = $model;
-        $this->driver = $driver;
+        $this->model        = $model;
+        $this->driver       = $driver;
+        $this->modelManager = $modelManager;
     }
 
     /**
@@ -39,7 +49,12 @@ class Repository
      */
     public function findAll()
     {
-        return $this->driver->findAll($this->model);
+        $entities = $this->driver->findAll($this->model);
+        foreach ($entities as $entity) {
+            $this->modelManager->injectServices($this->model->getName(), $entity);
+        }
+
+        return $entities;
     }
 
     /**
@@ -51,7 +66,8 @@ class Repository
      */
     public function find($id)
     {
-        return $this->driver->find($this->model, $id);
+        $entity = $this->driver->find($this->model, $id);
+        return $this->modelManager->injectServices($this->model->getName(), $entity);
     }
 
     /**
@@ -63,7 +79,12 @@ class Repository
      */
     public function findByExpr($expr)
     {
-        return $this->driver->findByExpr($this->model, $expr);
+        $entities = $this->driver->findByExpr($this->model, $expr);
+        foreach ($entities as $entity) {
+            $this->modelManager->injectServices($this->model->getName(), $entity);
+        }
+
+        return $entities;
     }
 
     /**

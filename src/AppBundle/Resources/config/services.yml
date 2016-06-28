@@ -12,8 +12,8 @@ services:
   appgear.storage:
     class: AppGear\AppBundle\Storage\Storage
     arguments:
-      - @app_gear.core.model.manager
       - @appgear.storage.driver.doctrine_orm
+      - @app_gear.core.model.manager
 
   appgear.storage.driver.doctrine_orm:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
