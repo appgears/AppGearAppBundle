@@ -49,6 +49,17 @@ abstract class DriverAbstract
     abstract public function find(Model $model, $id);
 
     /**
+     * Finds a single object by a criteria.
+     *
+     * @param Model  $model Model
+     * @param string $field Field name
+     * @param mixed  $value Field value
+     *
+     * @return object|null The object or null.
+     */
+    abstract public function findOneBy(Model $model, $field, $value);
+
+    /**
      * Finds entities by criteria expression.
      *
      * @param Model  $model Model

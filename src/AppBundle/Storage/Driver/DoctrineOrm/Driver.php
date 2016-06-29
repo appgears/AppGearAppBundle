@@ -90,6 +90,14 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
+    public function findOneBy(Model $model, $field, $value)
+    {
+        return $this->getObjectRepository($model)->findOneBy([$field => $value]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function findByExpr(Model $model, $expr)
     {
         $modelService = new ModelService($model);

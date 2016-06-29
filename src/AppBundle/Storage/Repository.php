@@ -37,8 +37,8 @@ class Repository
      */
     public function __construct(DriverAbstract $driver, Model $model, ModelManager $modelManager)
     {
-        $this->model        = $model;
-        $this->driver       = $driver;
+        $this->model = $model;
+        $this->driver = $driver;
         $this->modelManager = $modelManager;
     }
 
@@ -67,6 +67,20 @@ class Repository
     public function find($id)
     {
         $entity = $this->driver->find($this->model, $id);
+        return $this->modelManager->injectServices($this->model->getName(), $entity);
+    }
+
+    /**
+     * Finds a single object by a criteria.
+     *
+     * @param string $field Field name
+     * @param mixed  $value Field value
+     *
+     * @return object|null The object or null.
+     */
+    public function findOneBy($field, $value)
+    {
+        $entity = $this->driver->findOneBy($this->model, $field, $value);
         return $this->modelManager->injectServices($this->model->getName(), $entity);
     }
 
