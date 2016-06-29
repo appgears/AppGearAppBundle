@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\EntityExtension;
 
+use AppGear\AppBundle\EntityExtension\Sluggable\Transliterator;
 use AppGear\CoreBundle\EntityExtension\ComputedPropertyExtensionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,7 +14,7 @@ class Sluggable implements ComputedPropertyExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function execute($object, $field, array $options = [])
+    public function compute($object, $field, array $options = [])
     {
         $optionsResolver = new OptionsResolver();
         $optionsResolver
@@ -23,7 +24,8 @@ class Sluggable implements ComputedPropertyExtensionInterface
         $transliterator = new Transliterator();
 
         $text = $object->{'get' . ucfirst($options['field'])}();
-        $text = $transliterator->urlize($text);
-        $object->{'set' . ucfirst($field)}($text);
+        $text = $transliterator->transliterate($text);
+
+        return $text;
     }
 }
