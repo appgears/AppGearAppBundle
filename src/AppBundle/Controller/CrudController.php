@@ -106,8 +106,13 @@ class CrudController extends Controller
         $formModel         = $this->modelManager->get($formModelId);
         $storageRepository = $this->storage->getRepository($formModel);
 
-        $entity = ($id === null) ? $this->modelManager->instance($formModelId) : $storageRepository->find($id);
-        $form   = $this->buildForm($formModel, $entity);
+        if ($id === null) {
+            $entity = $this->modelManager->instance($formModelId);
+            $entity = $this->modelManager->injectServices($formModelId, $entity);
+        } else {
+            $entity = $storageRepository->find($id);
+        }
+        $form = $this->buildForm($formModel, $entity);
 
         $viewParameters = $this->requireAttribute($request, '_view');
         $view           = $this->initialize($request, $viewParameters);
