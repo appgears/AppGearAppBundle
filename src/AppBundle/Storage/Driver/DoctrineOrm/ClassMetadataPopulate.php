@@ -224,7 +224,7 @@ class ClassMetadataPopulate
                             } elseif (strlen($inversedBy = $extension->getInversedBy())) {
                                 $mapping['inversedBy'] = $inversedBy;
                                 $mapping['joinColumn'] = [
-                                    'name' => strtolower($this->modelManager->name($targetModel->className())) . '_id',
+                                    'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
                                     'referencedColumnName' => 'id'
                                 ];
                                 break;

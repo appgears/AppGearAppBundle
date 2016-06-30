@@ -37,9 +37,23 @@ class Repository
      */
     public function __construct(DriverAbstract $driver, Model $model, ModelManager $modelManager)
     {
-        $this->model = $model;
-        $this->driver = $driver;
+        $this->model        = $model;
+        $this->driver       = $driver;
         $this->modelManager = $modelManager;
+    }
+
+    /**
+     * Finds an object by its primary key / identifier.
+     *
+     * @param mixed $id The identifier.
+     *
+     * @return object The object.
+     */
+    public function find($id)
+    {
+        $entity = $this->driver->find($this->model, $id);
+
+        return $this->modelManager->injectServices($this->model->getName(), $entity);
     }
 
     /**
@@ -58,33 +72,6 @@ class Repository
     }
 
     /**
-     * Finds an object by its primary key / identifier.
-     *
-     * @param mixed $id The identifier.
-     *
-     * @return object The object.
-     */
-    public function find($id)
-    {
-        $entity = $this->driver->find($this->model, $id);
-        return $this->modelManager->injectServices($this->model->getName(), $entity);
-    }
-
-    /**
-     * Finds a single object by a criteria.
-     *
-     * @param string $field Field name
-     * @param mixed  $value Field value
-     *
-     * @return object|null The object or null.
-     */
-    public function findOneBy($field, $value)
-    {
-        $entity = $this->driver->findOneBy($this->model, $field, $value);
-        return $this->modelManager->injectServices($this->model->getName(), $entity);
-    }
-
-    /**
      * Finds entities by criteria expression.
      *
      * @param string $expr Expression language criteria string
@@ -99,6 +86,23 @@ class Repository
         }
 
         return $entities;
+    }
+
+    /**
+     * Finds a single object by a criteria expression.
+     *
+     * @param string $expr Expression language criteria string
+     *
+     * @return object|null The object or null.
+     */
+    public function findOneByExpr($expr)
+    {
+        $entities = $this->findByExpr($expr);
+        if (count($entities) > 0) {
+            return $entities[0];
+        }
+
+        return null;
     }
 
     /**

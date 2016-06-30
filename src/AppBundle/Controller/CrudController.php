@@ -183,19 +183,17 @@ class CrudController extends Controller
                 var_export($parameters, true)));
         }
 
-        // Get ID from parameters
-        $id = array_key_exists('_id', $parameters) ? $parameters['_id'] : null;
+        // Get ID or expression from parameters
+        $id   = array_key_exists('_id', $parameters) ? $parameters['_id'] : null;
+        $expr = array_key_exists('_expression', $parameters) ? $parameters['_expression'] : null;
 
         // Load instance if ID passed
         if ($id !== null) {
-            $id = $this->performLink($request, $id);
-
-            // TODO: надо переписать после интеграции моделей с хранилищем
-            if ($modelId === 'app_gear.core_bundle.entity.model') {
-                $instance = $this->modelManager->get($id);
-            } else {
-                $instance = $this->storage->getRepository($modelId)->find($id);
-            }
+            $id       = $this->performLink($request, $id);
+            $instance = $this->storage->getRepository($modelId)->find($id);
+        } elseif ($expr !== null) {
+            $expr       = $this->performEmbeddedLink($request, $expr);
+            $instance = $this->storage->getRepository($modelId)->findOneByExpr($expr);
         } else {
             // Else create new instance
             $instance = $this->modelManager->instance($modelId);

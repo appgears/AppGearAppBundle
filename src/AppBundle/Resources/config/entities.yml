@@ -22,7 +22,7 @@ services:
       - @app_gear.core.model.manager
     tags:
       - name: appgear.entity_service.view
-        model: app_gear.app_bundle.entity.view.model_view.detail_view
+        model: app_gear.app_bundle.entity.view.detail_view
 
   appgear.entity_service.form_view_service:
     class: AppGear\AppBundle\EntityService\FormViewService

@@ -42,7 +42,7 @@ class DetailViewService extends ViewService
     {
         /** @var $detailView DetailView */
         $detailView = $this->view;
-        $entity     = $this->storage->getRepository($detailView->getModel())->find($detailView->getId());
+        $entity     = $detailView->getEntity();
 
         return $this->twig->render(
             $this->view->getTemplate(),
