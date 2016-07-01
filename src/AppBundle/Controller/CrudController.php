@@ -100,32 +100,42 @@ class CrudController extends Controller
      */
     public function formAction(Request $request, $id = null)
     {
-        $formViewPath = $this->requireAttribute($request, '_form_view_path');
+        $formModelId     = $this->requireAttribute($request, '_model');
+        $formModel       = $this->modelManager->get($formModelId);
+        $modelRepository = $this->storage->getRepository($formModel);
 
-        $formModelId       = $this->requireAttribute($request, '_model');
-        $formModel         = $this->modelManager->get($formModelId);
-        $storageRepository = $this->storage->getRepository($formModel);
-
+        // Загружаем существующую сущность или создаем новую
         if ($id === null) {
             $entity = $this->modelManager->instance($formModelId);
             $entity = $this->modelManager->injectServices($formModelId, $entity);
         } else {
-            $entity = $storageRepository->find($id);
+            $entity = $modelRepository->find($id);
         }
+
+        // Собираем форму
         $form = $this->buildForm($formModel, $entity);
 
+        // Инициализируем отображение
         $viewParameters = $this->requireAttribute($request, '_view');
         $view           = $this->initialize($request, $viewParameters);
 
-        $accessor = new PropertyAccessor();
-        $formView = $accessor->getValue($view, $formViewPath);
-        $formView->setForm($form);
 
+        // Инициализируем FormView
+        // Если используется ContainerView, то FormView будет вложена в ContainerView
+        $formViewPath = $request->attributes->get('_form_view_path');
+        if ($formViewPath !== null) {
+            $accessor = new PropertyAccessor();
+            $formView = $accessor->getValue($view, $formViewPath);
+            $formView->setForm($form);
+        } else {
+            // Иначе текущее отображение и есть FormView
+            $view->setForm($form);
+        }
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $storageRepository->save($entity);
+                $modelRepository->save($entity);
 
                 return new Response('Save!');
             }
@@ -192,7 +202,7 @@ class CrudController extends Controller
             $id       = $this->performLink($request, $id);
             $instance = $this->storage->getRepository($modelId)->find($id);
         } elseif ($expr !== null) {
-            $expr       = $this->performEmbeddedLink($request, $expr);
+            $expr     = $this->performEmbeddedLink($request, $expr);
             $instance = $this->storage->getRepository($modelId)->findOneByExpr($expr);
         } else {
             // Else create new instance
