@@ -137,7 +137,11 @@ class CrudController extends Controller
             if ($form->isSubmitted() && $form->isValid()) {
                 $modelRepository->save($entity);
 
-                return new Response('Save!');
+                if ($route = $request->attributes->get('_redirect')) {
+                    return $this->redirectToRoute($route);
+                } else {
+                    return new Response('Save!');
+                }
             }
         }
 
