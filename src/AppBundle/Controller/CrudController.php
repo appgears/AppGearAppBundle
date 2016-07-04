@@ -119,7 +119,6 @@ class CrudController extends Controller
         $viewParameters = $this->requireAttribute($request, '_view');
         $view           = $this->initialize($request, $viewParameters);
 
-
         // Инициализируем FormView
         // Если используется ContainerView, то FormView будет вложена в ContainerView
         $formViewPath = $request->attributes->get('_form_view_path');
