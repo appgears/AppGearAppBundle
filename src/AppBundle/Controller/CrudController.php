@@ -19,6 +19,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class CrudController extends Controller
@@ -204,9 +205,15 @@ class CrudController extends Controller
         if ($id !== null) {
             $id       = $this->performLink($request, $id);
             $instance = $this->storage->getRepository($modelId)->find($id);
+            if ($instance === null) {
+                throw new NotFoundHttpException;
+            }
         } elseif ($expr !== null) {
             $expr     = $this->performEmbeddedLink($request, $expr);
             $instance = $this->storage->getRepository($modelId)->findOneByExpr($expr);
+            if ($instance === null) {
+                throw new NotFoundHttpException;
+            }
         } else {
             // Else create new instance
             $instance = $this->modelManager->instance($modelId);
