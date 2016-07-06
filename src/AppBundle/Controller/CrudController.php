@@ -203,8 +203,15 @@ class CrudController extends Controller
 
         // Load instance if ID passed
         if ($id !== null) {
-            $id       = $this->performLink($request, $id);
-            $instance = $this->storage->getRepository($modelId)->find($id);
+            $id = $this->performEmbeddedLink($request, $id);
+
+            // TODO: надо переписать после интеграции моделей с хранилищем
+            if ($modelId === 'app_gear.core_bundle.entity.model') {
+                $instance = $this->modelManager->get($id);
+            } else {
+                $instance = $this->storage->getRepository($modelId)->find($id);
+            }
+
             if ($instance === null) {
                 throw new NotFoundHttpException;
             }
