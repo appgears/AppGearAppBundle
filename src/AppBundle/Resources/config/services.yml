@@ -9,14 +9,14 @@ services:
     calls:
       - [setContainer, ['@service_container']]
 
-  appgear.event.http_not_found_redirect:
-    class: AppGear\AppBundle\Event\HttpNotFoundRedirect
-    arguments:
-      - @router
-      - %appgear.application.route404.enabled%
-      - %appgear.application.route404.route%
-    tags:
-    - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+#  appgear.event.http_not_found_redirect:
+#    class: AppGear\AppBundle\Event\HttpNotFoundRedirect
+#    arguments:
+#      - @router
+#      - %appgear.application.route404.enabled%
+#      - %appgear.application.route404.route%
+#    tags:
+#    - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
   appgear.storage:
     class: AppGear\AppBundle\Storage\Storage
