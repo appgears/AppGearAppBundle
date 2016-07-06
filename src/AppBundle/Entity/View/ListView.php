@@ -12,6 +12,11 @@ class ListView extends View
     protected $entities;
     
     /**
+     * Model
+     */
+    protected $model;
+    
+    /**
      * Set entities
      */
     public function setEntities($entities)
@@ -26,5 +31,22 @@ class ListView extends View
     public function getEntities()
     {
         return $this->entities;
+    }
+    
+    /**
+     * Set model
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+        return $this;
+    }
+    
+    /**
+     * Get model
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 }

@@ -30,4 +30,4 @@ services:
       - @templating
     tags:
       - name: appgear.entity_service.view
-        model: app_gear.app_bundle.entity.view.model_view.form_view
+        model: app_gear.app_bundle.entity.view.form_view
