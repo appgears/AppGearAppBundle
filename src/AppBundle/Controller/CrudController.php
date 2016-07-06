@@ -91,7 +91,7 @@ class CrudController extends Controller
         return new Response($this->viewManager->getViewService($view)->render());
     }
 
-    /**
+    /**```
      * Action for form view and process
      *
      * @param Request $request Request
@@ -237,12 +237,15 @@ class CrudController extends Controller
                         $value[] = $this->initialize($request, $subParameters, $property->getTarget());
                     }
                 } elseif ($property instanceof Collection) {
+                    $propertyModel = $propertyParameters['_model'];
+                    $propertyModel = $this->performEmbeddedLink($request, $propertyModel);
+
                     if (array_key_exists('_expression', $propertyParameters)) {
                         $expr  = $propertyParameters['_expression'];
                         $expr  = $this->performEmbeddedLink($request, $expr);
-                        $value = $this->storage->getRepository($propertyParameters['_model'])->findByExpr($expr);
+                        $value = $this->storage->getRepository($propertyModel)->findByExpr($expr);
                     } else {
-                        $value = $this->storage->getRepository($propertyParameters['_model'])->findAll();
+                        $value = $this->storage->getRepository($propertyModel)->findAll();
                     }
                 }
 
