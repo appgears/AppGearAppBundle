@@ -6,16 +6,22 @@ services:
       - name: extension.property.computed
         model: app_gear.app_bundle.entity.ui.sluggable
 
-  appgear.entity_service.view_service:
-    class: AppGear\AppBundle\EntityService\ViewService
+  appgear.entity_service.property.field.datetime_type_servce:
+    class: AppGear\AppBundle\EntityService\Property\Field\DateTimeTypeService
+    tags:
+      - name: form.property.field.service
+        field: datetime
+
+  appgear.entity_service.view.view_service:
+    class: AppGear\AppBundle\EntityService\View\ViewService
     arguments:
       - @templating
     tags:
       - name: appgear.entity_service.view
         model: app_gear.app_bundle.entity.view
 
-  appgear.entity_service.detail_view_service:
-    class: AppGear\AppBundle\EntityService\DetailViewService
+  appgear.entity_service.view.detail_view_service:
+    class: AppGear\AppBundle\EntityService\View\DetailViewService
     arguments:
       - @templating
       - @appgear.storage
@@ -24,8 +30,8 @@ services:
       - name: appgear.entity_service.view
         model: app_gear.app_bundle.entity.view.detail_view
 
-  appgear.entity_service.form_view_service:
-    class: AppGear\AppBundle\EntityService\FormViewService
+  appgear.entity_service.view.form_view_service:
+    class: AppGear\AppBundle\EntityService\View\FormViewService
     arguments:
       - @templating
     tags:

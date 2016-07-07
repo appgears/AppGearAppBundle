@@ -1,6 +1,6 @@
 <?php
 
-namespace AppGear\AppBundle\EntityService;
+namespace AppGear\AppBundle\EntityService\View;
 
 use AppGear\AppBundle\Entity\View;
 

@@ -102,6 +102,7 @@ class CrudController extends Controller
     public function formAction(Request $request, $id = null)
     {
         $formModelId     = $this->requireAttribute($request, '_model');
+        $formModelId     = $this->performEmbeddedLink($request, $formModelId);
         $formModel       = $this->modelManager->get($formModelId);
         $modelRepository = $this->storage->getRepository($formModel);
 
@@ -161,10 +162,13 @@ class CrudController extends Controller
         $form = $this->createFormBuilder($entity);
         foreach ($model->getProperties() as $property) {
             if ($property instanceof Field) {
-                $form->add($property->getName(), TextType::class);
+                $form->add($property->getName(), TextType::class, [
+                    'required' => false
+                ]);
             } elseif ($property instanceof Relationship) {
                 $form->add($property->getName(), ChoiceType::class, [
-                    'choice_loader' => new ModelChoiceLoader($this->storage, $property->getTarget())
+                    'choice_loader' => new ModelChoiceLoader($this->storage, $property->getTarget()),
+                    'required' => false
                 ]);
             }
         }
