@@ -6,6 +6,7 @@ services:
       - @appgear.storage
       - @app_gear.core.model.manager
       - @appgear.view.manager
+      - @appgear.form.builder
     calls:
       - [setContainer, ['@service_container']]
 
@@ -17,6 +18,12 @@ services:
       - %appgear.application.route404.route%
     tags:
     - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
+  appgear.form.builder:
+    class: AppGear\AppBundle\Form\FormBuilder
+    arguments:
+      - @form.factory
+      - @appgear.storage
 
   appgear.storage:
     class: AppGear\AppBundle\Storage\Storage

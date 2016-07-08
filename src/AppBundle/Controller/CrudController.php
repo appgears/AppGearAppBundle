@@ -2,7 +2,7 @@
 
 namespace AppGear\AppBundle\Controller;
 
-use AppGear\AppBundle\Form\ModelChoiceLoader;
+use AppGear\AppBundle\Form\FormBuilder;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -12,10 +12,6 @@ use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -46,17 +42,31 @@ class CrudController extends Controller
     private $viewManager;
 
     /**
+     * Model form builder
+     *
+     * @var FormBuilder
+     */
+    private $formBuilder;
+
+    /**
      * CrudController constructor.
      *
      * @param Storage      $storage      Storage
      * @param ModelManager $modelManager Model manager
      * @param ViewManager  $viewManager  View manager
+     * @param FormBuilder  $formBuilder  Form builder for model
      */
-    public function __construct(Storage $storage, ModelManager $modelManager, ViewManager $viewManager)
+    public function __construct(
+        Storage $storage,
+        ModelManager $modelManager,
+        ViewManager $viewManager,
+        FormBuilder $formBuilder
+    )
     {
         $this->storage      = $storage;
         $this->modelManager = $modelManager;
         $this->viewManager  = $viewManager;
+        $this->formBuilder  = $formBuilder;
     }
 
     /**
@@ -115,7 +125,7 @@ class CrudController extends Controller
         }
 
         // Собираем форму
-        $form = $this->buildForm($formModel, $entity);
+        $form = $this->formBuilder->build($formModel, $entity);
 
         // Инициализируем отображение
         $viewParameters = $this->requireAttribute($request, '_view');
@@ -147,34 +157,6 @@ class CrudController extends Controller
         }
 
         return new Response($this->viewManager->getViewService($view)->render());
-    }
-
-    /**
-     * Build form for model
-     *
-     * @param Model  $model  Model
-     * @param object $entity Model entity
-     *
-     * @return Form
-     */
-    protected function buildForm(Model $model, $entity = null)
-    {
-        $form = $this->createFormBuilder($entity);
-        foreach ($model->getProperties() as $property) {
-            if ($property instanceof Field) {
-                $form->add($property->getName(), TextType::class, [
-                    'required' => false
-                ]);
-            } elseif ($property instanceof Relationship) {
-                $form->add($property->getName(), ChoiceType::class, [
-                    'choice_loader' => new ModelChoiceLoader($this->storage, $property->getTarget()),
-                    'required' => false
-                ]);
-            }
-        }
-        $form->add('save', SubmitType::class, array('label' => 'Save'));
-
-        return $form->getForm();
     }
 
     /**

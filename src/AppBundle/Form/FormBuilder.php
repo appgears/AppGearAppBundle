@@ -2,11 +2,44 @@
 
 namespace AppGear\AppBundle\Form;
 
+use AppGear\AppBundle\Storage\Storage;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Entity\Property\Field;
+use AppGear\CoreBundle\Entity\Property\Relationship;
+use AppGear\CoreBundle\EntityService\ModelService;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class FormBuilder
 {
+    /**
+     * Form factory
+     *
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
+     * Storage
+     *
+     * @var Storage
+     */
+    protected $storage;
+
+    /**
+     * FormBuilder constructor.
+     *
+     * @param FormFactoryInterface $formFactory Form factory
+     */
+    public function __construct(FormFactoryInterface $formFactory, Storage $storage)
+    {
+        $this->formFactory = $formFactory;
+        $this->storage     = $storage;
+    }
+
     /**
      * Build form for model
      *
@@ -15,8 +48,24 @@ class FormBuilder
      *
      * @return Form
      */
-    protected function build(Model $model, $entity = null)
+    public function build(Model $model, $entity = null)
     {
+        $modelService = new ModelService($model);
+        $form         = $this->formFactory->createBuilder('form', $entity);
+        foreach ($modelService->getAllProperties() as $property) {
+            if ($property instanceof Field) {
+                $form->add($property->getName(), TextType::class, [
+                    'required' => false
+                ]);
+            } elseif ($property instanceof Relationship) {
+                $form->add($property->getName(), ChoiceType::class, [
+                    'choice_loader' => new ModelChoiceLoader($this->storage, $property->getTarget()),
+                    'required' => false
+                ]);
+            }
+        }
+        $form->add('save', SubmitType::class, array('label' => 'Save'));
 
+        return $form->getForm();
     }
 }
