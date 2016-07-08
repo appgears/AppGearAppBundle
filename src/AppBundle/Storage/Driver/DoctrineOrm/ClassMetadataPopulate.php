@@ -101,7 +101,8 @@ class ClassMetadataPopulate
 
             foreach ($modelChildren as $child) {
                 $childEntityClass = $this->modelManager->fullClassName($child->getName());
-                $this->populateClassMetadataFor($child);
+                $childClassMetaData = $this->populateClassMetadataFor($child);
+                $childClassMetaData->setInheritanceType(ClassMetadataInfo::INHERITANCE_TYPE_JOINED);
                 $classMetaData->addDiscriminatorMapClass(str_replace('\\', '', $childEntityClass), $childEntityClass);
             }
         }
@@ -213,7 +214,8 @@ class ClassMetadataPopulate
                         'isOwningSide' => true,
                         'fetch' => ClassMetadataInfo::FETCH_LAZY,
                         'inversedBy' => false,
-                        'mappedBy' => false
+                        'mappedBy' => false,
+                        'isCascadePersist' => false
                     ];
                     foreach ($property->getExtensions() as $extension) {
                         if ($extension instanceof Column) {
@@ -223,10 +225,6 @@ class ClassMetadataPopulate
                                 break;
                             } elseif (strlen($inversedBy = $extension->getInversedBy())) {
                                 $mapping['inversedBy'] = $inversedBy;
-                                $mapping['joinColumn'] = [
-                                    'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
-                                    'referencedColumnName' => 'id'
-                                ];
                                 break;
                             }
                         }
@@ -236,6 +234,12 @@ class ClassMetadataPopulate
                         $mapping['type']                     = ClassMetadataInfo::MANY_TO_ONE;
                         $mapping['targetToSourceKeyColumns'] = [
                             'id' => strtolower($this->modelManager->className($targetModel->getName())) . '_id'
+                        ];
+                        $mapping['joinColumns'] = [
+                            [
+                                'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
+                                'referencedColumnName' => 'id'
+                            ]
                         ];
                     } elseif ($property instanceof Property\Relationship\ToMany) {
                         if ($this->isManyToMany($property, $mapping)) {
