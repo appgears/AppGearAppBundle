@@ -172,7 +172,6 @@ class ClassMetadataPopulate
                         $classMetadata->mapManyToOne($mapping);
                     } elseif ($property instanceof Property\Relationship\ToMany) {
                         if ($this->isManyToMany($property, $mapping)) {
-                            echo 1;
                             //$classMetadata->mapManyToMany($mapping);
                         } else {
                             $classMetadata->mapOneToMany($mapping);
