@@ -102,13 +102,22 @@ class ClassMetadataPopulate
             foreach ($modelChildren as $child) {
                 $childEntityClass = $this->modelManager->fullClassName($child->getName());
                 $childClassMetaData = $this->populateClassMetadataFor($child);
+                $childClassMetaData->setDiscriminatorColumn(['name' => '_discriminator']);
                 $childClassMetaData->setInheritanceType(ClassMetadataInfo::INHERITANCE_TYPE_JOINED);
+                $childClassMetaData->addDiscriminatorMapClass(str_replace('\\', '', $childEntityClass), $childEntityClass);
                 $classMetaData->addDiscriminatorMapClass(str_replace('\\', '', $childEntityClass), $childEntityClass);
             }
         }
 
         $this->mapProperties($classMetaData, $model);
         $this->mapInheritedProperties($classMetaData, $model);
+
+        if ($parents = (new ModelService($model))->getParents()) {
+            $parents = array_map(function ($parent) {
+                return $this->modelManager->fullClassName($parent->getName());
+            }, $parents);
+            $classMetaData->setParentClasses($parents);
+        }
 
         $classMetaData->wakeupReflection(new RuntimeReflectionService);
         $this->metadataFactory->setMetadataFor($entityClass, $classMetaData);
@@ -163,6 +172,7 @@ class ClassMetadataPopulate
                         $classMetadata->mapManyToOne($mapping);
                     } elseif ($property instanceof Property\Relationship\ToMany) {
                         if ($this->isManyToMany($property, $mapping)) {
+                            echo 1;
                             //$classMetadata->mapManyToMany($mapping);
                         } else {
                             $classMetadata->mapOneToMany($mapping);
@@ -186,13 +196,14 @@ class ClassMetadataPopulate
         $ms = new ModelService($model);
         foreach ($ms->getParents() as $parent) {
             foreach ($parent->getProperties() as $property) {
+                $mapping = [
+                    'fieldName' => $property->getName(),
+                    'inherited' => $this->modelManager->fullClassName($parent->getName())
+                ];
+
                 if ($property instanceof Field) {
-                    $mapping = [
-                        'columnName' => $property->getName(),
-                        'fieldName' => $property->getName(),
-                        'inherited' => true,
-                        'type' => 'string'
-                    ];
+                        $mapping['columnName'] = $property->getName();
+                        $mapping['type'] = 'string';
                     foreach ($property->getExtensions() as $extension) {
                         if ($extension instanceof Column && $extension->getIdentifier()) {
                             $mapping['id'] = true;
@@ -206,17 +217,14 @@ class ClassMetadataPopulate
                     $targetModel       = $property->getTarget();
                     $targetEntityClass = $this->modelManager->fullClassName($targetModel->getName());
 
-                    $mapping     = [
-                        'fieldName' => $property->getName(),
-                        'targetEntity' => $targetEntityClass,
-                        'sourceEntity' => $this->modelManager->fullClassName($model->getName()),
-                        'inherited' => true,
-                        'isOwningSide' => true,
-                        'fetch' => ClassMetadataInfo::FETCH_LAZY,
-                        'inversedBy' => false,
-                        'mappedBy' => false,
-                        'isCascadePersist' => false
-                    ];
+                    $mapping['targetEntity'] = $targetEntityClass;
+                    $mapping['sourceEntity'] = $this->modelManager->fullClassName($model->getName());
+                    $mapping['isOwningSide'] = true;
+                    $mapping['fetch'] = ClassMetadataInfo::FETCH_LAZY;
+                    $mapping['inversedBy'] = false;
+                    $mapping['mappedBy'] = false;
+                    $mapping['isCascadePersist'] = false;
+
                     foreach ($property->getExtensions() as $extension) {
                         if ($extension instanceof Column) {
                             if (strlen($mappedBy = $extension->getMappedBy())) {

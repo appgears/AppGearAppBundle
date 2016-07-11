@@ -53,15 +53,22 @@ class FormBuilder
         $modelService = new ModelService($model);
         $form         = $this->formFactory->createBuilder('form', $entity);
         foreach ($modelService->getAllProperties() as $property) {
+            $propertyName = $property->getName();
+
             if ($property instanceof Field) {
-                $form->add($property->getName(), TextType::class, [
+                $form->add($propertyName, TextType::class, [
                     'required' => false
                 ]);
             } elseif ($property instanceof Relationship) {
-                $form->add($property->getName(), ChoiceType::class, [
+                $options = [
                     'choice_loader' => new ModelChoiceLoader($this->storage, $property->getTarget()),
                     'required' => false
-                ]);
+                ];
+                if ($property instanceof Relationship\ToMany) {
+                    $options['multiple'] = true;
+                }
+
+                $form->add($propertyName, ChoiceType::class, $options);
             }
         }
         $form->add('save', SubmitType::class, array('label' => 'Save'));
