@@ -112,7 +112,7 @@ class CrudController extends Controller
     public function formAction(Request $request, $id = null)
     {
         $formModelId     = $this->requireAttribute($request, '_model');
-        $formModelId     = $this->performEmbeddedLink($request, $formModelId);
+        $formModelId     = $this->performExpression($request, $formModelId);
         $formModel       = $this->modelManager->get($formModelId);
         $modelRepository = $this->storage->getRepository($formModel);
 
@@ -156,7 +156,7 @@ class CrudController extends Controller
                         $parameters = array_key_exists('parameters', $redirect) ? $redirect['parameters'] : [];
                         $parameters = array_map(
                             function ($parameter) use ($request) {
-                                return $this->performEmbeddedLink($request, $parameter);
+                                return $this->performExpression($request, $parameter);
                             },
                             $parameters
                         );
@@ -201,7 +201,7 @@ class CrudController extends Controller
 
         // Load instance if ID passed
         if ($id !== null) {
-            $id = $this->performEmbeddedLink($request, $id);
+            $id = $this->performExpression($request, $id);
 
             // TODO: надо переписать после интеграции моделей с хранилищем
             if ($modelId === 'app_gear.core_bundle.entity.model') {
@@ -214,7 +214,7 @@ class CrudController extends Controller
                 throw new NotFoundHttpException;
             }
         } elseif ($expr !== null) {
-            $expr     = $this->performEmbeddedLink($request, $expr);
+            $expr     = $this->performExpression($request, $expr);
             $instance = $this->storage->getRepository($modelId)->findOneByExpr($expr);
             if ($instance === null) {
                 throw new NotFoundHttpException;
@@ -239,23 +239,25 @@ class CrudController extends Controller
                 } elseif ($property instanceof Relationship\ToMany) {
                     $value = [];
                     foreach ($propertyParameters as $subParameters) {
+                        if (is_scalar($subParameters)) {
+                            $subParameters = ['_id' => $subParameters];
+                        }
                         $value[] = $this->initialize($request, $subParameters, $property->getTarget());
                     }
                 } elseif ($property instanceof Collection) {
                     $propertyModel = $propertyParameters['_model'];
-                    $propertyModel = $this->performEmbeddedLink($request, $propertyModel);
+                    $propertyModel = $this->performExpression($request, $propertyModel);
 
                     if (array_key_exists('_expression', $propertyParameters)) {
                         $expr  = $propertyParameters['_expression'];
-                        $expr  = $this->performEmbeddedLink($request, $expr);
+                        $expr  = $this->performExpression($request, $expr);
                         $value = $this->storage->getRepository($propertyModel)->findByExpr($expr);
                     } else {
                         $value = $this->storage->getRepository($propertyModel)->findAll();
                     }
                 }
 
-                $setter = 'set' . ucfirst($propertyName);
-                $instance->$setter($value);
+                $instance->{'set' . ucfirst($propertyName)}($value);
             }
         }
 
@@ -274,16 +276,32 @@ class CrudController extends Controller
     protected function performLink(Request $request, $value)
     {
         if (strlen($value) > 2 && $value[0] === '{' && $value[strlen($value) - 1] === '}') {
-            $link = substr($value, 1, -1);
-            if ($request->query->has($link)) {
-                $value = $request->query->get($link);
-            } elseif ($request->request->has($link)) {
-                $value = $request->request->get($link);
-            } elseif ($request->attributes->has($link)) {
-                $value = $request->attributes->get($link);
-            } else {
-                throw new BadRequestHttpException(sprintf('Undefined parameter link: "%s"', $link));
-            }
+            return $this->getFromRequest($request, substr($value, 1, -1));
+        }
+
+        return $value;
+    }
+
+    /**
+     * Try to get value from request
+     *
+     * @param Request $request
+     * @param         $name
+     *
+     * @return mixed
+     */
+    protected function getFromRequest(Request $request, $name)
+    {
+        if ($request->query->has($name)) {
+            $value = $request->query->get($name);
+        } elseif ($request->request->has($name)) {
+            $value = $request->request->get($name);
+        } elseif ($request->attributes->has($name)) {
+            $value = $request->attributes->get($name);
+        } elseif ($request->cookies->has($name)) {
+            $value = $request->cookies->get($name);
+        } else {
+            throw new BadRequestHttpException(sprintf('Undefined parameter link: "%s"', $name));
         }
 
         return $value;
@@ -297,13 +315,14 @@ class CrudController extends Controller
      *
      * @return string
      */
-    protected function performEmbeddedLink(Request $request, $expression)
+    protected function performExpression(Request $request, $expression)
     {
         if (preg_match_all('/\{.+?\}/', $expression, $matches)) {
-            foreach ($matches as $match) {
-                $link       = current($match);
-                $value      = $this->performLink($request, $link);
-                $expression = str_replace($link, $value, $expression);
+            if (isset($matches[1])) {
+                foreach ($matches[1] as $match) {
+                    $value      = $this->getFromRequest($request, $match);
+                    $expression = str_replace($match, $value, $expression);
+                }
             }
         }
 
