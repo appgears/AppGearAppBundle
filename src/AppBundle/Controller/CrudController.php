@@ -148,11 +148,23 @@ class CrudController extends Controller
             if ($form->isSubmitted() && $form->isValid()) {
                 $modelRepository->save($entity);
 
-                if ($route = $request->attributes->get('_redirect')) {
-                    return $this->redirectToRoute($route);
-                } else {
-                    return new Response('Save!');
+                if ($redirect = $request->attributes->get('_redirect')) {
+                    if (is_string($redirect)) {
+                        return $this->redirectToRoute($redirect);
+                    } elseif (is_array($redirect) && array_key_exists('name', $redirect)) {
+                        $route      = $redirect['name'];
+                        $parameters = array_key_exists('parameters', $redirect) ? $redirect['parameters'] : [];
+                        $parameters = array_map(
+                            function ($parameter) use ($request) {
+                                return $this->performEmbeddedLink($request, $parameter);
+                            },
+                            $parameters
+                        );
+                        return $this->redirectToRoute($route, $parameters);
+                    }
                 }
+
+                return new Response('Save!');
             }
         }
 
