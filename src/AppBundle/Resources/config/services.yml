@@ -23,6 +23,8 @@ services:
     class: AppGear\AppBundle\Form\FormBuilder
     arguments:
       - @form.factory
+      - @app_gear.core.model.manager
+      - @ag.service.tagged_manager
       - @appgear.storage
 
   appgear.storage:

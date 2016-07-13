@@ -317,11 +317,11 @@ class CrudController extends Controller
      */
     protected function performExpression(Request $request, $expression)
     {
-        if (preg_match_all('/\{.+?\}/', $expression, $matches)) {
+        if (preg_match_all('/\{(.+?)\}/', $expression, $matches)) {
             if (isset($matches[1])) {
                 foreach ($matches[1] as $match) {
                     $value      = $this->getFromRequest($request, $match);
-                    $expression = str_replace($match, $value, $expression);
+                    $expression = str_replace('{' . $match . '}', $value, $expression);
                 }
             }
         }

@@ -7,6 +7,8 @@ use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\Model\ModelManager;
+use AppGear\PlatformBundle\Service\TaggedManager;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -30,14 +32,36 @@ class FormBuilder
     protected $storage;
 
     /**
+     * Tagged manager
+     *
+     * @var TaggedManager
+     */
+    private $taggedManager;
+
+    /**
+     * Model manager
+     *
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    /**
      * FormBuilder constructor.
      *
-     * @param FormFactoryInterface $formFactory Form factory
+     * @param FormFactoryInterface $formFactory   Form factory
+     * @param ModelManager         $modelManager  Model manager
+     * @param TaggedManager        $taggedManager Tagged services manager
+     * @param Storage              $storage       Storage
      */
-    public function __construct(FormFactoryInterface $formFactory, Storage $storage)
+    public function __construct(FormFactoryInterface $formFactory,
+                                ModelManager $modelManager,
+                                TaggedManager $taggedManager,
+                                Storage $storage)
     {
-        $this->formFactory = $formFactory;
-        $this->storage     = $storage;
+        $this->formFactory   = $formFactory;
+        $this->modelManager  = $modelManager;
+        $this->taggedManager = $taggedManager;
+        $this->storage       = $storage;
     }
 
     /**
@@ -56,7 +80,8 @@ class FormBuilder
             $propertyName = $property->getName();
 
             if ($property instanceof Field) {
-                $form->add($propertyName, TextType::class, [
+                $type = $this->resolveFieldType($property);
+                $form->add($propertyName, $type, [
                     'required' => false
                 ]);
             } elseif ($property instanceof Relationship) {
@@ -80,5 +105,24 @@ class FormBuilder
         $form->add('save', SubmitType::class, array('label' => 'Save'));
 
         return $form->getForm();
+    }
+
+    /**
+     * Resolve form field type for model field
+     *
+     * @param Field $field Model field
+     *
+     * @return mixed
+     */
+    private function resolveFieldType(Field $field)
+    {
+        $fieldModel = $this->modelManager->getByInstance($field);
+        
+        /** @var FormFieldTypeServiceInterface $service */
+        if ($service = $this->taggedManager->get('form.property.field.service', ['field' => $fieldModel->getName()])) {
+            return $service->getFormType();
+        }
+
+        return TextType::class;
     }
 }
