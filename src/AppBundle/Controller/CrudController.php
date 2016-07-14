@@ -303,7 +303,7 @@ class CrudController extends Controller
             if (isset($matches[1])) {
 
                 // If expression contains only parameter - then return this parameter (prevent cast to string)
-                if (count($matches[1]) === 1) {
+                if ((count($matches[1]) === 1) && ($expression[0] === '{') && ($expression[strlen($expression)-1] === '}')) {
                     return $this->getFromRequest($request, $matches[1][0]);
                 }
 
