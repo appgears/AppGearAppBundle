@@ -233,7 +233,7 @@ class CrudController extends Controller
 
                 if ($property instanceof Field) {
                     $value = $propertyParameters;
-                    $value = $this->performLink($request, $value);
+                    $value = $this->performExpression($request, $value);
                 } elseif ($property instanceof Relationship\ToOne) {
                     $value = $this->initialize($request, $propertyParameters, $property->getTarget());
                 } elseif ($property instanceof Relationship\ToMany) {
@@ -262,24 +262,6 @@ class CrudController extends Controller
         }
 
         return $instance;
-    }
-
-    /**
-     * If value is link - try to extract target value
-     * Else, return the original value
-     *
-     * @param Request $request Request
-     * @param string  $value   Value
-     *
-     * @return string
-     */
-    protected function performLink(Request $request, $value)
-    {
-        if (strlen($value) > 2 && $value[0] === '{' && $value[strlen($value) - 1] === '}') {
-            return $this->getFromRequest($request, substr($value, 1, -1));
-        }
-
-        return $value;
     }
 
     /**
@@ -319,6 +301,12 @@ class CrudController extends Controller
     {
         if (preg_match_all('/\{(.+?)\}/', $expression, $matches)) {
             if (isset($matches[1])) {
+
+                // If expression contains only parameter - then return this parameter (prevent cast to string)
+                if (count($matches[1]) === 1) {
+                    return $this->getFromRequest($request, $matches[1][0]);
+                }
+
                 foreach ($matches[1] as $match) {
                     $value      = $this->getFromRequest($request, $match);
                     $expression = str_replace('{' . $match . '}', $value, $expression);
