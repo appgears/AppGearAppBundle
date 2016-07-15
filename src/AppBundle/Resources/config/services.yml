@@ -24,7 +24,7 @@ services:
     arguments:
       - @form.factory
       - @app_gear.core.model.manager
-      - @ag.service.tagged_manager
+      - @app_gear.core.tagged_manager
       - @appgear.storage
 
   appgear.storage:
@@ -60,8 +60,20 @@ services:
     class: AppGear\AppBundle\View\ViewManager
     arguments:
       - @app_gear.core.model.manager
-      - @ag.service.tagged_manager
+      - @app_gear.core.tagged_manager
       - @service_container
+
+  appgear.twig.common_extension:
+      class: AppGear\AppBundle\Twig\CommonExtension
+      tags:
+          - { name: twig.extension }
+
+  appgear.twig.php_extension:
+      class: AppGear\AppBundle\Twig\PhpExtension
+      arguments:
+        - %app_gear_app.twig.php_extension.available_functions%
+      tags:
+          - { name: twig.extension }
 
   appgear.twig.translation_extension:
       class: AppGear\AppBundle\Twig\TranslationExtension

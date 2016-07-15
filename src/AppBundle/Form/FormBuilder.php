@@ -3,12 +3,12 @@
 namespace AppGear\AppBundle\Form;
 
 use AppGear\AppBundle\Storage\Storage;
+use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
-use AppGear\PlatformBundle\Service\TaggedManager;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
