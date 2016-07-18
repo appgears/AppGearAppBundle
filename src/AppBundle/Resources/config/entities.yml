@@ -12,11 +12,11 @@ services:
       - name: form.property.field.service
         field: app_gear.core_bundle.entity.property.field.datetime
 
-  appgear.entity_service.property.field.html_type_servce:
-    class: AppGear\AppBundle\EntityService\Property\Field\HtmlTypeService
+  appgear.entity_service.property.field.markdown_type_servce:
+    class: AppGear\AppBundle\EntityService\Property\Field\MarkdownTypeService
     tags:
       - name: form.property.field.service
-        field: app_gear.core_bundle.entity.property.field.html
+        field: app_gear.core_bundle.entity.property.field.markdown
 
   appgear.entity_service.property.field.text_type_servce:
     class: AppGear\AppBundle\EntityService\Property\Field\TextTypeService

@@ -5,7 +5,7 @@ namespace AppGear\AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-class HtmlType extends AbstractType
+class MarkdownType extends AbstractType
 {
     public function getParent()
     {
@@ -14,6 +14,6 @@ class HtmlType extends AbstractType
 
     public function getBlockPrefix()
     {
-        return 'html';
+        return 'markdown';
     }
 }

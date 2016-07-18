@@ -8,7 +8,7 @@ services:
       - @app_gear.core.tagged_manager
       - @appgear.storage
 
-  appgear.form.type.html:
-    class: AppGear\AppBundle\Form\Type\HtmlType
+  appgear.form.type.markdown:
+    class: AppGear\AppBundle\Form\Type\MarkdownType
     tags:
-      - { name: form.type, alias: html }
+      - { name: form.type, alias: markdown }

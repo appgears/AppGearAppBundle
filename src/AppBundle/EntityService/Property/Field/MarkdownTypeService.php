@@ -3,15 +3,15 @@
 namespace AppGear\AppBundle\EntityService\Property\Field;
 
 use AppGear\AppBundle\Form\FormFieldTypeServiceInterface;
-use AppGear\AppBundle\Form\Type\HtmlType;
+use AppGear\AppBundle\Form\Type\MarkdownType;
 
-class HtmlTypeService implements FormFieldTypeServiceInterface
+class MarkdownTypeService implements FormFieldTypeServiceInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return HtmlType::class;
+        return MarkdownType::class;
     }
 }
