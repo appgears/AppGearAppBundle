@@ -1,5 +1,8 @@
 {% block markdown_widget %}
     {% spaceless %}
         {{ block('textarea_widget') }}
+        <script type="text/javascript">
+            new SimpleMDE({element: document.getElementById("{{ id }}")});
+        </script>
     {% endspaceless %}
 {% endblock %}
