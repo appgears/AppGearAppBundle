@@ -19,14 +19,6 @@ services:
     tags:
     - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
-  appgear.form.builder:
-    class: AppGear\AppBundle\Form\FormBuilder
-    arguments:
-      - @form.factory
-      - @app_gear.core.model.manager
-      - @app_gear.core.tagged_manager
-      - @appgear.storage
-
   appgear.storage:
     class: AppGear\AppBundle\Storage\Storage
     arguments:

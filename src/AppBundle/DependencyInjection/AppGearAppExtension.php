@@ -19,6 +19,7 @@ class AppGearAppExtension extends Extension
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('entities.yml');
+        $loader->load('form.yml');
         $loader->load('services.yml');
 
         $container->setParameter('appgear.application.route404.enabled', $config['route404']['enabled']);

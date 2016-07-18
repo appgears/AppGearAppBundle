@@ -1,0 +1,14 @@
+services:
+
+  appgear.form.builder:
+    class: AppGear\AppBundle\Form\FormBuilder
+    arguments:
+      - @form.factory
+      - @app_gear.core.model.manager
+      - @app_gear.core.tagged_manager
+      - @appgear.storage
+
+  appgear.form.type.html:
+    class: AppGear\AppBundle\Form\Type\HtmlType
+    tags:
+      - { name: form.type, alias: html }
