@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
+use League\CommonMark\CommonMarkConverter;
 use Twig_Extension;
 use Twig_SimpleFilter;
 
@@ -36,6 +37,7 @@ class ViewExtension extends Twig_Extension
     {
         return array(
             new Twig_SimpleFilter('view_render', array($this, 'render')),
+            new Twig_SimpleFilter('markdown_typograph', array($this, 'markdownTypograph'), array('is_safe' => array('html'))),
         );
     }
 
@@ -49,6 +51,21 @@ class ViewExtension extends Twig_Extension
     public function render(View $view)
     {
         return $this->viewManager->getViewService($view)->render();
+    }
+
+    /**
+     * Render markdown to html and processing html
+     *
+     * @param string $markdown Markdown text
+     *
+     * @return string
+     */
+    public function markdownTypograph($markdown)
+    {
+        $converter = new CommonMarkConverter();
+        $html = $converter->convertToHtml($markdown);
+
+        return $html;
     }
 
     /**

@@ -78,15 +78,3 @@ services:
           - @appgear.view.manager
       tags:
           - { name: twig.extension }
-
-  aptoma.twig.markdown_extension:
-    class: Aptoma\Twig\Extension\MarkdownExtension
-    arguments:
-      - @aptoma.twig.markdown_engine.phpleague_common_mark_engine
-    public: false
-    tags:
-        - { name: twig.extension }
-
-  aptoma.twig.markdown_engine.phpleague_common_mark_engine:
-    class: Aptoma\Twig\Extension\MarkdownEngine\PHPLeagueCommonMarkEngine
-    public: false
