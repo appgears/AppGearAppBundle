@@ -1,4 +1,23 @@
+parameters:
+  memcache.host: localhost
+  memcache.port: 11211
+
 services:
+
+  appgear.cache.cache_manager:
+      class: AppGear\AppBundle\Cache\CacheManager
+      arguments:
+        - @doctrine.cache.memcache
+
+  doctrine.cache.memcache:
+    class: Doctrine\Common\Cache\MemcacheCache
+    calls:
+      - [setMemcache, [@memcache]]
+
+  memcache:
+    class: Memcache
+    calls:
+      - [addserver, [%memcache.host%, %memcache.port%]]
 
   appgear.controller.crud:
     class: AppGear\AppBundle\Controller\CrudController
@@ -76,5 +95,6 @@ services:
       class: AppGear\AppBundle\Twig\ViewExtension
       arguments:
           - @appgear.view.manager
+          - @appgear.cache.cache_manager
       tags:
           - { name: twig.extension }

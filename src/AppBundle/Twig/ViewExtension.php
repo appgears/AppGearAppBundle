@@ -2,12 +2,10 @@
 
 namespace AppGear\AppBundle\Twig;
 
+use AppGear\AppBundle\Cache\CacheManager;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
 use League\CommonMark\CommonMarkConverter;
-use simplehtmldom_1_5\simple_html_dom;
-use simplehtmldom_1_5\simple_html_dom_node;
-use Sunra\PhpSimple\HtmlDomParser;
 use Symfony\Component\DomCrawler\Crawler;
 use Twig_Extension;
 use Twig_SimpleFilter;
@@ -25,13 +23,22 @@ class ViewExtension extends Twig_Extension
     private $viewManager;
 
     /**
+     * Cache manager
+     *
+     * @var CacheManager
+     */
+    private $cacheManager;
+
+    /**
      * ViewExtension constructor.
      *
-     * @param ViewManager $viewManager View manager
+     * @param ViewManager  $viewManager  View manager
+     * @param CacheManager $cacheManager Cache manager
      */
-    public function __construct(ViewManager $viewManager)
+    public function __construct(ViewManager $viewManager, CacheManager $cacheManager)
     {
-        $this->viewManager = $viewManager;
+        $this->viewManager  = $viewManager;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -66,6 +73,11 @@ class ViewExtension extends Twig_Extension
      */
     public function markdownTypograph($markdown)
     {
+        $cacheKey = 'markdown_' . md5($markdown);
+        if ($this->cacheManager->contains($cacheKey)) {
+            return $this->cacheManager->fetch($cacheKey);
+        }
+
         $converter = new CommonMarkConverter();
         $html      = $converter->convertToHtml($markdown);
 
@@ -102,6 +114,8 @@ class ViewExtension extends Twig_Extension
         foreach ($matches[1] as $match) {
             $html = str_replace($match, html_entity_decode($match), $html);
         }
+
+        $this->cacheManager->save($cacheKey, $html);
 
         return $html;
     }
