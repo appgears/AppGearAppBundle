@@ -16,6 +16,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * Provide method for populate MetadataFactory with metadata from the model and related models
+ *
+ * @todo Use http://doctrine-orm.readthedocs.io/projects/doctrine-orm/en/latest/reference/advanced-configuration.html#metadata-driver-required
  */
 class ClassMetadataPopulate
 {
