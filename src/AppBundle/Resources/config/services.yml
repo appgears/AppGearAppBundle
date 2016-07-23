@@ -19,14 +19,6 @@ services:
     calls:
       - [addserver, [%memcache.host%, %memcache.port%]]
 
-  appgear.storage.proxy_cache_warmer:
-    class: AppGear\AppBundle\Storage\CacheWarmer\ProxyCacheWarmer
-    arguments:
-      - @doctrine.orm.entity_manager
-      - @app_gear.core.model.manager
-    tags:
-    - { name: kernel.cache_warmer, priority: 0 }
-
   appgear.controller.crud:
     class: AppGear\AppBundle\Controller\CrudController
     arguments:
