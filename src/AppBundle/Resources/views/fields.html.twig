@@ -1,0 +1,22 @@
+{% block widget_property %}
+    {% spaceless %}
+        {% if (property|class) != 'ToMany' %}
+            {% set _block = block('widget_' ~ ((property|class))|lower) %}
+            {% if _block is not empty %}
+                {{ _block|raw }}
+            {% else %}
+                {{ attribute(entity, property.name) }}
+            {% endif %}
+        {% else %}
+            {% for item in attribute(entity, property.name) %}
+                {{ item }}
+            {% endfor %}
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
+
+{% block widget_text %}
+    {% spaceless %}
+        {{ attribute(entity, property.name)|nl2br|raw }}
+    {% endspaceless %}
+{% endblock %}
