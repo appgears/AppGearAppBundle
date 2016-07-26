@@ -101,7 +101,7 @@ class CrudController extends Controller
         return new Response($this->viewManager->getViewService($view)->render());
     }
 
-    /**```
+    /**
      * Action for form view and process
      *
      * @param Request $request Request
@@ -160,6 +160,7 @@ class CrudController extends Controller
                             },
                             $parameters
                         );
+
                         return $this->redirectToRoute($route, $parameters);
                     }
                 }
@@ -169,6 +170,28 @@ class CrudController extends Controller
         }
 
         return new Response($this->viewManager->getViewService($view)->render());
+    }
+
+    /**
+     * Action for entity removing
+     *
+     * @param Request $request Request
+     *
+     * @return Response
+     */
+    public function removeAction(Request $request)
+    {
+        $modelId = $this->requireAttribute($request, '_model');
+        $modelId = $this->performExpression($request, $modelId);
+        $model   = $this->modelManager->get($modelId);
+
+        if (!$request->request->has('id')) {
+            throw new BadRequestHttpException('Undefined id parameter');
+        }
+        $id = $request->request->get('id');
+
+        $repository = $this->storage->getRepository($model);
+        $repository->remove($id);
     }
 
     /**
@@ -303,7 +326,7 @@ class CrudController extends Controller
             if (isset($matches[1])) {
 
                 // If expression contains only parameter - then return this parameter (prevent cast to string)
-                if ((count($matches[1]) === 1) && ($expression[0] === '{') && ($expression[strlen($expression)-1] === '}')) {
+                if ((count($matches[1]) === 1) && ($expression[0] === '{') && ($expression[strlen($expression) - 1] === '}')) {
                     return $this->getFromRequest($request, $matches[1][0]);
                 }
 
