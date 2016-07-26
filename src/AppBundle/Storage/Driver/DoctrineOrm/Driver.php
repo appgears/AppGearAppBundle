@@ -63,17 +63,6 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function save(Model $model, $object)
-    {
-        $this->classMetadataPopulate->populate($model);
-
-        $this->objectManager->persist($object);
-        $this->objectManager->flush();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function findAll(Model $model)
     {
         return $this->getObjectRepository($model)->findAll();
@@ -133,6 +122,27 @@ class Driver extends DriverAbstract
         $criteria->andWhere($expr);
 
         return $this->getObjectRepository($model)->matching($criteria);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save(Model $model, $object)
+    {
+        $this->classMetadataPopulate->populate($model);
+
+        $this->objectManager->persist($object);
+        $this->objectManager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove(Model $model, $object)
+    {
+        $this->classMetadataPopulate->populate($model);
+        $this->objectManager->remove($object);
+        $this->objectManager->flush();
     }
 
     /**

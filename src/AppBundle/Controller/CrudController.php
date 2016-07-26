@@ -12,6 +12,7 @@ use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -148,23 +149,9 @@ class CrudController extends Controller
             if ($form->isSubmitted() && $form->isValid()) {
                 $modelRepository->save($entity);
 
-                if ($redirect = $request->attributes->get('_redirect')) {
-                    if (is_string($redirect)) {
-                        return $this->redirectToRoute($redirect);
-                    } elseif (is_array($redirect) && array_key_exists('name', $redirect)) {
-                        $route      = $redirect['name'];
-                        $parameters = array_key_exists('parameters', $redirect) ? $redirect['parameters'] : [];
-                        $parameters = array_map(
-                            function ($parameter) use ($request) {
-                                return $this->performExpression($request, $parameter);
-                            },
-                            $parameters
-                        );
-
-                        return $this->redirectToRoute($route, $parameters);
-                    }
+                if ($redirect = $this->performRedirect($request)) {
+                    return $redirect;
                 }
-
                 return new Response('Save!');
             }
         }
@@ -191,7 +178,42 @@ class CrudController extends Controller
         $id = $request->request->get('id');
 
         $repository = $this->storage->getRepository($model);
-        $repository->remove($id);
+        $entity = $repository->find($id);
+        $repository->remove($entity);
+
+        if ($redirect = $this->performRedirect($request)) {
+            return $redirect;
+        }
+        return new Response('Deleted!');
+    }
+
+    /**
+     * Perform redirect if redirect is configured
+     *
+     * @param Request $request Request
+     *
+     * @return null|RedirectResponse
+     */
+    protected function performRedirect(Request $request)
+    {
+        if (!$redirect = $request->attributes->get('_redirect')) {
+            return null;
+        }
+
+        if (is_string($redirect)) {
+            return $this->redirectToRoute($redirect);
+        } elseif (is_array($redirect) && array_key_exists('name', $redirect)) {
+            $route      = $redirect['name'];
+            $parameters = array_key_exists('parameters', $redirect) ? $redirect['parameters'] : [];
+            $parameters = array_map(
+                function ($parameter) use ($request) {
+                    return $this->performExpression($request, $parameter);
+                },
+                $parameters
+            );
+
+            return $this->redirectToRoute($route, $parameters);
+        }
     }
 
     /**
