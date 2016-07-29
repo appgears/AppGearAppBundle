@@ -21,6 +21,11 @@ class Column
     protected $inversedBy;
     
     /**
+     * OrderBy
+     */
+    protected $orderBy;
+    
+    /**
      * Set identifier
      */
     public function setIdentifier($identifier)
@@ -69,5 +74,22 @@ class Column
     public function getInversedBy()
     {
         return $this->inversedBy;
+    }
+    
+    /**
+     * Set orderBy
+     */
+    public function setOrderBy($orderBy)
+    {
+        $this->orderBy = $orderBy;
+        return $this;
+    }
+    
+    /**
+     * Get orderBy
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
     }
 }

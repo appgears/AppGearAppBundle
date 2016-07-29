@@ -11,6 +11,9 @@ models:
       inversedBy:
         field:
           type: app_gear.core_bundle.entity.property.field.string
+      orderBy:
+        field:
+          type: app_gear.core_bundle.entity.property.field.string
 
   ui.translation:
     properties:

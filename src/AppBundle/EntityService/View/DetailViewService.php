@@ -15,14 +15,14 @@ class DetailViewService extends ViewService
      *
      * @var Storage
      */
-    private $storage;
+    protected $storage;
 
     /**
      * Model manager
      *
      * @var ModelManager
      */
-    private $modelManager;
+    protected $modelManager;
 
     /**
      * ViewService constructor.

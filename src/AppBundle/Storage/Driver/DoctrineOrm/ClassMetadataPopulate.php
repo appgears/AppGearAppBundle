@@ -159,14 +159,15 @@ class ClassMetadataPopulate
                         if ($extension instanceof Column) {
                             if (strlen($mappedBy = $extension->getMappedBy())) {
                                 $mapping['mappedBy'] = $mappedBy;
-                                break;
                             } elseif (strlen($inversedBy = $extension->getInversedBy())) {
                                 $mapping['inversedBy'] = $inversedBy;
                                 $mapping['joinColumn'] = [
                                     'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
                                     'referencedColumnName' => 'id'
                                 ];
-                                break;
+                            }
+                            if (strlen($orderBy = $extension->getOrderBy())) {
+                                $mapping['orderBy'] = [$orderBy => 'ASC'];
                             }
                         }
                     }
