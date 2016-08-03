@@ -40,6 +40,7 @@ services:
     arguments:
       - @doctrine.orm.entity_manager
       - @app_gear.core.model.manager
+      - @app_gear.core.tagged_manager
 
   appgear.storage.driver.doctrine_phpcr:
     class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\Driver

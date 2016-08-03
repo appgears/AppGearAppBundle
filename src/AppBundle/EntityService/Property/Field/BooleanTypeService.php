@@ -4,16 +4,17 @@ namespace AppGear\AppBundle\EntityService\Property\Field;
 
 use AppGear\AppBundle\Form\FormFieldTypeServiceInterface;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class DateTimeTypeService implements FormFieldTypeServiceInterface, MysqlFieldTypeServiceInterface
+class BooleanTypeService implements FormFieldTypeServiceInterface, MysqlFieldTypeServiceInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return DateTimeType::class;
+        return CheckboxType::class;
     }
 
     /**
@@ -21,10 +22,7 @@ class DateTimeTypeService implements FormFieldTypeServiceInterface, MysqlFieldTy
      */
     public function getFormOptions()
     {
-        return [
-            'widget' => 'single_text',
-            'format' => 'yyyy-MM-dd HH:mm:ss'
-        ];
+        return [];
     }
 
     /**
@@ -32,6 +30,6 @@ class DateTimeTypeService implements FormFieldTypeServiceInterface, MysqlFieldTy
      */
     public function getMysqlFieldType()
     {
-        return 'datetime';
+        return 'boolean';
     }
 }

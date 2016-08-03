@@ -14,4 +14,12 @@ class MarkdownTypeService implements FormFieldTypeServiceInterface
     {
         return MarkdownType::class;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormOptions()
+    {
+        return [];
+    }
 }

@@ -3,6 +3,8 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
 use AppGear\AppBundle\Entity\Storage\Column;
+use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
+use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
@@ -43,15 +45,25 @@ class ClassMetadataPopulate
     private $modelManager;
 
     /**
+     * Tagged manager
+     *
+     * @var TaggedManager
+     */
+    private $taggedManager;
+
+    /**
      * ClassMetadataPopulate constructor.
      *
      * @param ClassMetadataFactory $metadataFactory Class metadata factory
      * @param ModelManager         $modelManager    Model manager
+     * @param TaggedManager        $taggedManager   Tagged manager
      */
-    public function __construct(ClassMetadataFactory $metadataFactory, ModelManager $modelManager)
+    public function __construct(ClassMetadataFactory $metadataFactory, ModelManager $modelManager,
+                                TaggedManager $taggedManager)
     {
         $this->metadataFactory = $metadataFactory;
         $this->modelManager    = $modelManager;
+        $this->taggedManager   = $taggedManager;
     }
 
     /**
@@ -137,7 +149,7 @@ class ClassMetadataPopulate
     {
         foreach ($model->getProperties() as $property) {
             if ($property instanceof Field) {
-                $mapping = ['fieldName' => $property->getName(), 'type' => 'string'];
+                $mapping = ['fieldName' => $property->getName(), 'type' => $this->resolveFieldType($property)];
                 foreach ($property->getExtensions() as $extension) {
                     if ($extension instanceof Column && $extension->getIdentifier()) {
                         $mapping['id'] = true;
@@ -205,7 +217,7 @@ class ClassMetadataPopulate
 
                 if ($property instanceof Field) {
                         $mapping['columnName'] = $property->getName();
-                        $mapping['type'] = 'string';
+                        $mapping['type'] = $this->resolveFieldType($property);
                     foreach ($property->getExtensions() as $extension) {
                         if ($extension instanceof Column && $extension->getIdentifier()) {
                             $mapping['id'] = true;
@@ -267,6 +279,24 @@ class ClassMetadataPopulate
         }
     }
 
+    /**
+     * Resolve field type for model field
+     *
+     * @param Field $field Model field
+     *
+     * @return mixed
+     */
+    private function resolveFieldType(Field $field)
+    {
+        $fieldModel = $this->modelManager->getByInstance($field);
+
+        /** @var MysqlFieldTypeServiceInterface $service */
+        if ($service = $this->taggedManager->get('storage.platform.mysql.property.field.service', ['field' => $fieldModel->getName()])) {
+            return $service->getMysqlFieldType();
+        }
+
+        return 'string';
+    }
 
     /**
      * Determine if relationship is ManyToMany

@@ -6,10 +6,20 @@ services:
       - name: extension.property.computed
         model: app_gear.app_bundle.entity.ui.sluggable
 
+  appgear.entity_service.property.field.boolean_type_servce:
+    class: AppGear\AppBundle\EntityService\Property\Field\BooleanTypeService
+    tags:
+      - name: form.property.field.service
+        field: app_gear.core_bundle.entity.property.field.boolean
+      - name: storage.platform.mysql.property.field.service
+        field: app_gear.core_bundle.entity.property.field.boolean
+
   appgear.entity_service.property.field.datetime_type_servce:
     class: AppGear\AppBundle\EntityService\Property\Field\DateTimeTypeService
     tags:
       - name: form.property.field.service
+        field: app_gear.core_bundle.entity.property.field.datetime
+      - name: storage.platform.mysql.property.field.service
         field: app_gear.core_bundle.entity.property.field.datetime
 
   appgear.entity_service.property.field.markdown_type_servce:

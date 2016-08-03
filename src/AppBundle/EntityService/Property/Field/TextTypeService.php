@@ -14,4 +14,12 @@ class TextTypeService implements FormFieldTypeServiceInterface
     {
         return TextareaType::class;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormOptions()
+    {
+        return [];
+    }
 }

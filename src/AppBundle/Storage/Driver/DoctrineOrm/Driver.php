@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
 use AppGear\AppBundle\Storage\DriverAbstract;
+use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
@@ -51,12 +52,14 @@ class Driver extends DriverAbstract
      *
      * @param ObjectManager $objectManager Manager registry
      * @param ModelManager  $modelManager  Model manager
+     * @param TaggedManager $taggedManager Tagged manager
      */
-    public function __construct(ObjectManager $objectManager, ModelManager $modelManager)
+    public function __construct(ObjectManager $objectManager, ModelManager $modelManager, TaggedManager $taggedManager)
     {
         $this->objectManager         = $objectManager;
         $this->modelManager          = $modelManager;
-        $this->classMetadataPopulate = new ClassMetadataPopulate($objectManager->getMetadataFactory(), $modelManager);
+        $this->classMetadataPopulate = new ClassMetadataPopulate($objectManager->getMetadataFactory(), $modelManager,
+            $taggedManager);
         $this->expressionLanguage    = new ExpressionLanguage();
     }
 
