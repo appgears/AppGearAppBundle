@@ -37,16 +37,15 @@ class PhpExtension extends \Twig_Extension
     {
         $result = array();
 
-        // Перебираем все атомы с тегом ag.twig, то есть атомы доступные в твиг-шаблонах
         foreach ($this->availableFunctions as $function) {
 
-            // Создаем замыкание, которое будет вызывать атом
-            $callback = function() use($function) {
-                $args = func_get_args();
-                return call_user_func_array($function, $args);
-            };
+            if (is_array($function) && !is_numeric(key($function))) {
+                $callback = current($function);
+                $function = key($function);
+            } else {
+                $callback = $function;
+            }
 
-            // Добавляем всё это в твиг
             $result[] =  new \Twig_SimpleFilter($function, $callback);
         }
 
