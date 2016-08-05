@@ -3,12 +3,8 @@
 namespace AppGear\AppBundle\Twig;
 
 use AppGear\PlatformBundle\Entity\Model\Property\Relationship;
-use AppGear\PlatformBundle\Service\Entity\View\FindTemplate;
-use Cosmologist\Gears\Obj\PropertyRecursiveAccess;
-use Twig_Environment;
 use Twig_Extension;
 use Twig_SimpleFilter;
-use Twig_SimpleFunction;
 
 /**
  * Common twig extension

@@ -4,7 +4,7 @@ namespace AppGear\AppBundle\Storage;
 
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
-use Cosmologist\Gears\Fs;
+use Cosmologist\Gears\FileSystem;
 
 abstract class ProxyManagerAbstract
 {
@@ -85,6 +85,6 @@ abstract class ProxyManagerAbstract
      */
     protected function buildProxyClassFilePath($fqcn)
     {
-        return Fs::joinPaths([$this->cacheDir, Fs::normalizeSeparators($fqcn)]) . '.php';
+        return FileSystem::joinPaths([$this->cacheDir, FileSystem::normalizeSeparators($fqcn)]) . '.php';
     }
 }
