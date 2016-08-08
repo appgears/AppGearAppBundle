@@ -20,3 +20,9 @@
         {{ attribute(entity, property.name)|nl2br|raw }}
     {% endspaceless %}
 {% endblock %}
+
+{% block widget_datetime %}
+    {% spaceless %}
+        {{ attribute(entity, property.name)|date('Y-m-d H:i:s') }}
+    {% endspaceless %}
+{% endblock %}
