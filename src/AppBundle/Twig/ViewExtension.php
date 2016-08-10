@@ -105,8 +105,10 @@ class ViewExtension extends Twig_Extension
         }
 
         $html = '';
-        foreach ($crawler->getNode(0)->childNodes->item(0)->childNodes as $childNode) {
-            $html .= $childNode->ownerDocument->saveXML($childNode);
+        if ($crawler->getNode(0)) {
+            foreach ($crawler->getNode(0)->childNodes->item(0)->childNodes as $childNode) {
+                $html .= $childNode->ownerDocument->saveXML($childNode);
+            }
         }
 
         // Fix bug with encoded image alt-text
