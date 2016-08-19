@@ -42,6 +42,9 @@ services:
       - @app_gear.core.model.manager
       - @app_gear.core.tagged_manager
 
+  appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver:
+    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
+
   appgear.storage.driver.doctrine_phpcr:
     class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\Driver
     arguments:
