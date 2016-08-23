@@ -34,13 +34,6 @@ class Driver extends DriverAbstract
     private $modelManager;
 
     /**
-     * ClassMetadataPopulate instance
-     *
-     * @var ClassMetadataPopulate
-     */
-    private $classMetadataPopulate;
-
-    /**
      * Expression language component
      *
      * @var ExpressionLanguage
@@ -56,11 +49,9 @@ class Driver extends DriverAbstract
      */
     public function __construct(ObjectManager $objectManager, ModelManager $modelManager, TaggedManager $taggedManager)
     {
-        $this->objectManager         = $objectManager;
-        $this->modelManager          = $modelManager;
-        $this->classMetadataPopulate = new ClassMetadataPopulate($objectManager->getMetadataFactory(), $modelManager,
-            $taggedManager);
-        $this->expressionLanguage    = new ExpressionLanguage();
+        $this->objectManager      = $objectManager;
+        $this->modelManager       = $modelManager;
+        $this->expressionLanguage = new ExpressionLanguage();
     }
 
     /**
@@ -132,8 +123,6 @@ class Driver extends DriverAbstract
      */
     public function save(Model $model, $object)
     {
-        $this->classMetadataPopulate->populate($model);
-
         $this->objectManager->persist($object);
         $this->objectManager->flush();
     }
@@ -143,7 +132,6 @@ class Driver extends DriverAbstract
      */
     public function remove(Model $model, $object)
     {
-        $this->classMetadataPopulate->populate($model);
         $this->objectManager->remove($object);
         $this->objectManager->flush();
     }
@@ -157,8 +145,8 @@ class Driver extends DriverAbstract
      */
     protected function getObjectRepository(Model $model)
     {
-        $classMetadata = $this->classMetadataPopulate->populate($model);
+        $fqcn = $this->modelManager->fullClassName($model->getName());
 
-        return $this->objectManager->getRepository($classMetadata->getName());
+        return $this->objectManager->getRepository($fqcn);
     }
 }

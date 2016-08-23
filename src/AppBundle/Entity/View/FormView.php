@@ -3,7 +3,7 @@
 namespace AppGear\AppBundle\Entity\View;
 
 use AppGear\AppBundle\Entity\View;
-class FormView extends View
+abstract class FormView extends View
 {
     
     /**
