@@ -66,6 +66,11 @@ class AppGearModelDriver implements MappingDriver
 
         $metadata->setPrimaryTable(['name' => $this->buildTableName($className)]);
 
+        // Если текущая сущность не абстрактная, то надо добавить её в discriminator map
+        if (!$model->getAbstract() && count($this->modelManager->children($model->getName())) > 0) {
+            $metadata->addDiscriminatorMapClass(str_replace('\\', '', $className), $className);
+        }
+
         // Inheritance
         $modelChildren = $this->modelManager->children($model->getName());
         if (count($modelChildren) > 0) {

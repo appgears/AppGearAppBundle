@@ -2,7 +2,7 @@
 
 namespace AppGear\AppBundle\Entity;
 
-abstract class View
+class View
 {
     
     /**

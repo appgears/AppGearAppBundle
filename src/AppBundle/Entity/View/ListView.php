@@ -3,7 +3,7 @@
 namespace AppGear\AppBundle\Entity\View;
 
 use AppGear\AppBundle\Entity\View;
-abstract class ListView extends View
+class ListView extends View
 {
     
     /**
