@@ -128,6 +128,7 @@ class AppGearModelDriver implements MappingDriver
                     if ($extension instanceof Column && $extension->getIdentifier()) {
                         $mapping['id'] = true;
                         $classMetadata->setIdGenerator(new IdentityGenerator());
+                        $classMetadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
                         break;
                     }
                 }
