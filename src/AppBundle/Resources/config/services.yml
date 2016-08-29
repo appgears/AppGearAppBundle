@@ -37,6 +37,8 @@ services:
 
   appgear.storage.driver.manager:
     class: AppGear\AppBundle\Storage\DriverManager
+    arguments:
+      - "@service_container"
 
   appgear.storage.driver.doctrine_orm:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
@@ -50,17 +52,17 @@ services:
   appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
     calls:
-      - [setModelManager, ['@appgear.storage.driver.manager']]
+      - [setDriverManager, ['@appgear.storage.driver.manager']]
       - [setModelManager, ['@app_gear.core.model.manager']]
       - [setTaggedManager, ['@app_gear.core.tagged_manager']]
 
-  appgear.storage.driver.doctrine_phpcr:
-    class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\Driver
-    arguments:
-      - @doctrine_phpcr
-      - @appgear.storage.driver.doctrine_phpcr.proxy_manager
-    tags:
-        - { name: appgear.storage.driver, alias: doctrine_phpcr }
+#  appgear.storage.driver.doctrine_phpcr:
+#    class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\Driver
+#    arguments:
+#      - @doctrine_phpcr
+#      - @appgear.storage.driver.doctrine_phpcr.proxy_manager
+#    tags:
+#        - { name: appgear.storage.driver, alias: doctrine_phpcr }
 
   appgear.storage.proxy_manager_abstract:
     class: AppGear\AppBundle\Storage\ProxyManagerAbstract

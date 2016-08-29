@@ -19,6 +19,11 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class AppGearModelDriver implements MappingDriver
 {
     /**
+     * DoctrineOrm driver name
+     */
+    const DRIVER_NAME = 'appgear.storage.driver.doctrine_orm';
+
+    /**
      * Driver manager
      *
      * @var DriverManager
@@ -96,7 +101,7 @@ class AppGearModelDriver implements MappingDriver
         if (count($modelChildren) > 0) {
 
             $metadata->setInheritanceType(ClassMetadataInfo::INHERITANCE_TYPE_JOINED);
-            $metadata->setDiscriminatorColumn(['name' => '_discriminator']);
+            $metadata->setDiscriminatorColumn(['name' => '_discriminator', 'length' => null]);
 
             foreach ($modelChildren as $child) {
                 $childEntityClass = $this->modelManager->fullClassName($child->getName());
@@ -120,7 +125,18 @@ class AppGearModelDriver implements MappingDriver
      */
     public function getAllClassNames()
     {
-        throw new \RuntimeException('AppGearModelDriver::getAllClassNames not implemented');
+        $classNames         = [];
+        $registeredPrefixes = $this->driverManager->getPrefixes(self::DRIVER_NAME);
+        $registeredModels   = $this->modelManager->all();
+        foreach ($registeredModels as $model) {
+            foreach ($registeredPrefixes as $prefix) {
+                if (strpos($model->getName(), $prefix) === 0) {
+                    $classNames[] = $this->modelManager->fullClassName($model->getName());
+                }
+            }
+        }
+
+        return $classNames;
     }
 
     /**

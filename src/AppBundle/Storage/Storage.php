@@ -57,9 +57,8 @@ class Storage
         if (array_key_exists($model->getName(), $this->repositories)) {
             return $this->repositories[$model->getName()];
         }
-
-        $fqcn                                  = $this->modelManager->fullClassName($model->getName());
-        $driver                                = $this->driverManager->getDriver($fqcn);
+        
+        $driver                                = $this->driverManager->getDriver($model->getName());
         $repository                            = new Repository($driver, $model, $this->modelManager);
         $this->repositories[$model->getName()] = $repository;
 

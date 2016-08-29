@@ -2,21 +2,31 @@
 
 namespace AppGear\AppBundle\Storage;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 class DriverManager
 {
     /**
-     * Map between classes (class prefixes) and suitable drivers
+     * Map between models (models prefixes) and suitable drivers
      *
      * @var array
      */
     private $prefixes = [];
 
     /**
-     * Drivers
+     * Container
      *
-     * @var array
+     * @var ContainerInterface
      */
-    private $drivers = [];
+    private $container;
+
+    /**
+     * @param ContainerInterface $container Container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Add prefix for driver
@@ -26,7 +36,7 @@ class DriverManager
      *
      * @return $this
      */
-    public function addDriverPrefix($alias, $prefix)
+    public function addPrefix($alias, $prefix)
     {
         if (!array_key_exists($alias, $this->prefixes)) {
             $this->prefixes[$alias] = [];
@@ -37,37 +47,38 @@ class DriverManager
     }
 
     /**
-     * Add driver
+     * Return driver for model
      *
-     * @param string         $alias  Driver alias
-     * @param DriverAbstract $driver Driver
-     *
-     * @return $this
-     */
-    public function addDriver($alias, DriverAbstract $driver)
-    {
-        $this->drivers[$alias] = $driver;
-
-        return $this;
-    }
-
-    /**
-     * Return driver for classes with passed prefix
-     *
-     * @param string $fqcn FQCN
+     * @param string $modelName The model name
      *
      * @return DriverAbstract
      */
-    public function getDriver($fqcn)
+    public function getDriver($modelName)
     {
         foreach ($this->prefixes as $driverAlias => $prefixes) {
             foreach ($prefixes as $prefix) {
-                if ((strpos($fqcn, $prefix) === 0) && (array_key_exists($driverAlias, $this->drivers))) {
-                    return $this->drivers[$driverAlias];
+                if ((strpos($modelName, $prefix) === 0) && (array_key_exists($driverAlias, $this->prefixes))) {
+                    return $this->container->get($driverAlias);
                 }
             }
         }
 
-        throw new \RuntimeException(sprintf('Driver for class "%" not found', $fqcn));
+        throw new \RuntimeException(sprintf('Driver for model "%" not found', $modelName));
+    }
+
+    /**
+     * Return all prefixes under the driver
+     *
+     * @param string $driverAlias Driver alias
+     *
+     * @return array
+     */
+    public function getPrefixes($driverAlias)
+    {
+        if (array_key_exists($driverAlias, $this->prefixes)) {
+            return $this->prefixes[$driverAlias];
+        }
+
+        return [];
     }
 }
