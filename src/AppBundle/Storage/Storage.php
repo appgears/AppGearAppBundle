@@ -9,18 +9,18 @@ use AppGear\CoreBundle\Model\ModelManager;
 class Storage
 {
     /**
-     * Storage driver
+     * Storage drivers manager
      *
-     * @var Driver
+     * @var DriverManager
      */
-    protected $driver;
+    protected $driverManager;
 
     /**
      * Models manager
      *
      * @var ModelManager
      */
-    protected $manager;
+    protected $modelManager;
 
     /**
      * Repositories cache
@@ -32,13 +32,13 @@ class Storage
     /**
      * CrudController constructor.
      *
-     * @param DriverAbstract $driver  Storage driver
-     * @param ModelManager   $manager Models manager
+     * @param DriverManager $driverManager Drivers manager
+     * @param ModelManager  $modelManager  Models manager
      */
-    public function __construct(DriverAbstract $driver, ModelManager $manager)
+    public function __construct(DriverManager $driverManager, ModelManager $modelManager)
     {
-        $this->driver  = $driver;
-        $this->manager = $manager;
+        $this->driverManager = $driverManager;
+        $this->modelManager  = $modelManager;
     }
 
     /**
@@ -51,14 +51,16 @@ class Storage
     public function getRepository($model)
     {
         if (is_string($model)) {
-            $model = $this->manager->get($model);
+            $model = $this->modelManager->get($model);
         }
 
         if (array_key_exists($model->getName(), $this->repositories)) {
             return $this->repositories[$model->getName()];
         }
 
-        $repository                            = new Repository($this->driver, $model, $this->manager);
+        $fqcn                                  = $this->modelManager->fullClassName($model->getName());
+        $driver                                = $this->driverManager->getDriver($fqcn);
+        $repository                            = new Repository($driver, $model, $this->modelManager);
         $this->repositories[$model->getName()] = $repository;
 
         return $repository;

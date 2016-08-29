@@ -29,6 +29,15 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('route')->end()
                     ->end()
                 ->end()
+                ->arrayNode('storage')
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('prefixes')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

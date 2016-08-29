@@ -32,8 +32,11 @@ services:
   appgear.storage:
     class: AppGear\AppBundle\Storage\Storage
     arguments:
-      - @appgear.storage.driver.doctrine_orm
-      - @app_gear.core.model.manager
+      - "@appgear.storage.driver.manager"
+      - "@app_gear.core.model.manager"
+
+  appgear.storage.driver.manager:
+    class: AppGear\AppBundle\Storage\DriverManager
 
   appgear.storage.driver.doctrine_orm:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
@@ -41,10 +44,13 @@ services:
       - @doctrine.orm.entity_manager
       - @app_gear.core.model.manager
       - @app_gear.core.tagged_manager
+    tags:
+        - { name: appgear.storage.driver, alias: doctrine_orm }
 
   appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
     calls:
+      - [setModelManager, ['@appgear.storage.driver.manager']]
       - [setModelManager, ['@app_gear.core.model.manager']]
       - [setTaggedManager, ['@app_gear.core.tagged_manager']]
 
@@ -53,6 +59,8 @@ services:
     arguments:
       - @doctrine_phpcr
       - @appgear.storage.driver.doctrine_phpcr.proxy_manager
+    tags:
+        - { name: appgear.storage.driver, alias: doctrine_phpcr }
 
   appgear.storage.proxy_manager_abstract:
     class: AppGear\AppBundle\Storage\ProxyManagerAbstract

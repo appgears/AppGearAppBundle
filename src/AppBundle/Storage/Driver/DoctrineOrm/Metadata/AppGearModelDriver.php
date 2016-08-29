@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata;
 
 use AppGear\AppBundle\Entity\Storage\Column;
+use AppGear\AppBundle\Storage\DriverManager;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -18,6 +19,13 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class AppGearModelDriver implements MappingDriver
 {
     /**
+     * Driver manager
+     *
+     * @var DriverManager
+     */
+    private $driverManager;
+
+    /**
      * Model manager
      *
      * @var ModelManager
@@ -30,6 +38,18 @@ class AppGearModelDriver implements MappingDriver
      * @var TaggedManager
      */
     private $taggedManager;
+
+    /**
+     * @param DriverManager $driverManager Driver manager
+     *
+     * @return AppGearModelDriver
+     */
+    public function setDriverManager($driverManager)
+    {
+        $this->driverManager = $driverManager;
+
+        return $this;
+    }
 
     /**
      * @param ModelManager $modelManager
@@ -190,7 +210,7 @@ class AppGearModelDriver implements MappingDriver
 
                 if ($property instanceof Field) {
                     $mapping['columnName'] = $property->getName();
-                    $mapping['type'] = $this->resolveFieldType($property);
+                    $mapping['type']       = $this->resolveFieldType($property);
                     foreach ($property->getExtensions() as $extension) {
                         if ($extension instanceof Column && $extension->getIdentifier()) {
                             $mapping['id'] = true;
@@ -204,12 +224,12 @@ class AppGearModelDriver implements MappingDriver
                     $targetModel       = $property->getTarget();
                     $targetEntityClass = $this->modelManager->fullClassName($targetModel->getName());
 
-                    $mapping['targetEntity'] = $targetEntityClass;
-                    $mapping['sourceEntity'] = $this->modelManager->fullClassName($model->getName());
-                    $mapping['isOwningSide'] = true;
-                    $mapping['fetch'] = ClassMetadataInfo::FETCH_LAZY;
-                    $mapping['inversedBy'] = false;
-                    $mapping['mappedBy'] = false;
+                    $mapping['targetEntity']     = $targetEntityClass;
+                    $mapping['sourceEntity']     = $this->modelManager->fullClassName($model->getName());
+                    $mapping['isOwningSide']     = true;
+                    $mapping['fetch']            = ClassMetadataInfo::FETCH_LAZY;
+                    $mapping['inversedBy']       = false;
+                    $mapping['mappedBy']         = false;
                     $mapping['isCascadePersist'] = false;
 
                     foreach ($property->getExtensions() as $extension) {
@@ -230,7 +250,7 @@ class AppGearModelDriver implements MappingDriver
                         $mapping['targetToSourceKeyColumns'] = [
                             'id' => strtolower($this->modelManager->className($targetModel->getName())) . '_id'
                         ];
-                        $mapping['joinColumns'] = [
+                        $mapping['joinColumns']              = [
                             [
                                 'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
                                 'referencedColumnName' => 'id'
