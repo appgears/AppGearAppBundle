@@ -61,7 +61,7 @@ class Repository
      *
      * @return array The objects.
      */
-    public function findAll()
+    public function findAll(array $orderings = [])
     {
         $entities = $this->driver->findAll($this->model);
         foreach ($entities as $entity) {
@@ -72,15 +72,34 @@ class Repository
     }
 
     /**
-     * Finds entities by criteria expression.
+     * Finds objects by a set of criteria.
      *
-     * @param string $expr Expression language criteria string
+     * Optionally sorting and limiting details can be passed.
+     *
+     * @param array      $criteria
+     * @param array|null $orderBy
+     * @param int|null   $limit
+     * @param int|null   $offset
      *
      * @return array The objects.
      */
-    public function findByExpr($expr)
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
-        $entities = $this->driver->findByExpr($this->model, $expr);
+        return $this->driver->findBy($this->model, $criteria, $orderBy, $limit, $offset);
+    }
+
+    /**
+     * Finds entities by criteria expression.
+     *
+     * @param string $expr      Expression language criteria string
+     * @param array  $orderings The orderings
+     *                          Keys are field and values are the order, being either ASC or DESC.
+     *
+     * @return array The objects.
+     */
+    public function findByExpr($expr, array $orderings = [])
+    {
+        $entities = $this->driver->findByExpr($this->model, $expr, $orderings);
         foreach ($entities as $entity) {
             $this->modelManager->injectServices($this->model->getName(), $entity);
         }

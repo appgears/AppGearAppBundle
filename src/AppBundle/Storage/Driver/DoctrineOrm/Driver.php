@@ -65,6 +65,14 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
+    public function findBy(Model $model, array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    {
+        return $this->getObjectRepository($model)->findBy($criteria, $orderBy, $limit, $offset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find(Model $model, $id)
     {
         return $this->getObjectRepository($model)->find($id);
@@ -73,7 +81,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function findByExpr(Model $model, $expr)
+    public function findByExpr(Model $model, $expr, array $orderings = [])
     {
         $modelService = new ModelService($model);
         $properties   = $modelService->getAllProperties();
@@ -114,6 +122,10 @@ class Driver extends DriverAbstract
             throw new \RuntimeException(sprintf('Unsupported note "%s" in expression "%s"', get_class($node), $expr));
         }
         $criteria->andWhere($expr);
+
+        if (count($orderings)) {
+            $criteria->orderBy($orderings);
+        }
 
         return $this->getObjectRepository($model)->matching($criteria);
     }

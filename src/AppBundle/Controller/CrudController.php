@@ -293,10 +293,18 @@ class CrudController extends Controller
                     $propertyModel = $propertyParameters['_model'];
                     $propertyModel = $this->performExpression($request, $propertyModel);
 
+                    $orderings = [];
+                    if (array_key_exists('_orderings', $propertyParameters)) {
+                        $orderings = $propertyParameters['_orderings'];
+                    }
+
                     if (array_key_exists('_expression', $propertyParameters)) {
                         $expr  = $propertyParameters['_expression'];
                         $expr  = $this->performExpression($request, $expr);
-                        $value = $this->storage->getRepository($propertyModel)->findByExpr($expr);
+
+                        $value = $this->storage->getRepository($propertyModel)->findByExpr($expr, $orderings);
+                    } elseif ($orderings !== []) {
+                        $value = $this->storage->getRepository($propertyModel)->findBy([], $orderings);
                     } else {
                         $value = $this->storage->getRepository($propertyModel)->findAll();
                     }
