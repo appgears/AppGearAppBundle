@@ -6,6 +6,7 @@ use AppGear\AppBundle\Cache\CacheManager;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
 use Cosmologist\Gears\Html;
+use DOMDocument;
 use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\DomCrawler\Crawler;
 use Twig_Extension;
@@ -144,24 +145,29 @@ class ViewExtension extends Twig_Extension
 
     private function truncateHtml($html, $limit = 1000)
     {
-        $crawler = new Crawler();
-        $crawler->addHtmlContent($html, 'UTF-8');
+        $doc = new DOMDocument();
+        $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
 
         // Get content nodes (ignore first html element and second body element)
-        $nodes = $crawler->children()->children();
+        $bodyNodes = $doc->getElementsByTagName('body');
+        if ($bodyNodes->length !== 1) {
+
+        }
+        $bodyNode = $bodyNodes->item(0);
 
         $result = '';
         $counter = 0;
-        foreach ($nodes as $node) {
-            if ($counter > $limit) {
-                break;
-            }
+        foreach ($bodyNode->childNodes as $node) {
 
             // Assume truncated html
             $result .= $node->ownerDocument->saveXML($node);
 
             // Increase counter by paragraph content size
             $counter += strlen($node->textContent);
+
+            if ($counter > $limit) {
+                break;
+            }
         }
 
         return $result;
