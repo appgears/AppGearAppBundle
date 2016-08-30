@@ -5,8 +5,6 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Cache\CacheManager;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
-use Cosmologist\Gears\Html;
-use DOMDocument;
 use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\DomCrawler\Crawler;
 use Twig_Extension;
@@ -87,9 +85,6 @@ class ViewExtension extends Twig_Extension
         // Decorate images in the html
         $html = $this->decorateHtmlImages($html);
 
-        // Truncate html
-        $html = $this->truncateHtml($html);
-
         $this->cacheManager->save($cacheKey, $html);
 
         return $html;
@@ -141,36 +136,6 @@ class ViewExtension extends Twig_Extension
         }
 
         return $html;
-    }
-
-    private function truncateHtml($html, $limit = 1000)
-    {
-        $doc = new DOMDocument();
-        $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
-
-        // Get content nodes (ignore first html element and second body element)
-        $bodyNodes = $doc->getElementsByTagName('body');
-        if ($bodyNodes->length !== 1) {
-
-        }
-        $bodyNode = $bodyNodes->item(0);
-
-        $result = '';
-        $counter = 0;
-        foreach ($bodyNode->childNodes as $node) {
-
-            // Assume truncated html
-            $result .= $node->ownerDocument->saveXML($node);
-
-            // Increase counter by paragraph content size
-            $counter += strlen($node->textContent);
-
-            if ($counter > $limit) {
-                break;
-            }
-        }
-
-        return $result;
     }
 
     /**
