@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Cache\CacheManager;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
+use Cosmologist\Gears\Html;
 use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\DomCrawler\Crawler;
 use Twig_Extension;
@@ -75,12 +76,33 @@ class ViewExtension extends Twig_Extension
     {
         $cacheKey = 'markdown_' . md5($markdown);
         if ($this->cacheManager->contains($cacheKey)) {
-            return $this->cacheManager->fetch($cacheKey);
+            //return $this->cacheManager->fetch($cacheKey);
         }
 
+        // Convert from markdown to the html
         $converter = new CommonMarkConverter();
         $html      = $converter->convertToHtml($markdown);
 
+        // Decorate images in the html
+        $html = $this->decorateHtmlImages($html);
+
+        // Truncate html
+        $html = $this->truncateHtml($html);
+
+        $this->cacheManager->save($cacheKey, $html);
+
+        return $html;
+    }
+
+    /**
+     * Move images to paragraph with text from image alt
+     *
+     * @param string $html Html
+     *
+     * @return mixed|string
+     */
+    private function decorateHtmlImages($html)
+    {
         $crawler = new Crawler();
         $crawler->addHtmlContent($html, 'UTF-8');
 
@@ -117,9 +139,32 @@ class ViewExtension extends Twig_Extension
             $html = str_replace($match, html_entity_decode($match), $html);
         }
 
-        $this->cacheManager->save($cacheKey, $html);
-
         return $html;
+    }
+
+    private function truncateHtml($html, $limit = 1000)
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent($html, 'UTF-8');
+
+        // Get content nodes (ignore first html element and second body element)
+        $nodes = $crawler->children()->children();
+
+        $result = '';
+        $counter = 0;
+        foreach ($nodes as $node) {
+            if ($counter > $limit) {
+                break;
+            }
+
+            // Assume truncated html
+            $result .= $node->ownerDocument->saveXML($node);
+
+            // Increase counter by paragraph content size
+            $counter += strlen($node->textContent);
+        }
+
+        return $result;
     }
 
     /**
