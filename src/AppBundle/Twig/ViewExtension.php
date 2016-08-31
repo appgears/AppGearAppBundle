@@ -80,9 +80,10 @@ class ViewExtension extends Twig_Extension
      */
     public function markdownTypograph($markdown, $autoEmbed = false, $truncateLength = 0, $truncateEnding = '')
     {
-        $cacheKey = 'markdown_' . md5($markdown);
+        $cacheKey = sprintf('AppGearAppBundleTwigViewExtension_markdown_%u_%u_%s', $autoEmbed, $truncateLength,
+            md5($markdown . $truncateEnding));
         if ($this->cacheManager->contains($cacheKey)) {
-            //return $this->cacheManager->fetch($cacheKey);
+            return $this->cacheManager->fetch($cacheKey);
         }
 
         // Convert from markdown to the html
