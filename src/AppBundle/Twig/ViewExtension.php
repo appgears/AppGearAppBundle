@@ -5,6 +5,8 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Cache\CacheManager;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
+use Cosmologist\Gears\Html;
+use Embera\Embera;
 use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\DomCrawler\Crawler;
 use Twig_Extension;
@@ -67,11 +69,16 @@ class ViewExtension extends Twig_Extension
     /**
      * Render markdown to html and processing html
      *
-     * @param string $markdown Markdown text
+     * @param string $markdown       Markdown text
+     *
+     * @param bool   $autoEmbed      Does embed known/available services into the given text?
+     * @param int    $truncateLength Truncates html with tags preserving by length.
+     *                               Set zero if don't need truncating
+     * @param string $truncateEnding Append it to the end of truncated html
      *
      * @return string
      */
-    public function markdownTypograph($markdown)
+    public function markdownTypograph($markdown, $autoEmbed = false, $truncateLength = 0, $truncateEnding = '')
     {
         $cacheKey = 'markdown_' . md5($markdown);
         if ($this->cacheManager->contains($cacheKey)) {
@@ -82,8 +89,28 @@ class ViewExtension extends Twig_Extension
         $converter = new CommonMarkConverter();
         $html      = $converter->convertToHtml($markdown);
 
+        // Auto embed
+        if ($autoEmbed) {
+            $embera = new Embera();
+            $html   = $embera->autoEmbed($html);
+        }
+
         // Decorate images in the html
-        $html = $this->decorateHtmlImages($html);
+        $html = $this->decorateMedia($html, 'img', 'article-image');
+
+        // Decorate iframes in the html
+        $html = $this->decorateMedia($html, 'iframe', 'thumbnail text-center');
+
+        // Fix bug with encoded image alt-text
+        preg_match_all('/alt="(.+?)"/', $html, $matches);
+        foreach ($matches[1] as $match) {
+            $html = str_replace($match, html_entity_decode($match), $html);
+        }
+
+        // Truncate the content
+        if ($truncateLength > 0) {
+            $html = Html::truncate($html, $truncateLength, $truncateEnding);
+        }
 
         $this->cacheManager->save($cacheKey, $html);
 
@@ -91,32 +118,38 @@ class ViewExtension extends Twig_Extension
     }
 
     /**
-     * Move images to paragraph with text from image alt
+     * Move media content (images, iframe's etc) from paragraphs to div's with specific class
      *
-     * @param string $html Html
+     * Decorates images with legend from alt.
      *
-     * @return mixed|string
+     * @param string $html     Html
+     * @param string $tag      Media tag (img, iframe etc)
+     * @param string $divClass Set div class
+     *
+     * @return string
      */
-    private function decorateHtmlImages($html)
+    private function decorateMedia($html, $tag, $divClass = '')
     {
         $crawler = new Crawler();
         $crawler->addHtmlContent($html, 'UTF-8');
 
-        foreach ($crawler->filter('p img') as $image) {
-            /** @var \DomElement $image */
+        foreach ($crawler->filter('p ' . $tag) as $media) {
+            /** @var \DomElement $media */
             /** @var \DomElement $paragraph */
-            if (($paragraph = $image->parentNode) && ($paragraph->childNodes->length !== 1)) {
+            if (($paragraph = $media->parentNode) && ($paragraph->childNodes->length !== 1)) {
                 continue;
             }
 
             $div = new \DOMElement('div');
             $paragraph->parentNode->replaceChild($div, $paragraph);
-            $div->setAttribute('class', 'article-image');
+            if (strlen($divClass)) {
+                $div->setAttribute('class', $divClass);
+            }
 
-            $div->appendChild($image);
+            $div->appendChild($media);
 
-            // if image has alt text - add paragraph with this text
-            if ($alt = $image->getAttribute('alt')) {
+            // if media is image and has alt text - add paragraph with this text
+            if (($media->tagName === 'img') && ($alt = $media->getAttribute('alt'))) {
                 $legend = new \DOMElement('p', $alt);
                 $div->appendChild($legend);
             }
@@ -125,14 +158,8 @@ class ViewExtension extends Twig_Extension
         $html = '';
         if ($crawler->getNode(0)) {
             foreach ($crawler->getNode(0)->childNodes->item(0)->childNodes as $childNode) {
-                $html .= $childNode->ownerDocument->saveXML($childNode);
+                $html .= $childNode->ownerDocument->saveHTML($childNode);
             }
-        }
-
-        // Fix bug with encoded image alt-text
-        preg_match_all('/alt="(.+?)"/', $html, $matches);
-        foreach ($matches[1] as $match) {
-            $html = str_replace($match, html_entity_decode($match), $html);
         }
 
         return $html;
