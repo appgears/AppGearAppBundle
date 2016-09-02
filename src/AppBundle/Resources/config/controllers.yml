@@ -1,0 +1,27 @@
+services:
+
+  appgear.controller:
+    abstract: true
+    class: AppGear\AppBundle\Controller\AbstractController
+    arguments:
+      - '@appgear.storage'
+      - '@app_gear.core.model.manager'
+      - '@appgear.view.manager'
+    calls:
+      - [setContainer, ['@service_container']]
+
+  appgear.controller.form:
+    parent: appgear.controller
+    class: AppGear\AppBundle\Controller\FormController
+    arguments:
+      - '@appgear.storage'
+      - '@app_gear.core.model.manager'
+      - '@appgear.view.manager'
+
+  appgear.controller.remove:
+    parent: appgear.controller
+    class: AppGear\AppBundle\Controller\RemoveController
+
+  appgear.controller.view:
+    parent: appgear.controller
+    class: AppGear\AppBundle\Controller\ViewController

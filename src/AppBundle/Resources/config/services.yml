@@ -19,16 +19,6 @@ services:
     calls:
       - [addserver, [%memcache.host%, %memcache.port%]]
 
-  appgear.controller.crud:
-    class: AppGear\AppBundle\Controller\CrudController
-    arguments:
-      - @appgear.storage
-      - @app_gear.core.model.manager
-      - @appgear.view.manager
-      - @appgear.form.builder
-    calls:
-      - [setContainer, ['@service_container']]
-
   appgear.storage:
     class: AppGear\AppBundle\Storage\Storage
     arguments:
