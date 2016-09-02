@@ -163,6 +163,9 @@ class AppGearModelDriver implements MappingDriver
                 foreach ($property->getExtensions() as $extension) {
                     if ($extension instanceof Column && $extension->getIdentifier()) {
                         $mapping['id'] = true;
+                        if ($property instanceof Field\Integer) {
+                            //$mapping['unsigned'] = true;
+                        }
                         $classMetadata->setIdGenerator(new IdentityGenerator());
                         $classMetadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
                         break;
