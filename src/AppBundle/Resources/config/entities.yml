@@ -22,6 +22,12 @@ services:
       - name: storage.platform.mysql.property.field.service
         field: app_gear.core_bundle.entity.property.field.datetime
 
+  appgear.entity_service.property.field.float_type_servce:
+    class: AppGear\AppBundle\EntityService\Property\Field\FloatTypeService
+    tags:
+      - name: storage.platform.mysql.property.field.service
+        field: app_gear.core_bundle.entity.property.field.float
+
   appgear.entity_service.property.field.integer_type_servce:
     class: AppGear\AppBundle\EntityService\Property\Field\IntegerTypeService
     tags:
@@ -33,11 +39,15 @@ services:
     tags:
       - name: form.property.field.service
         field: app_gear.core_bundle.entity.property.field.markdown
+      - name: storage.platform.mysql.property.field.service
+        field: app_gear.core_bundle.entity.property.field.markdown
 
   appgear.entity_service.property.field.text_type_servce:
     class: AppGear\AppBundle\EntityService\Property\Field\TextTypeService
     tags:
       - name: form.property.field.service
+        field: app_gear.core_bundle.entity.property.field.text
+      - name: storage.platform.mysql.property.field.service
         field: app_gear.core_bundle.entity.property.field.text
 
   appgear.entity_service.view.view_service:
