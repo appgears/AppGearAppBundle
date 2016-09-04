@@ -110,7 +110,6 @@ class AppGearModelDriver implements MappingDriver
         }
 
         $this->mapProperties($metadata, $model);
-        $this->mapInheritedProperties($metadata, $model);
 
         if ($parents = (new ModelService($model))->getParents()) {
             $parents = array_map(function ($parent) {
@@ -144,7 +143,11 @@ class AppGearModelDriver implements MappingDriver
      */
     public function isTransient($className)
     {
-        return true;
+        /** @var ClassMetadataInfo $metadata */
+
+        $model = $this->modelManager->getByInstance($className);
+
+        return !$model->getAbstract();
     }
 
     /**
@@ -159,12 +162,17 @@ class AppGearModelDriver implements MappingDriver
 
         foreach ($model->getProperties() as $property) {
             if ($property instanceof Field) {
-                $mapping = ['fieldName' => $property->getName(), 'type' => $this->resolveFieldType($property)];
+                $mapping = [
+                    'fieldName' => $property->getName(),
+                    'type' => $this->resolveFieldType($property),
+                    'nullable' => true,
+                    'options' => []
+                ];
                 foreach ($property->getExtensions() as $extension) {
                     if ($extension instanceof Column && $extension->getIdentifier()) {
                         $mapping['id'] = true;
                         if ($property instanceof Field\Integer) {
-                            $mapping['options'] = ['unsigned' => true];
+                            $mapping['options']['unsigned'] = true;
                         }
                         $classMetadata->setIdGenerator(new IdentityGenerator());
                         $classMetadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
@@ -204,88 +212,6 @@ class AppGearModelDriver implements MappingDriver
                     } else {
                         $classMetadata->mapOneToMany($mapping);
                     }
-                }
-            }
-        }
-    }
-
-    /**
-     * Map parent models properties to the class metadata as inherited
-     *
-     * @param ClassMetadata $classMetadata Class metadata
-     * @param Model         $model         Model
-     */
-    protected function mapInheritedProperties(ClassMetadata $classMetadata, Model $model)
-    {
-        /** @var ClassMetadataInfo $classMetadata */
-
-        $ms = new ModelService($model);
-        foreach ($ms->getParents() as $parent) {
-            foreach ($parent->getProperties() as $property) {
-                $mapping = [
-                    'fieldName' => $property->getName(),
-                    'inherited' => $this->modelManager->fullClassName($parent->getName())
-                ];
-
-                if ($property instanceof Field) {
-                    $mapping['columnName'] = $property->getName();
-                    $mapping['type']       = $this->resolveFieldType($property);
-                    foreach ($property->getExtensions() as $extension) {
-                        if ($extension instanceof Column && $extension->getIdentifier()) {
-                            $mapping['id'] = true;
-                            $classMetadata->setIdGenerator(new IdentityGenerator());
-                            $classMetadata->setIdentifier([$property->getName()]);
-                            break;
-                        }
-                    }
-                    $classMetadata->addInheritedFieldMapping($mapping);
-                } elseif ($property instanceof Property\Relationship) {
-                    $targetModel       = $property->getTarget();
-                    $targetEntityClass = $this->modelManager->fullClassName($targetModel->getName());
-
-                    $mapping['targetEntity']     = $targetEntityClass;
-                    $mapping['sourceEntity']     = $this->modelManager->fullClassName($model->getName());
-                    $mapping['isOwningSide']     = true;
-                    $mapping['fetch']            = ClassMetadataInfo::FETCH_LAZY;
-                    $mapping['inversedBy']       = false;
-                    $mapping['mappedBy']         = false;
-                    $mapping['isCascadePersist'] = false;
-
-                    foreach ($property->getExtensions() as $extension) {
-                        if ($extension instanceof Column) {
-                            if (strlen($mappedBy = $extension->getMappedBy())) {
-                                $mapping['mappedBy']     = $mappedBy;
-                                $mapping['isOwningSide'] = false;
-                                break;
-                            } elseif (strlen($inversedBy = $extension->getInversedBy())) {
-                                $mapping['inversedBy'] = $inversedBy;
-                                break;
-                            }
-                        }
-                    }
-
-                    if ($property instanceof Property\Relationship\ToOne) {
-                        $mapping['type']                     = ClassMetadataInfo::MANY_TO_ONE;
-                        $mapping['targetToSourceKeyColumns'] = [
-                            'id' => strtolower($this->modelManager->className($targetModel->getName())) . '_id'
-                        ];
-                        $mapping['joinColumns']              = [
-                            [
-                                'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
-                                'referencedColumnName' => 'id'
-                            ]
-                        ];
-                    } elseif ($property instanceof Property\Relationship\ToMany) {
-                        if ($this->isManyToMany($property, $mapping)) {
-                            $mapping['type'] = ClassMetadataInfo::MANY_TO_MANY;
-                        } else {
-                            $mapping['type']                     = ClassMetadataInfo::ONE_TO_MANY;
-                            $mapping['targetToSourceKeyColumns'] = [
-                                'id' => strtolower($this->modelManager->className($targetModel->getName())) . '_id'
-                            ];
-                        }
-                    }
-                    $classMetadata->addInheritedAssociationMapping($mapping);
                 }
             }
         }
