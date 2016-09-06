@@ -1,5 +1,11 @@
 models:
 
+  tree:
+    properties:
+      byRelationship:
+        field:
+          type: app_gear.core_bundle.entity.property.field.string
+
   storage.column:
     properties:
       identifier:
