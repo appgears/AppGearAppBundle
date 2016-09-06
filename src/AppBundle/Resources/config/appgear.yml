@@ -40,15 +40,8 @@ models:
         field:
           type: app_gear.core_bundle.entity.property.field.string
 
-  view.list_view:
+  view.container_view:
     parent: view
-    properties:
-      entities:
-        collection: []
-      model:
-        relationship:
-          type: app_gear.core_bundle.entity.property.relationship.toOne
-          target: app_gear.core_bundle.entity.model
 
   view.detail_view:
     parent: view
@@ -60,5 +53,15 @@ models:
         classType:
           className: Symfony\Component\Form\Form
 
-  view.container_view:
+  view.list_view:
     parent: view
+    properties:
+      entities:
+        collection: []
+      model:
+        relationship:
+          type: app_gear.core_bundle.entity.property.relationship.toOne
+          target: app_gear.core_bundle.entity.model
+
+  view.tree_view:
+    parent: view.list_view
