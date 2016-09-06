@@ -14,9 +14,7 @@ services:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\FormController
     arguments:
-      - '@appgear.storage'
-      - '@app_gear.core.model.manager'
-      - '@appgear.view.manager'
+      - '@appgear.form.builder'
 
   appgear.controller.remove:
     parent: appgear.controller
