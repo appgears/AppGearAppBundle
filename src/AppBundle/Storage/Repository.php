@@ -61,7 +61,7 @@ class Repository
      *
      * @return array The objects.
      */
-    public function findAll(array $orderings = [])
+    public function findAll()
     {
         $entities = $this->driver->findAll($this->model);
         foreach ($entities as $entity) {
