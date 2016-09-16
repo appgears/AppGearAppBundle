@@ -1,0 +1,8 @@
+.widget_text_max_lines {
+    display: block;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    overflow: hidden;
+    line-height: 1.42857143em; /* default line-height for bootstrapped table */
+    max-height: 4.28em; /* by default, show only 3 lines - 3 x line-height */
+}
