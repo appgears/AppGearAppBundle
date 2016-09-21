@@ -68,7 +68,7 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
         $values = array_map(
             function ($item) {
                 if (is_object($item)) {
-                    return $item->getId();
+                    return (string) $item->getId();
                 }
                 return $item;
             },
@@ -89,6 +89,8 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
         foreach ($choices as $i => $object) {
             if (is_object($object)) {
                 $values[$i] = (string) $object->getId();
+            } else {
+                $values[$i] = (string) $object;
             }
         }
 
