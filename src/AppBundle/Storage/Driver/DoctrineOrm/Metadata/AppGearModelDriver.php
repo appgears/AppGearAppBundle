@@ -208,7 +208,7 @@ class AppGearModelDriver implements MappingDriver
                     $classMetadata->mapManyToOne($mapping);
                 } elseif ($property instanceof Property\Relationship\ToMany) {
                     if ($this->isManyToMany($property, $mapping)) {
-//                        //$classMetadata->mapManyToMany($mapping);
+                        $classMetadata->mapManyToMany($mapping);
                     } else {
                         $classMetadata->mapOneToMany($mapping);
                     }

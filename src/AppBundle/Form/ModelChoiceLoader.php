@@ -65,6 +65,16 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
             return array();
         }
 
+        $values = array_map(
+            function ($item) {
+                if (is_object($item)) {
+                    return $item->getId();
+                }
+                return $item;
+            },
+            $values
+        );
+
         return $this->loadChoiceList($value)->getChoicesForValues($values);
     }
 

@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\Form;
 
+use AppGear\AppBundle\Form\Transformer\ChoicesCollectionToValuesTransformer;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -9,6 +10,7 @@ use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
+use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -75,36 +77,39 @@ class FormBuilder
     public function build(Model $model, $entity = null)
     {
         $modelService = new ModelService($model);
-        $form         = $this->formFactory->createBuilder('form', $entity);
+        $formBuilder  = $this->formFactory->createBuilder('form', $entity);
         foreach ($modelService->getAllProperties() as $property) {
             $propertyName = $property->getName();
 
             if ($property instanceof Field) {
                 $type = $this->resolveFieldType($property);
-                $form->add($propertyName, $type, [
+                $formBuilder->add($propertyName, $type, [
                     'required' => false
                 ]);
             } elseif ($property instanceof Relationship) {
 
-                // Temporary don't support
-                if ($property instanceof Relationship\ToMany) {
-                    continue;
-                }
-
-                $options = [
-                    'choice_loader' => new ModelChoiceLoader($this->storage, $property->getTarget()),
+                $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
+                $options      = [
+                    'choice_loader' => $choiceLoader,
                     'required' => false
                 ];
                 if ($property instanceof Relationship\ToMany) {
                     $options['multiple'] = true;
                 }
 
-                $form->add($propertyName, ChoiceType::class, $options);
+                $formBuilder->add($propertyName, ChoiceType::class, $options);
+
+                // Add special transformer to toMany associations
+                // because, toMany properties contains PersistentCollection, but ChoiceType supports only array
+                if (isset($options['multiple'])) {
+                    $formBuilder->get($propertyName)
+                        ->addModelTransformer(new ChoicesCollectionToValuesTransformer(new LazyChoiceList($choiceLoader)));
+                }
             }
         }
-        $form->add('save', SubmitType::class, array('label' => 'Save'));
+        $formBuilder->add('save', SubmitType::class, array('label' => 'Save'));
 
-        return $form->getForm();
+        return $formBuilder->getForm();
     }
 
     /**
@@ -117,7 +122,7 @@ class FormBuilder
     private function resolveFieldType(Field $field)
     {
         $fieldModel = $this->modelManager->getByInstance($field);
-        
+
         /** @var FormFieldTypeServiceInterface $service */
         if ($service = $this->taggedManager->get('form.property.field.service', ['field' => $fieldModel->getName()])) {
             return $service->getFormType();
