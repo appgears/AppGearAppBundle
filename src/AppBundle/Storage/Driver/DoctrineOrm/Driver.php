@@ -107,7 +107,8 @@ class Driver extends DriverAbstract
                     $value = $right->attributes['value'];
 
                     $property = $modelService->getProperty($name);
-                    if ($property instanceof Property\Relationship) {
+                    // Doctrine need "in" expression for relationships
+                    if (($property instanceof Property\Relationship) && ($value !== null)) {
                         $expr = $expr->in($name, [$value]);
                     } else {
                         $expr = $expr->eq($name, $value);
