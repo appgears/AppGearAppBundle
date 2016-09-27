@@ -10,4 +10,11 @@ interface FormFieldTypeServiceInterface
      * @return string
      */
     public function getFormType();
+
+    /**
+     * Return field form type options
+     *
+     * @return array
+     */
+    public function getFormOptions();
 }

@@ -82,17 +82,16 @@ class FormBuilder
             $propertyName = $property->getName();
 
             if ($property instanceof Field) {
-                $type = $this->resolveFieldType($property);
-                $formBuilder->add($propertyName, $type, [
-                    'required' => false
-                ]);
+                list($type, $options) = $this->resolveFieldType($property);
+                $options['required'] = false;
+                $formBuilder->add($propertyName, $type, $options);
             } elseif ($property instanceof Relationship) {
-
                 $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
-                $options      = [
+                $options = [
                     'choice_loader' => $choiceLoader,
                     'required' => false
                 ];
+
                 if ($property instanceof Relationship\ToMany) {
                     $options['multiple'] = true;
                 }
@@ -125,9 +124,9 @@ class FormBuilder
 
         /** @var FormFieldTypeServiceInterface $service */
         if ($service = $this->taggedManager->get('form.property.field.service', ['field' => $fieldModel->getName()])) {
-            return $service->getFormType();
+            return [$service->getFormType(), $service->getFormOptions()];
         }
 
-        return TextType::class;
+        return [TextType::class, []];
     }
 }
