@@ -4,19 +4,11 @@ namespace AppGear\AppBundle\EntityService\View;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Entity\View\DetailView;
-use AppGear\AppBundle\Storage\Storage;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
 class DetailViewService extends ViewService
 {
-    /**
-     * Storage
-     *
-     * @var Storage
-     */
-    protected $storage;
-
     /**
      * Model manager
      *
@@ -27,30 +19,30 @@ class DetailViewService extends ViewService
     /**
      * ViewService constructor.
      *
-     * @param TwigEngine   $twig    Twig
-     * @param Storage      $storage Storage
+     * @param TwigEngine   $twig         Twig
      * @param ModelManager $modelManager Model manager
      */
-    public function __construct(TwigEngine $twig, Storage $storage, ModelManager $modelManager)
+    public function __construct(TwigEngine $twig, ModelManager $modelManager)
     {
         parent::__construct($twig);
-        $this->storage      = $storage;
+
         $this->modelManager = $modelManager;
     }
 
-    public function render()
+    /**
+     * {@inheritdoc}
+     */
+    public function collectData()
     {
-        /** @var $detailView DetailView */
-        $detailView = $this->view;
-        $entity     = $detailView->getEntity();
+        parent::collectData();
 
-        return $this->twig->render(
-            $this->view->getTemplate(),
-            [
-                'view' => $this->view,
-                'entity' => $entity,
-                'model' => $this->modelManager->getByInstance($entity)
-            ]
-        );
+        /** @var DetailView $view */
+        $view   = $this->view;
+        $entity = $view->getEntity();
+        $model  = $this->modelManager->getByInstance($entity);
+
+        $this
+            ->addData('entity', $entity)
+            ->addData('model', $model);
     }
 }

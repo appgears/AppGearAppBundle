@@ -22,6 +22,13 @@ class ViewService
     protected $twig;
 
     /**
+     * Data that will be passed to template
+     *
+     * @var array
+     */
+    protected $data = [];
+
+    /**
      * ViewService constructor.
      *
      * @param TwigEngine $twig Twig
@@ -45,8 +52,38 @@ class ViewService
         return $this;
     }
 
+    /**
+     * Add data that will be passed to template
+     *
+     * @param string $name  Name for data
+     * @param mixed  $value Data
+     *
+     * @return $this
+     */
+    protected function addData($name, $value)
+    {
+        $this->data[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Collects suitable data for the view rendering
+     */
+    protected function collectData()
+    {
+        $this->addData('view', $this->view);
+    }
+
+    /**
+     * Render template
+     *
+     * @return string
+     * 
+     * @throws \Twig_Error
+     */
     public function render()
     {
-        return $this->twig->render($this->view->getTemplate(), ['view' => $this->view]);
+        return $this->twig->render($this->view->getTemplate(), $this->data);
     }
 }

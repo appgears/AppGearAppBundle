@@ -3,17 +3,19 @@
 namespace AppGear\AppBundle\EntityService\View;
 
 use AppGear\AppBundle\Entity\View;
+use AppGear\AppBundle\Entity\View\FormView;
 
 class FormViewService extends ViewService
 {
-    public function render()
+    /**
+     * {@inheritdoc}
+     */
+    public function collectData()
     {
-        return $this->twig->render(
-            $this->view->getTemplate(),
-            [
-                'view' => $this->view,
-                'form' => $this->view->getForm()->createView()
-            ]
-        );
+        parent::collectData();
+
+        /** @var FormView $view */
+        $view = $this->view;
+        $this->addData('form', $view->getForm()->createView());
     }
 }

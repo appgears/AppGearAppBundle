@@ -62,7 +62,6 @@ services:
     class: AppGear\AppBundle\EntityService\View\DetailViewService
     arguments:
       - @templating
-      - @appgear.storage
       - @app_gear.core.model.manager
     tags:
       - name: appgear.entity_service.view
