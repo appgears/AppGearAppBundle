@@ -79,11 +79,13 @@ class ViewService
      * Render template
      *
      * @return string
-     * 
+     *
      * @throws \Twig_Error
      */
     public function render()
     {
+        $this->collectData();
+        
         return $this->twig->render($this->view->getTemplate(), $this->data);
     }
 }
