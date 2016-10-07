@@ -30,15 +30,26 @@ class DetailViewService extends ViewService
     }
 
     /**
+     * Get entity from view
+     *
+     * @return object
+     */
+    protected function getEntity()
+    {
+        /** @var DetailView $view */
+        $view = $this->view;
+
+        return $view->getEntity();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function collectData()
     {
         parent::collectData();
 
-        /** @var DetailView $view */
-        $view   = $this->view;
-        $entity = $view->getEntity();
+        $entity = $this->getEntity();
         $model  = $this->modelManager->getByInstance($entity);
 
         $this
