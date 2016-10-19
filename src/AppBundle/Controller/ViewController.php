@@ -2,8 +2,6 @@
 
 namespace AppGear\AppBundle\Controller;
 
-use AppGear\PlatformBundle\Entity\Model\Property\Field;
-use AppGear\PlatformBundle\Entity\Model\Property\Relationship;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
