@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class AppGearAppExtension extends Extension
+class AppExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -45,5 +45,13 @@ class AppGearAppExtension extends Extension
                 $managerDef->addMethodCall('addPrefix', [$driver, $prefix]);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return 'app';
     }
 }

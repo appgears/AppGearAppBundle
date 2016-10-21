@@ -22,31 +22,29 @@ class RoutingsConfigurator implements ConfiguratorInterface
         $rootNode    = $treeBuilder->root('routings');
 
         $rootNode
-            ->useAttributeAsKey('name')
             ->prototype('array')
-                ->performNoDeepMerging()
-                ->children()
-                    ->scalarNode('pattern')
-                        ->isRequired()
-                    ->end()
-                    ->scalarNode('controller')
-                        ->isRequired()
-                    ->end()
-                    ->arrayNode('defaults')
-                        ->prototype('variable')
-                        ->end()
-                    ->end()
-                    ->arrayNode('requirements')
-                        ->prototype('scalar')
-                        ->end()
-                    ->end()
-                    ->arrayNode('methods')
-                        ->prototype('scalar')
-                        ->end()
-                    ->end()
-                ->end()
+            ->performNoDeepMerging()
+            ->children()
+            ->scalarNode('pattern')
+            ->isRequired()
             ->end()
-        ;
+            ->scalarNode('controller')
+            ->isRequired()
+            ->end()
+            ->arrayNode('defaults')
+            ->prototype('variable')
+            ->end()
+            ->end()
+            ->arrayNode('requirements')
+            ->prototype('scalar')
+            ->end()
+            ->end()
+            ->arrayNode('methods')
+            ->prototype('scalar')
+            ->end()
+            ->end()
+            ->end()
+            ->end();
 
         return $rootNode;
     }
@@ -59,19 +57,16 @@ class RoutingsConfigurator implements ConfiguratorInterface
         $routesLoaderDef = new Definition('AppGear\AppBundle\Routing\AppGearLoader');
         $routesLoaderDef->addTag('routing.loader');
 
-        foreach ($modulesConfigs as $moduleName=>$routes) {
-            foreach ($routes as $routeName=>$route) {
-                $routeAlias = $moduleName . '.' . $routeName;
-                $routesLoaderDef->addMethodCall(
-                    'addRoute', [
-                        $routeAlias,
-                        $route['controller'],
-                        $route['pattern'],
-                        $route['defaults'],
-                        $route['requirements']
-                    ]
-                );
-            }
+        foreach ($modulesConfigs as $routeName => $route) {
+            $routesLoaderDef->addMethodCall(
+                'addRoute', [
+                    $routeName,
+                    $route['controller'],
+                    $route['pattern'],
+                    $route['defaults'],
+                    $route['requirements']
+                ]
+            );
         }
 
         $container->setDefinition('appgear.routing.loader', $routesLoaderDef);

@@ -1,67 +1,67 @@
 models:
 
-  tree:
+  app.tree:
     properties:
       byRelationship:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
 
-  storage.column:
+  app.storage.column:
     properties:
       identifier:
         field:
-          type: app_gear.core_bundle.entity.property.field.boolean
+          type: core.property.field.boolean
       mappedBy:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
       inversedBy:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
       orderBy:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
 
-  ui.translation:
+  app.ui.translation:
     properties:
       label:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
 
-  ui.sluggable:
-    parent: app_gear.core_bundle.entity.extension.property.computed
+  app.ui.sluggable:
+    parent: core.extension.property.computed
     properties:
       field:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
 
-  view:
+  app.view:
     properties:
       template:
         field:
-          type: app_gear.core_bundle.entity.property.field.string
+          type: core.property.field.string
 
-  view.container_view:
-    parent: view
+  app.view.container_view:
+    parent: app.view
 
-  view.detail_view:
-    parent: view
+  app.view.detail_view:
+    parent: app.view
 
-  view.form_view:
-    parent: view
+  app.view.form_view:
+    parent: app.view
     properties:
       form:
         classType:
           className: Symfony\Component\Form\Form
 
-  view.list_view:
-    parent: view
+  app.view.list_view:
+    parent: app.view
     properties:
       entities:
         collection: []
       model:
         relationship:
-          type: app_gear.core_bundle.entity.property.relationship.toOne
-          target: app_gear.core_bundle.entity.model
+          type: core.property.relationship.toOne
+          target: core.model
 
-  view.tree_view:
-    parent: view.list_view
+  app.view.tree_view:
+    parent: app.view.list_view
