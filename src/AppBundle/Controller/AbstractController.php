@@ -189,7 +189,7 @@ abstract class AbstractController extends Controller
             $id = $this->performExpression($request, $id);
 
             // TODO: надо переписать после интеграции моделей с хранилищем
-            if ($modelId === 'app_gear.core_bundle.entity.model') {
+            if ($modelId === 'core.model') {
                 $instance = $this->modelManager->get($id);
             } else {
                 $instance = $this->storage->getRepository($modelId)->find($id);
