@@ -8,6 +8,7 @@ use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -19,7 +20,7 @@ class FormController extends AbstractController
      *
      * @var FormBuilder
      */
-    private $formBuilder;
+    protected $formBuilder;
 
     /**
      * CrudController constructor.
@@ -59,13 +60,17 @@ class FormController extends AbstractController
         $entity = $this->loadEntity($model, $id);
 
         // Собираем форму
-        $form = $this->formBuilder->build($model, $entity);
+        $form = $this->getForm($model, $entity);
 
         // Если форма была отправлена и успешно обработана
         if ($this->submitForm($request, $form)) {
             $this->saveEntity($model, $entity);
 
-            return $this->buildRedirectResponse($request);
+            if ($redirect = $this->buildRedirectResponse($request)) {
+                return $redirect;
+            }
+
+            return new Response();
         }
 
         // Инициализируем отображение
@@ -85,6 +90,19 @@ class FormController extends AbstractController
         }
 
         return new Response($this->viewManager->getViewService($view)->render());
+    }
+
+    /**
+     * Get form for model entity
+     *
+     * @param Model  $model  Model
+     * @param object $entity Entity
+     *
+     * @return FormInterface
+     */
+    protected function getForm(Model $model, $entity)
+    {
+        return $this->formBuilder->prepare($model, $entity)->getForm();
     }
 
     /**

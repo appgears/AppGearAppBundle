@@ -14,7 +14,7 @@ use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class FormBuilder
@@ -67,17 +67,18 @@ class FormBuilder
     }
 
     /**
-     * Build form for model
+     * Prepare form builder for model entity
      *
-     * @param Model  $model  Model
-     * @param object $entity Model entity
+     * @param Model  $model   Model
+     * @param object $entity  Model entity
+     * @param array  $options Form builder options
      *
-     * @return Form
+     * @return FormBuilderInterface
      */
-    public function build(Model $model, $entity = null)
+    public function prepare(Model $model, $entity = null, array $options = [])
     {
         $modelService = new ModelService($model);
-        $formBuilder  = $this->formFactory->createBuilder('form', $entity);
+        $formBuilder  = $this->formFactory->createBuilder('form', $entity, $options);
         foreach ($modelService->getAllProperties() as $property) {
             $propertyName = $property->getName();
 
@@ -87,7 +88,7 @@ class FormBuilder
                 $formBuilder->add($propertyName, $type, $options);
             } elseif ($property instanceof Relationship) {
                 $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
-                $options = [
+                $options      = [
                     'choice_loader' => $choiceLoader,
                     'required' => false
                 ];
@@ -108,7 +109,7 @@ class FormBuilder
         }
         $formBuilder->add('save', SubmitType::class, array('label' => 'Save'));
 
-        return $formBuilder->getForm();
+        return $formBuilder;
     }
 
     /**
