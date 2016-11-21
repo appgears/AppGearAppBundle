@@ -19,52 +19,6 @@ services:
     calls:
       - [addserver, [%memcache.host%, %memcache.port%]]
 
-  appgear.storage:
-    class: AppGear\AppBundle\Storage\Storage
-    arguments:
-      - "@appgear.storage.driver.manager"
-      - "@app_gear.core.model.manager"
-
-  appgear.storage.driver.manager:
-    class: AppGear\AppBundle\Storage\DriverManager
-    arguments:
-      - "@service_container"
-
-  appgear.storage.driver.doctrine_orm:
-    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
-    arguments:
-      - @doctrine.orm.entity_manager
-      - @app_gear.core.model.manager
-      - @app_gear.core.tagged_manager
-    tags:
-        - { name: appgear.storage.driver, alias: doctrine_orm }
-
-  appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver:
-    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
-    calls:
-      - [setDriverManager, ['@appgear.storage.driver.manager']]
-      - [setModelManager, ['@app_gear.core.model.manager']]
-      - [setTaggedManager, ['@app_gear.core.tagged_manager']]
-
-#  appgear.storage.driver.doctrine_phpcr:
-#    class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\Driver
-#    arguments:
-#      - @doctrine_phpcr
-#      - @appgear.storage.driver.doctrine_phpcr.proxy_manager
-#    tags:
-#        - { name: appgear.storage.driver, alias: doctrine_phpcr }
-
-  appgear.storage.proxy_manager_abstract:
-    class: AppGear\AppBundle\Storage\ProxyManagerAbstract
-    abstract: true
-    arguments:
-     - %kernel.cache_dir%
-     - @app_gear.core.model.manager
-
-  appgear.storage.driver.doctrine_phpcr.proxy_manager:
-    class: AppGear\AppBundle\Storage\Driver\DoctrinePhpCr\ProxyManager
-    parent: appgear.storage.proxy_manager_abstract
-
   appgear.view.manager:
     class: AppGear\AppBundle\View\ViewManager
     arguments:

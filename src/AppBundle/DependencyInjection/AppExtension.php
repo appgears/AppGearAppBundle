@@ -23,6 +23,7 @@ class AppExtension extends Extension
         $loader->load('entities.yml');
         $loader->load('form.yml');
         $loader->load('services.yml');
+        $loader->load('storage.yml');
 
         $container->setParameter('appgear.application.route404.enabled', $config['route404']['enabled']);
         $container->setParameter('appgear.application.route404.route', $config['route404']['route']);
