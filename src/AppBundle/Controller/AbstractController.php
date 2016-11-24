@@ -13,6 +13,7 @@ use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -83,7 +84,7 @@ abstract class AbstractController extends Controller
      */
     protected function buildRedirectResponse(Request $request)
     {
-        if (!$redirect = $request->attributes->get('_redirect')) {
+        if (!$redirect = $request->attributes->get('_success[_redirect]', null, true)) {
             return null;
         }
 
@@ -101,6 +102,26 @@ abstract class AbstractController extends Controller
 
             return $this->redirectToRoute($route, $parameters);
         }
+    }
+
+    /**
+     * Build view response for successfully action
+     *
+     * @param Request $request Request
+     * @param object  $entity  Entity
+     *
+     * @return null|Response
+     */
+    protected function buildSuccessResponse(Request $request, $entity)
+    {
+        if (!$viewParameters = $request->attributes->get('_success[_view]', null, true)) {
+            return null;
+        }
+
+        $view = $this->initialize($request, $viewParameters);
+        $view->setEntity($entity);
+
+        return new Response($this->viewManager->getViewService($view)->render());
     }
 
     /**
@@ -239,8 +260,8 @@ abstract class AbstractController extends Controller
                     }
 
                     if (array_key_exists('_expression', $propertyParameters)) {
-                        $expr  = $propertyParameters['_expression'];
-                        $expr  = $this->performExpression($request, $expr);
+                        $expr = $propertyParameters['_expression'];
+                        $expr = $this->performExpression($request, $expr);
 
                         $value = $this->storage->getRepository($propertyModel)->findByExpr($expr, $orderings);
                     } elseif ($orderings !== []) {

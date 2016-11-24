@@ -68,6 +68,8 @@ class FormController extends AbstractController
 
             if ($redirect = $this->buildRedirectResponse($request)) {
                 return $redirect;
+            } elseif ($response = $this->buildSuccessResponse($request, $entity)) {
+                return $response;
             }
 
             return new Response();

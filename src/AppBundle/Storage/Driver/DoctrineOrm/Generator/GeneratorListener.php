@@ -21,7 +21,7 @@ class GeneratorListener
 
         /** @var Model $parent */
         if (null !== $parent = $model->getParent()) {
-            if ($parent->getAbstract() && (null !== $property = $this->findIdentifierProperty($parent))) {
+            if (!$parent->getAbstract() && (null !== $property = $this->findIdentifierProperty($parent))) {
 
                 $class   = $generatorEvent->getClass();
                 $factory = new BuilderFactory();
