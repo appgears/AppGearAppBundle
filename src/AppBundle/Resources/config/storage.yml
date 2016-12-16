@@ -16,9 +16,15 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
       - '@app_gear.core.model.manager'
-      - '@app_gear.core.tagged_manager'
     tags:
         - { name: appgear.storage.driver, alias: doctrine_orm }
+
+  appgear.storage.driver.yaml:
+    class: AppGear\AppBundle\Storage\Driver\Yaml\Driver
+    arguments:
+      - '@app_gear.core.model.manager'
+    tags:
+        - { name: appgear.storage.driver, alias: yaml }
 
   appgear.storage.driver.doctrine_orm.generator.listener:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener

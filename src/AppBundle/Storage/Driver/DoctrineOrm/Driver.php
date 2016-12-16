@@ -45,9 +45,8 @@ class Driver extends DriverAbstract
      *
      * @param ObjectManager $objectManager Manager registry
      * @param ModelManager  $modelManager  Model manager
-     * @param TaggedManager $taggedManager Tagged manager
      */
-    public function __construct(ObjectManager $objectManager, ModelManager $modelManager, TaggedManager $taggedManager)
+    public function __construct(ObjectManager $objectManager, ModelManager $modelManager)
     {
         $this->objectManager      = $objectManager;
         $this->modelManager       = $modelManager;

@@ -12,6 +12,7 @@ use AppGear\CoreBundle\Model\ModelManager;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
@@ -25,15 +26,35 @@ class Driver extends DriverAbstract
      * @var ModelManager
      */
     private $modelManager;
+    /**
+     * @var ConfigCache
+     */
+    private $configCache;
 
     /**
      * Constructor.
      *
      * @param ModelManager $modelManager Model manager
+     * @param ConfigCache  $configCache  Config cache
      */
-    public function __construct(ModelManager $modelManager)
+    public function __construct(ModelManager $modelManager, ConfigCache $configCache)
     {
         $this->modelManager = $modelManager;
+        $this->configCache  = $configCache;
+    }
+
+    /**
+     * Load data
+     *
+     * @return array
+     */
+    protected function loadData()
+    {
+        if (!$this->configCache->isFresh()) {
+
+        }
+
+        return [];
     }
 
     /**
