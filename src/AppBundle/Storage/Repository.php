@@ -111,12 +111,14 @@ class Repository
      * Finds a single object by a criteria expression.
      *
      * @param string $expr Expression language criteria string
+     * @param array  $orderings The orderings
+     *                          Keys are field and values are the order, being either ASC or DESC.
      *
      * @return object|null The object or null.
      */
-    public function findOneByExpr($expr)
+    public function findOneByExpr($expr, array $orderings = [])
     {
-        $entities = $this->findByExpr($expr);
+        $entities = $this->findByExpr($expr, $orderings);
         if (count($entities) > 0) {
             return $entities[0];
         }
