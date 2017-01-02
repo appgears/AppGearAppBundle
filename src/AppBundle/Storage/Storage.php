@@ -50,17 +50,17 @@ class Storage
      */
     public function getRepository($model)
     {
-        if (is_string($model)) {
-            $model = $this->modelManager->get($model);
+        if (!is_string($model)) {
+            $model = $this->modelManager->name($model);
         }
 
-        if (array_key_exists($model->getName(), $this->repositories)) {
-            return $this->repositories[$model->getName()];
+        if (array_key_exists($model, $this->repositories)) {
+            return $this->repositories[$model];
         }
         
-        $driver                                = $this->driverManager->getDriver($model->getName());
+        $driver                                = $this->driverManager->getDriver($model);
         $repository                            = new Repository($driver, $model, $this->modelManager);
-        $this->repositories[$model->getName()] = $repository;
+        $this->repositories[$model] = $repository;
 
         return $repository;
     }

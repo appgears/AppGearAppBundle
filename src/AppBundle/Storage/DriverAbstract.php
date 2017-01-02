@@ -2,25 +2,23 @@
 
 namespace AppGear\AppBundle\Storage;
 
-use AppGear\CoreBundle\Entity\Model;
-
 abstract class DriverAbstract
 {
     /**
      * Finds all objects in the repository.
      *
-     * @param Model $model Model
+     * @param string $model Model
      *
      * @return array The objects.
      */
-    abstract public function findAll(Model $model);
+    abstract public function findAll($model);
 
     /**
      * Finds objects by a set of criteria.
      *
      * Optionally sorting and limiting details can be passed.
      *
-     * @param Model      $model Model
+     * @param string     $model Model
      * @param array      $criteria
      * @param array|null $orderBy
      * @param int|null   $limit
@@ -28,48 +26,46 @@ abstract class DriverAbstract
      *
      * @return array The objects.
      */
-    abstract public function findBy(Model $model, array $criteria, array $orderBy = null, $limit = null, $offset = null);
+    abstract public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null);
 
     /**
      * Finds an object by its primary key / identifier.
      *
-     * @param Model $model Model
-     * @param mixed $id    The identifier.
+     * @param string $model Model
+     * @param mixed  $id    The identifier.
      *
      * @return object The object.
      */
-    abstract public function find(Model $model, $id);
+    abstract public function find($model, $id);
 
     /**
      * Finds entities by criteria expression.
      *
-     * @param Model  $model     Model
+     * @param string $model     Model
      * @param string $expr      Expression language criteria string
      * @param array  $orderings The orderings
      *                          Keys are field and values are the order, being either ASC or DESC.
      *
      * @return array The objects.
      */
-    abstract public function findByExpr(Model $model, $expr, array $orderings = []);
+    abstract public function findByExpr($model, $expr, array $orderings = []);
 
     /**
      * Save object to the storage.
      *
-     * @param Model  $model  Model
      * @param object $object Object
      *
      * @return void
      */
-    abstract public function save(Model $model, $object);
+    abstract public function save($object);
 
     /**
      * Remove object from the storage.
      *
-     * @param Model  $model  Model
      * @param object $object Object
      *
      * @return void
      */
-    abstract public function remove(Model $model, $object);
+    abstract public function remove($object);
 
 }

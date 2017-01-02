@@ -2,7 +2,6 @@
 
 namespace AppGear\AppBundle\Storage;
 
-use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
 
 class Repository
@@ -10,7 +9,7 @@ class Repository
     /**
      * Model
      *
-     * @var Model
+     * @var string
      */
     private $model;
 
@@ -32,10 +31,10 @@ class Repository
      * CrudController constructor.
      *
      * @param DriverAbstract $driver       Storage driver
-     * @param Model          $model        Model
+     * @param string         $model        Model
      * @param ModelManager   $modelManager Model manager
      */
-    public function __construct(DriverAbstract $driver, Model $model, ModelManager $modelManager)
+    public function __construct(DriverAbstract $driver, $model, ModelManager $modelManager)
     {
         $this->model        = $model;
         $this->driver       = $driver;
@@ -110,7 +109,7 @@ class Repository
     /**
      * Finds a single object by a criteria expression.
      *
-     * @param string $expr Expression language criteria string
+     * @param string $expr      Expression language criteria string
      * @param array  $orderings The orderings
      *                          Keys are field and values are the order, being either ASC or DESC.
      *
@@ -135,7 +134,7 @@ class Repository
      */
     public function save($object)
     {
-        $this->driver->save($this->model, $object);
+        $this->driver->save($object);
     }
 
     /**
@@ -147,6 +146,6 @@ class Repository
      */
     public function remove($object)
     {
-        $this->driver->remove($this->model, $object);
+        $this->driver->remove($object);
     }
 }

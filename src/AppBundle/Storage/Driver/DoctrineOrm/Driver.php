@@ -41,7 +41,7 @@ class Driver extends DriverAbstract
     private $expressionLanguage;
 
     /**
-     * DoctrinePhpCr constructor.
+     * Constructor
      *
      * @param ObjectManager $objectManager Manager registry
      * @param ModelManager  $modelManager  Model manager
@@ -56,7 +56,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function findAll(Model $model)
+    public function findAll($model)
     {
         return $this->getObjectRepository($model)->findAll();
     }
@@ -64,7 +64,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function findBy(Model $model, array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         return $this->getObjectRepository($model)->findBy($criteria, $orderBy, $limit, $offset);
     }
@@ -72,7 +72,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function find(Model $model, $id)
+    public function find($model, $id)
     {
         return $this->getObjectRepository($model)->find($id);
     }
@@ -80,9 +80,9 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function findByExpr(Model $model, $expr, array $orderings = [])
+    public function findByExpr($model, $expr, array $orderings = [])
     {
-        $modelService = new ModelService($model);
+        $modelService = new ModelService($this->modelManager->get($model));
         $properties   = $modelService->getAllProperties();
         $names        = array_map(
             function ($property) {
@@ -133,7 +133,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function save(Model $model, $object)
+    public function save($object)
     {
         $this->objectManager->persist($object);
         $this->objectManager->flush();
@@ -142,7 +142,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function remove(Model $model, $object)
+    public function remove($object)
     {
         $this->objectManager->remove($object);
         $this->objectManager->flush();
@@ -151,13 +151,13 @@ class Driver extends DriverAbstract
     /**
      * Return ObjectRepository for the model
      *
-     * @param Model $model Model
+     * @param string $model Model
      *
      * @return ObjectRepository
      */
-    protected function getObjectRepository(Model $model)
+    protected function getObjectRepository($model)
     {
-        $fqcn = $this->modelManager->fullClassName($model->getName());
+        $fqcn = $this->modelManager->fullClassName($model);
 
         return $this->objectManager->getRepository($fqcn);
     }

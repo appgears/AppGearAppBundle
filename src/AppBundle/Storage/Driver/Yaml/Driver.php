@@ -26,35 +26,15 @@ class Driver extends DriverAbstract
      * @var ModelManager
      */
     private $modelManager;
-    /**
-     * @var ConfigCache
-     */
-    private $configCache;
 
     /**
      * Constructor.
      *
      * @param ModelManager $modelManager Model manager
-     * @param ConfigCache  $configCache  Config cache
      */
-    public function __construct(ModelManager $modelManager, ConfigCache $configCache)
+    public function __construct(ModelManager $modelManager)
     {
         $this->modelManager = $modelManager;
-        $this->configCache  = $configCache;
-    }
-
-    /**
-     * Load data
-     *
-     * @return array
-     */
-    protected function loadData()
-    {
-        if (!$this->configCache->isFresh()) {
-
-        }
-
-        return [];
     }
 
     /**
@@ -92,7 +72,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function save(Model $model, $object)
+    public function save($object)
     {
         throw new \RuntimeException('Not implemented yet');
     }
