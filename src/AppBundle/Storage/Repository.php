@@ -50,9 +50,7 @@ class Repository
      */
     public function find($id)
     {
-        $entity = $this->driver->find($this->model, $id);
-
-        return $this->modelManager->injectServices($this->model->getName(), $entity);
+        return $this->driver->find($this->model, $id);
     }
 
     /**
@@ -62,12 +60,7 @@ class Repository
      */
     public function findAll()
     {
-        $entities = $this->driver->findAll($this->model);
-        foreach ($entities as $entity) {
-            $this->modelManager->injectServices($this->model->getName(), $entity);
-        }
-
-        return $entities;
+        return $this->driver->findAll($this->model);
     }
 
     /**
@@ -98,12 +91,7 @@ class Repository
      */
     public function findByExpr($expr, array $orderings = [])
     {
-        $entities = $this->driver->findByExpr($this->model, $expr, $orderings);
-        foreach ($entities as $entity) {
-            $this->modelManager->injectServices($this->model->getName(), $entity);
-        }
-
-        return $entities;
+        return $this->driver->findByExpr($this->model, $expr, $orderings);
     }
 
     /**
