@@ -3,52 +3,32 @@
 namespace AppGear\AppBundle\Storage\Driver\Yaml;
 
 use AppGear\AppBundle\Storage\DriverAbstract;
-use AppGear\CoreBundle\DependencyInjection\TaggedManager;
-use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
-use AppGear\CoreBundle\EntityService\ModelService;
-use AppGear\CoreBundle\Model\ModelManager;
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
-use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class Driver extends DriverAbstract
 {
     /**
-     * Model manager
+     * Loader
      *
-     * @var ModelManager
+     * @var Loader
      */
-    private $modelManager;
+    private $loader;
 
     /**
      * Constructor.
      *
-     * @param ModelManager $modelManager Model manager
+     * @param Loader $loader Loader
      */
-    public function __construct(ModelManager $modelManager)
+    public function __construct(Loader $loader)
     {
-        $this->modelManager = $modelManager;
+        $this->loader = $loader;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function findAll(Model $model)
-    {
-        throw new \RuntimeException('Not implemented yet');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findBy(Model $model, array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findAll($model)
     {
         throw new \RuntimeException('Not implemented yet');
     }
@@ -56,7 +36,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function find(Model $model, $id)
+    public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         throw new \RuntimeException('Not implemented yet');
     }
@@ -64,7 +44,15 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function findByExpr(Model $model, $expr, array $orderings = [])
+    public function find($model, $id)
+    {
+        throw new \RuntimeException('Not implemented yet');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findByExpr($model, $expr, array $orderings = [])
     {
         throw new \RuntimeException('Not implemented yet');
     }
@@ -80,7 +68,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function remove(Model $model, $object)
+    public function remove($model, $object)
     {
         throw new \RuntimeException('Not implemented yet');
     }
