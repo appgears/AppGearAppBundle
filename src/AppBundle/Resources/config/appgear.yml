@@ -39,6 +39,10 @@ models:
       template:
         field:
           type: core.property.field.string
+      userSpecifiedContent:
+        field:
+          type: core.property.field.boolean
+          defaultValue: true
 
   app.view.container_view:
     parent: app.view

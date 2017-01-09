@@ -8,7 +8,12 @@ class View
     /**
      * Template
      */
-    protected $template;
+    protected $template = null;
+    
+    /**
+     * UserSpecifiedContent
+     */
+    protected $userSpecifiedContent = true;
     
     /**
      * Set template
@@ -25,5 +30,22 @@ class View
     public function getTemplate()
     {
         return $this->template;
+    }
+    
+    /**
+     * Set userSpecifiedContent
+     */
+    public function setUserSpecifiedContent($userSpecifiedContent)
+    {
+        $this->userSpecifiedContent = $userSpecifiedContent;
+        return $this;
+    }
+    
+    /**
+     * Get userSpecifiedContent
+     */
+    public function getUserSpecifiedContent()
+    {
+        return $this->userSpecifiedContent;
     }
 }

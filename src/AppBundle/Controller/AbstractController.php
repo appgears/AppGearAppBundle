@@ -287,6 +287,12 @@ abstract class AbstractController extends Controller
      */
     protected function viewResponse(View $view)
     {
-        return new Response($this->viewManager->getViewService($view)->render());
+        $response = new Response($this->viewManager->getViewService($view)->render());
+        
+        if (!$view->getUserSpecifiedContent()) {
+            $response->setPublic();
+        } 
+
+        return $response;
     }
 }
