@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\Controller;
 
+use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -51,8 +52,7 @@ abstract class AbstractController extends Controller
         Storage $storage,
         ModelManager $modelManager,
         ViewManager $viewManager
-    )
-    {
+    ) {
         $this->storage      = $storage;
         $this->modelManager = $modelManager;
         $this->viewManager  = $viewManager;
@@ -276,5 +276,17 @@ abstract class AbstractController extends Controller
         }
 
         return $instance;
+    }
+
+    /**
+     * Generate response for view
+     *
+     * @param View $view View
+     *
+     * @return Response
+     */
+    protected function viewResponse(View $view)
+    {
+        return new Response($this->viewManager->getViewService($view)->render());
     }
 }

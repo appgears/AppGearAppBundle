@@ -3,7 +3,7 @@
 namespace AppGear\AppBundle\View;
 
 use AppGear\AppBundle\Entity\View;
-use AppGear\AppBundle\EntityService\ViewService;
+use AppGear\AppBundle\EntityService\View\ViewService;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;

@@ -91,7 +91,7 @@ class FormController extends AbstractController
             $view->setForm($form);
         }
 
-        return new Response($this->viewManager->getViewService($view)->render());
+        return $this->viewResponse($view);
     }
 
     /**

@@ -43,7 +43,7 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        $items   = $this->storage->getRepository($this->model)->findAll();
+        $items   = $this->storage->getRepository($this->model->getName())->findAll();
         $choices = [];
         foreach ($items as $item) {
             $key = method_exists($item , '__toString') ? (string) $item : $this->model->getName() . ' #' . $item->getId();

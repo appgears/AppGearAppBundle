@@ -19,6 +19,6 @@ class ViewController extends AbstractController
         $viewParameters = $this->requireAttribute($request, '_view');
         $view           = $this->initialize($request, $viewParameters);
 
-        return new Response($this->viewManager->getViewService($view)->render());
+        return $this->viewResponse($view);
     }
 }

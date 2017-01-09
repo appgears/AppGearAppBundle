@@ -63,7 +63,7 @@ class DriverManager
             }
         }
 
-        throw new \RuntimeException(sprintf('Driver for model "%" not found', $modelName));
+        throw new \RuntimeException(sprintf('Driver for model "%s" not found', $modelName));
     }
 
     /**
