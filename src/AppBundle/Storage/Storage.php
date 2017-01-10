@@ -2,7 +2,6 @@
 
 namespace AppGear\AppBundle\Storage;
 
-use AppGear\AppBundle\Storage\Driver\DoctrinePhpCr;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
 
@@ -51,7 +50,7 @@ class Storage
     public function getRepository($model)
     {
         if (!is_string($model)) {
-            $model = $this->modelManager->name($model);
+            $model = $model->getName();
         }
 
         if (array_key_exists($model, $this->repositories)) {
