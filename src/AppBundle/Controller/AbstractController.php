@@ -169,6 +169,9 @@ abstract class AbstractController extends Controller
 
                 foreach ($matches[1] as $match) {
                     $value      = $this->getFromRequest($request, $match);
+                    if ($value === null) {
+                        $value = 'null';
+                    }
                     $expression = str_replace('{' . $match . '}', $value, $expression);
                 }
             }
