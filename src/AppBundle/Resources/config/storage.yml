@@ -22,9 +22,19 @@ services:
   appgear.storage.driver.yaml:
     class: AppGear\AppBundle\Storage\Driver\Yaml\Driver
     arguments:
+      - '@appgear.storage.driver.yaml.loader'
+      - '@appgear.storage.driver.hydrator.factory'
       - '@app_gear.core.model.manager'
     tags:
         - { name: appgear.storage.driver, alias: yaml }
+
+  appgear.storage.driver.yaml.loader:
+    class: AppGear\AppBundle\Storage\Driver\Yaml\Loader
+    arguments:
+      - '%kernel.bundles%'
+
+  appgear.storage.driver.hydrator.factory:
+    class: AppGear\AppBundle\Storage\Driver\Yaml\HydratorFactory
 
   appgear.storage.driver.doctrine_orm.generator.listener:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener
