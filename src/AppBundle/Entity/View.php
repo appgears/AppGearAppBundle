@@ -8,7 +8,7 @@ class View
     /**
      * Template
      */
-    protected $template = null;
+    protected $template;
     
     /**
      * UserSpecifiedContent
