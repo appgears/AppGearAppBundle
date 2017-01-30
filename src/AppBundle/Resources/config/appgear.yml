@@ -17,6 +17,10 @@ models:
       inversedBy:
         field:
           type: core.property.field.string
+      composition:
+        field:
+          type: core.property.field.boolean
+          defaultValue: false
       orderBy:
         field:
           type: core.property.field.string
