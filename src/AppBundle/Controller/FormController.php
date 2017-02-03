@@ -104,7 +104,7 @@ class FormController extends AbstractController
      */
     protected function getForm(Model $model, $entity)
     {
-        return $this->formBuilder->prepare($model, $entity)->getForm();
+        return $this->formBuilder->build($this->formBuilder->create($entity), $model)->getForm();
     }
 
     /**
