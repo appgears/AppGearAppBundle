@@ -117,14 +117,8 @@ class FormBuilder
             $options['required'] = false;
             $formBuilder->add($propertyName, $type, $options);
         } elseif ($property instanceof Relationship) {
-            $compositionRelation = false;
-            foreach ($property->getExtensions() as $extension) {
-                if ($extension instanceof Column) {
-                    $compositionRelation = $extension->getComposition();
-                }
-            }
-
-            if (!$compositionRelation) {
+            
+            if (!$property->getComposition()) {
                 $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
                 $options      = [
                     'choice_loader' => $choiceLoader,

@@ -21,11 +21,6 @@ class Column
     protected $inversedBy;
     
     /**
-     * Composition
-     */
-    protected $composition = false;
-    
-    /**
      * OrderBy
      */
     protected $orderBy;
@@ -79,23 +74,6 @@ class Column
     public function getInversedBy()
     {
         return $this->inversedBy;
-    }
-    
-    /**
-     * Set composition
-     */
-    public function setComposition($composition)
-    {
-        $this->composition = $composition;
-        return $this;
-    }
-    
-    /**
-     * Get composition
-     */
-    public function getComposition()
-    {
-        return $this->composition;
     }
     
     /**
