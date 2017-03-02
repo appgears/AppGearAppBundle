@@ -7,6 +7,7 @@ use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,25 +22,31 @@ class FormController extends AbstractController
      * @var FormBuilder
      */
     protected $formBuilder;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * CrudController constructor.
      *
-     * @param Storage      $storage      Storage
-     * @param ModelManager $modelManager Model manager
-     * @param ViewManager  $viewManager  View manager
-     * @param FormBuilder  $formBuilder  Form builder for model
+     * @param Storage         $storage      Storage
+     * @param ModelManager    $modelManager Model manager
+     * @param ViewManager     $viewManager  View manager
+     * @param FormBuilder     $formBuilder  Form builder for model
+     * @param LoggerInterface $logger       Logger
      */
     public function __construct(
         Storage $storage,
         ModelManager $modelManager,
         ViewManager $viewManager,
-        FormBuilder $formBuilder
-    )
-    {
+        FormBuilder $formBuilder,
+        LoggerInterface $logger
+    ) {
         parent::__construct($storage, $modelManager, $viewManager);
 
         $this->formBuilder = $formBuilder;
+        $this->logger      = $logger;
     }
 
     /**
@@ -134,7 +141,16 @@ class FormController extends AbstractController
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
 
-            return $form->isSubmitted() && $form->isValid();
+            if (!$form->isSubmitted()) {
+                return false;
+            }
+            if (!$form->isValid()) {
+                $this->logger->error((string) $form->getErrors());
+
+                return false;
+            }
+
+            return true;
         }
 
         return false;

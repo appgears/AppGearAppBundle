@@ -15,6 +15,7 @@ services:
     class: AppGear\AppBundle\Controller\FormController
     arguments:
       - '@appgear.form.builder'
+      - '@logger'
 
   appgear.controller.remove:
     parent: appgear.controller
