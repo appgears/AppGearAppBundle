@@ -16,7 +16,7 @@ class Repository
     /**
      * Storage driver
      *
-     * @var DriverAbstract
+     * @var DriverInterface
      */
     private $driver;
 
@@ -30,11 +30,11 @@ class Repository
     /**
      * CrudController constructor.
      *
-     * @param DriverAbstract $driver       Storage driver
-     * @param string         $model        Model
-     * @param ModelManager   $modelManager Model manager
+     * @param DriverInterface $driver       Storage driver
+     * @param string          $model        Model
+     * @param ModelManager    $modelManager Model manager
      */
-    public function __construct(DriverAbstract $driver, $model, ModelManager $modelManager)
+    public function __construct(DriverInterface $driver, $model, ModelManager $modelManager)
     {
         $this->model        = $model;
         $this->driver       = $driver;

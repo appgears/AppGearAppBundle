@@ -2,9 +2,7 @@
 
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
-use AppGear\AppBundle\Storage\DriverAbstract;
-use AppGear\CoreBundle\DependencyInjection\TaggedManager;
-use AppGear\CoreBundle\Entity\Model;
+use AppGear\AppBundle\Storage\DriverInterface;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\EntityService\ModelService;
@@ -17,7 +15,7 @@ use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
-class Driver extends DriverAbstract
+class Driver implements DriverInterface
 {
     /**
      * Object manager

@@ -12,10 +12,12 @@ class AppGearModelDriverCompilerPass implements CompilerPassInterface
     {
         $driverChainDef = $container->findDefinition('doctrine.orm.default_metadata_driver');
 
-        $driverChainDef->addMethodCall('addDriver', array(
+        $driverChainDef->addMethodCall(
+            'addDriver',
+            [
                 new Reference('appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver'),
                 'Commerce\\PlatformBundle\\Entity'
-            )
+            ]
         );
     }
 }

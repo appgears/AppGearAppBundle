@@ -3,7 +3,6 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata;
 
 use AppGear\AppBundle\Entity\Storage\Column;
-use AppGear\AppBundle\Storage\DriverManager;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -19,18 +18,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class AppGearModelDriver implements MappingDriver
 {
     /**
-     * DoctrineOrm driver name
-     */
-    const DRIVER_NAME = 'appgear.storage.driver.doctrine_orm';
-
-    /**
-     * Driver manager
-     *
-     * @var DriverManager
-     */
-    private $driverManager;
-
-    /**
      * Model manager
      *
      * @var ModelManager
@@ -45,21 +32,16 @@ class AppGearModelDriver implements MappingDriver
     private $taggedManager;
 
     /**
-     * @param DriverManager $driverManager Driver manager
+     * Supported model prefixes
      *
-     * @return AppGearModelDriver
+     * @var string[]
      */
-    public function setDriverManager($driverManager)
-    {
-        $this->driverManager = $driverManager;
-
-        return $this;
-    }
+    private $supportedModelPrefixes;
 
     /**
      * @param ModelManager $modelManager
      *
-     * @return AppGearModelDriver
+     * @return $this
      */
     public function setModelManager($modelManager)
     {
@@ -71,11 +53,25 @@ class AppGearModelDriver implements MappingDriver
     /**
      * @param TaggedManager $taggedManager
      *
-     * @return AppGearModelDriver
+     * @return $this
      */
     public function setTaggedManager($taggedManager)
     {
         $this->taggedManager = $taggedManager;
+
+        return $this;
+    }
+
+    /**
+     * Set supported model prefixes
+     *
+     * @param array $supportedModelPrefixes Supported model prefixes
+     *
+     * @return $this
+     */
+    public function setSupportedModelPrefixes(array $supportedModelPrefixes)
+    {
+        $this->supportedModelPrefixes = $supportedModelPrefixes;
 
         return $this;
     }
@@ -124,11 +120,10 @@ class AppGearModelDriver implements MappingDriver
      */
     public function getAllClassNames()
     {
-        $classNames         = [];
-        $registeredPrefixes = $this->driverManager->getPrefixes(self::DRIVER_NAME);
-        $registeredModels   = $this->modelManager->all();
+        $classNames       = [];
+        $registeredModels = $this->modelManager->all();
         foreach ($registeredModels as $model) {
-            foreach ($registeredPrefixes as $prefix) {
+            foreach ($this->supportedModelPrefixes as $prefix) {
                 if (strpos($model->getName(), $prefix) === 0) {
                     $classNames[] = $this->modelManager->fullClassName($model->getName());
                 }
@@ -164,9 +159,9 @@ class AppGearModelDriver implements MappingDriver
             if ($property instanceof Field) {
                 $mapping = [
                     'fieldName' => $property->getName(),
-                    'type' => $this->resolveFieldType($property),
-                    'nullable' => true,
-                    'options' => []
+                    'type'      => $this->resolveFieldType($property),
+                    'nullable'  => true,
+                    'options'   => []
                 ];
                 foreach ($property->getExtensions() as $extension) {
                     if ($extension instanceof Column && $extension->getIdentifier()) {
@@ -185,7 +180,7 @@ class AppGearModelDriver implements MappingDriver
                 $targetEntityClass = $this->modelManager->fullClassName($targetModel->getName());
 
                 $mapping = [
-                    'fieldName' => $property->getName(),
+                    'fieldName'    => $property->getName(),
                     'targetEntity' => $targetEntityClass
                 ];
                 foreach ($property->getExtensions() as $extension) {
@@ -195,7 +190,7 @@ class AppGearModelDriver implements MappingDriver
                         } elseif (strlen($inversedBy = $extension->getInversedBy())) {
                             $mapping['inversedBy'] = $inversedBy;
                             $mapping['joinColumn'] = [
-                                'name' => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
+                                'name'                 => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
                                 'referencedColumnName' => 'id'
                             ];
                         }

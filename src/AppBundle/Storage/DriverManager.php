@@ -2,7 +2,7 @@
 
 namespace AppGear\AppBundle\Storage;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Cosmologist\Gears\StringType;
 
 class DriverManager
 {
@@ -14,34 +14,36 @@ class DriverManager
     private $prefixes = [];
 
     /**
-     * Container
+     * Default driver
      *
-     * @var ContainerInterface
+     * @var DriverInterface
      */
-    private $container;
+    private $defaultDriver;
 
     /**
-     * @param ContainerInterface $container Container
+     * Constructor
+     *
+     * @param DriverInterface $defaultDriver Default driver
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(DriverInterface $defaultDriver = null)
     {
-        $this->container = $container;
+        $this->defaultDriver = $defaultDriver;
     }
 
     /**
      * Add prefix for driver
      *
-     * @param string $alias  Driver alias
-     * @param string $prefix Class name prefix
+     * @param DriverInterface $driver   Driver
+     * @param string[]        $prefixes Model prefixes supported by driver
      *
      * @return $this
      */
-    public function addPrefix($alias, $prefix)
+    public function addDriver(DriverInterface $driver, array $prefixes)
     {
-        if (!array_key_exists($alias, $this->prefixes)) {
-            $this->prefixes[$alias] = [];
-        }
-        $this->prefixes[$alias][] = $prefix;
+        $this->prefixes[] = (object) [
+            'driver'   => $driver,
+            'prefixes' => $prefixes
+        ];
 
         return $this;
     }
@@ -51,19 +53,19 @@ class DriverManager
      *
      * @param string $modelName The model name
      *
-     * @return DriverAbstract
+     * @return DriverInterface
      */
     public function getDriver($modelName)
     {
-        foreach ($this->prefixes as $driverAlias => $prefixes) {
-            foreach ($prefixes as $prefix) {
-                if ((strpos($modelName, $prefix) === 0) && (array_key_exists($driverAlias, $this->prefixes))) {
-                    return $this->container->get($driverAlias);
+        foreach ($this->prefixes as $item) {
+            foreach ($item->prefixes as $prefix) {
+                if (StringType::startsWith($modelName, $prefix)) {
+                    return $item->driver;
                 }
             }
         }
 
-        throw new \RuntimeException(sprintf('Driver for model "%s" not found', $modelName));
+        return $this->defaultDriver;
     }
 
     /**

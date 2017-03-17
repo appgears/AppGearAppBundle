@@ -6,6 +6,7 @@ use Cosmologist\Gears\ArrayType;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class AppExtension extends Extension
@@ -28,7 +29,10 @@ class AppExtension extends Extension
         $container->setParameter('appgear.application.route404.enabled', $config['route404']['enabled']);
         $container->setParameter('appgear.application.route404.route', $config['route404']['route']);
 
-        $this->loadDrivers($container, $config['storage']);
+        $managerDef = $container->getDefinition('appgear.storage.driver.manager');
+//        $managerDef->addArgument(new Reference($config['storage']['default_driver']));
+
+        $this->loadDrivers($container, $config['storage']['drivers']);
     }
 
     /**
@@ -42,9 +46,8 @@ class AppExtension extends Extension
         $managerDef = $container->getDefinition('appgear.storage.driver.manager');
 
         foreach ($config as $driver => $options) {
-            foreach ($options['prefixes'] as $prefix) {
-                $managerDef->addMethodCall('addPrefix', [$driver, $prefix]);
-            }
+            $managerDef->addMethodCall('addDriver', [new Reference($driver), $options['prefixes']]);
+            $container->setParameter($driver . '.metadata.appgear_model_driver', $options['prefixes']);
         }
     }
 

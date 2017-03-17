@@ -1,3 +1,6 @@
+parameters:
+  appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver.supported_model_prefixes: []
+
 services:
 
   appgear.storage:
@@ -8,8 +11,6 @@ services:
 
   appgear.storage.driver.manager:
     class: AppGear\AppBundle\Storage\DriverManager
-    arguments:
-      - '@service_container'
 
   appgear.storage.driver.doctrine_orm:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
@@ -44,6 +45,6 @@ services:
   appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
     calls:
-      - [setDriverManager, ['@appgear.storage.driver.manager']]
       - [setModelManager, ['@app_gear.core.model.manager']]
       - [setTaggedManager, ['@app_gear.core.tagged_manager']]
+      - [setSupportedModelPrefixes, ['%appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver.supported_model_prefixes%']]

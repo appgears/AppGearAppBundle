@@ -2,12 +2,12 @@
 
 namespace AppGear\AppBundle\Storage\Driver\Yaml;
 
-use AppGear\AppBundle\Storage\DriverAbstract;
+use AppGear\AppBundle\Storage\DriverInterface;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Model\ModelManager;
 
-class Driver extends DriverAbstract
+class Driver implements DriverInterface
 {
     /**
      * Loader
@@ -89,7 +89,7 @@ class Driver extends DriverAbstract
     /**
      * {@inheritdoc}
      */
-    public function remove($model, $object)
+    public function remove($object)
     {
         throw new \RuntimeException('Not implemented yet');
     }

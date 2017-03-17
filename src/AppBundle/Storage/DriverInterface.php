@@ -2,7 +2,7 @@
 
 namespace AppGear\AppBundle\Storage;
 
-abstract class DriverAbstract
+interface DriverInterface
 {
     /**
      * Finds all objects in the repository.
@@ -11,7 +11,7 @@ abstract class DriverAbstract
      *
      * @return array The objects.
      */
-    abstract public function findAll($model);
+    public function findAll($model);
 
     /**
      * Finds objects by a set of criteria.
@@ -26,7 +26,7 @@ abstract class DriverAbstract
      *
      * @return array The objects.
      */
-    abstract public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null);
+    public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null);
 
     /**
      * Finds an object by its primary key / identifier.
@@ -36,7 +36,7 @@ abstract class DriverAbstract
      *
      * @return object The object.
      */
-    abstract public function find($model, $id);
+    public function find($model, $id);
 
     /**
      * Finds entities by criteria expression.
@@ -48,7 +48,7 @@ abstract class DriverAbstract
      *
      * @return array The objects.
      */
-    abstract public function findByExpr($model, $expr, array $orderings = []);
+    public function findByExpr($model, $expr, array $orderings = []);
 
     /**
      * Save object to the storage.
@@ -57,7 +57,7 @@ abstract class DriverAbstract
      *
      * @return void
      */
-    abstract public function save($object);
+    public function save($object);
 
     /**
      * Remove object from the storage.
@@ -66,6 +66,6 @@ abstract class DriverAbstract
      *
      * @return void
      */
-    abstract public function remove($object);
+    public function remove($object);
 
 }
