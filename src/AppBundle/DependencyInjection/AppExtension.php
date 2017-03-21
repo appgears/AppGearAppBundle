@@ -29,9 +29,6 @@ class AppExtension extends Extension
         $container->setParameter('appgear.application.route404.enabled', $config['route404']['enabled']);
         $container->setParameter('appgear.application.route404.route', $config['route404']['route']);
 
-        $managerDef = $container->getDefinition('appgear.storage.driver.manager');
-//        $managerDef->addArgument(new Reference($config['storage']['default_driver']));
-
         $this->loadDrivers($container, $config['storage']['drivers']);
     }
 
@@ -47,7 +44,7 @@ class AppExtension extends Extension
 
         foreach ($config as $driver => $options) {
             $managerDef->addMethodCall('addDriver', [new Reference($driver), $options['prefixes']]);
-            $container->setParameter($driver . '.metadata.appgear_model_driver', $options['prefixes']);
+            $container->setParameter($driver . '.metadata.appgear_model_driver.supported_model_prefixes', $options['prefixes']);
         }
     }
 
