@@ -81,6 +81,29 @@ class Repository
     }
 
     /**
+     * Finds a single object by a set of criteria.
+     *
+     * Optionally sorting and limiting details can be passed.
+     *
+     * @param array      $criteria
+     * @param array|null $orderBy
+     * @param int|null   $limit
+     * @param int|null   $offset
+     *
+     * @return array The objects.
+     */
+    public function findOneBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    {
+        $entities = $this->findBy($criteria, $orderBy, $limit, $offset);
+
+        if (count($entities) > 0) {
+            return $entities[0];
+        }
+
+        return null;
+    }
+
+    /**
      * Finds entities by criteria expression.
      *
      * @param string $expr      Expression language criteria string
@@ -106,6 +129,7 @@ class Repository
     public function findOneByExpr($expr, array $orderings = [])
     {
         $entities = $this->findByExpr($expr, $orderings);
+
         if (count($entities) > 0) {
             return $entities[0];
         }
