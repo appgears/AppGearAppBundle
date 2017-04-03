@@ -42,7 +42,6 @@ models:
       userSpecifiedContent:
         field:
           type: core.property.field.boolean
-          defaultValue: true
 
   app.view.container_view:
     parent: app.view

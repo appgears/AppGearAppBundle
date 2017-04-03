@@ -292,9 +292,11 @@ abstract class AbstractController extends Controller
     {
         $response = new Response($this->viewManager->getViewService($view)->render());
         
-        if (!$view->getUserSpecifiedContent()) {
+        if ($view->getUserSpecifiedContent() === false) {
             $response->setPublic();
-        } 
+        } elseif ($view->getUserSpecifiedContent() === true) {
+            $response->setPrivate();
+        }
 
         return $response;
     }

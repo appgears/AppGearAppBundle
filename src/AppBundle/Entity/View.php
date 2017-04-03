@@ -13,7 +13,7 @@ class View
     /**
      * UserSpecifiedContent
      */
-    protected $userSpecifiedContent = true;
+    protected $userSpecifiedContent;
     
     /**
      * Set template
