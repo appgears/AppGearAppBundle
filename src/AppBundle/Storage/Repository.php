@@ -42,7 +42,7 @@ class Repository
     }
 
     /**
-     * Finds an object by its primary key / identifier.
+     * Finds an object by its primary key/identifier.
      *
      * @param mixed $id The identifier.
      *

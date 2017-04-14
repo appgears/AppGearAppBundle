@@ -49,18 +49,29 @@ class Storage
      */
     public function getRepository($model)
     {
-        if (!is_string($model)) {
-            $model = $model->getName();
-        }
+        $model = (string) $model;
 
         if (array_key_exists($model, $this->repositories)) {
             return $this->repositories[$model];
         }
-        
-        $driver                                = $this->driverManager->getDriver($model);
-        $repository                            = new Repository($driver, $model, $this->modelManager);
+
+        $driver                     = $this->driverManager->getDriver($model);
+        $repository                 = new Repository($driver, $model, $this->modelManager);
         $this->repositories[$model] = $repository;
 
         return $repository;
+    }
+
+    /**
+     * Finds an object by its primary key/identifier.
+     *
+     * @param string|Model $model Model
+     * @param mixed        $id    ID
+     *
+     * @return object
+     */
+    public function find($model, $id)
+    {
+        return $this->getRepository($model)->find($id);
     }
 }
