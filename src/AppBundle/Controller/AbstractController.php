@@ -294,6 +294,7 @@ abstract class AbstractController extends Controller
         
         if ($view->getUserSpecifiedContent() === false) {
             $response->setPublic();
+            $response->setEtag(md5($response->getContent()));
         } elseif ($view->getUserSpecifiedContent() === true) {
             $response->setPrivate();
         }
