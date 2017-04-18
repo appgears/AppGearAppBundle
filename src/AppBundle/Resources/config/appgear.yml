@@ -4,44 +4,44 @@ models:
     properties:
       byRelationship:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
 
   app.storage.column:
     properties:
       identifier:
         field:
-          type: core.property.field.boolean
+          type: core.property.field.boolean_type
       mappedBy:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
       inversedBy:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
       orderBy:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
 
   app.ui.translation:
     properties:
       label:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
 
   app.ui.sluggable:
     parent: core.extension.property.computed
     properties:
       field:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
 
   app.view:
     properties:
       template:
         field:
-          type: core.property.field.string
+          type: core.property.field.string_type
       userSpecifiedContent:
         field:
-          type: core.property.field.boolean
+          type: core.property.field.boolean_type
 
   app.view.container_view:
     parent: app.view
