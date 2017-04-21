@@ -1,7 +1,7 @@
 {% block widget_property %}
     {% spaceless %}
         {% if (property|class) != 'ToMany' %}
-            {% set _block = block('widget_' ~ ((property|class))|lower) %}
+            {% set _block = block('widget_' ~ (property|class|replace({'Type': ''})|lower)) %}
             {% if _block is not empty %}
                 {{ _block|raw }}
             {% else %}
