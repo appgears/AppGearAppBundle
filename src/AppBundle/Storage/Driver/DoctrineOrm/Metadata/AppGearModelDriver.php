@@ -189,10 +189,17 @@ class AppGearModelDriver implements MappingDriver
                             $mapping['mappedBy'] = $mappedBy;
                         } elseif (strlen($inversedBy = $extension->getInversedBy())) {
                             $mapping['inversedBy'] = $inversedBy;
-                            $mapping['joinColumn'] = [
-                                'name'                 => strtolower($this->modelManager->className($targetModel->getName())) . '_id',
+                            $joinColumn            = [
+                                'name'                 => $property->getName() . '_id',
                                 'referencedColumnName' => 'id'
                             ];
+
+                            $target   = $property->getTarget();
+                            $targetMs = new ModelService($target);
+                            if ($targetMs->getProperty($inversedBy)->getComposition()) {
+                                $joinColumn['onDelete'] = 'CASCADE';
+                            }
+                            $mapping['joinColumns'][] = $joinColumn;
                         }
                         if (strlen($orderBy = $extension->getOrderBy())) {
                             $mapping['orderBy'] = [$orderBy => 'ASC'];
