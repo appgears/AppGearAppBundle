@@ -183,29 +183,39 @@ class AppGearModelDriver implements MappingDriver
                     'fieldName'    => $property->getName(),
                     'targetEntity' => $targetEntityClass
                 ];
+
+                $extension = null;
                 foreach ($property->getExtensions() as $extension) {
                     if ($extension instanceof Column) {
-                        if (strlen($mappedBy = $extension->getMappedBy())) {
-                            $mapping['mappedBy'] = $mappedBy;
-                        } elseif (strlen($inversedBy = $extension->getInversedBy())) {
-                            $mapping['inversedBy'] = $inversedBy;
-                            $joinColumn            = [
-                                'name'                 => $property->getName() . '_id',
-                                'referencedColumnName' => 'id'
-                            ];
-
-                            $target   = $property->getTarget();
-                            $targetMs = new ModelService($target);
-                            if ($targetMs->getProperty($inversedBy)->getComposition()) {
-                                $joinColumn['onDelete'] = 'CASCADE';
-                            }
-                            $mapping['joinColumns'][] = $joinColumn;
-                        }
-                        if (strlen($orderBy = $extension->getOrderBy())) {
-                            $mapping['orderBy'] = [$orderBy => 'ASC'];
-                        }
+                        break;
                     }
                 }
+
+                if ($extension !== null) {
+                    if (strlen($mappedBy = $extension->getMappedBy())) {
+                        $mapping['mappedBy'] = $mappedBy;
+                    } elseif ($inversedBy = $extension->getInversedBy()) {
+                        $mapping['inversedBy'] = $inversedBy;
+                    }
+
+                    if (strlen($orderBy = $extension->getOrderBy())) {
+                        $mapping['orderBy'] = [$orderBy => 'ASC'];
+                    }
+                }
+
+                if (!isset($mapping['mappedBy'])) {
+                    $joinColumn = [
+                        'name'                 => $property->getName() . '_id',
+                        'referencedColumnName' => 'id'
+                    ];
+
+                    if ($property->getComposition()) {
+                        $joinColumn['onDelete'] = 'CASCADE';
+                    }
+
+                    $mapping['joinColumns'][] = $joinColumn;
+                }
+
                 if ($property instanceof Property\Relationship\ToOne) {
                     $classMetadata->mapManyToOne($mapping);
                 } elseif ($property instanceof Property\Relationship\ToMany) {
