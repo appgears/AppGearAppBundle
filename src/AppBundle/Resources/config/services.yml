@@ -47,6 +47,6 @@ services:
       class: AppGear\AppBundle\Twig\ViewExtension
       arguments:
           - @appgear.view.manager
-          - @appgear.cache.cache_manager
+          - @app_gear.core.model.manager
       tags:
           - { name: twig.extension }

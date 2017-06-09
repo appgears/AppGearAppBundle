@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Cache\CacheManager;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
+use AppGear\CoreBundle\Model\ModelManager;
 use Embera\Embera;
 use League\CommonMark\CommonMarkConverter;
 use Twig_Extension;
@@ -23,13 +24,23 @@ class ViewExtension extends Twig_Extension
     private $viewManager;
 
     /**
+     * Model manager
+     *
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    /**
      * ViewExtension constructor.
      *
-     * @param ViewManager  $viewManager  View manager
+     * @param ViewManager $viewManager View manager
+     *
+     * @oaram ModelManager $modelManager Model manager
      */
-    public function __construct(ViewManager $viewManager)
+    public function __construct(ViewManager $viewManager, ModelManager $modelManager)
     {
         $this->viewManager  = $viewManager;
+        $this->modelManager = $modelManager;
     }
 
     /**
@@ -41,6 +52,7 @@ class ViewExtension extends Twig_Extension
             new Twig_SimpleFilter('embed', array($this, 'embed'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('markdown', array($this, 'markdown'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('view_render', array($this, 'render')),
+            new Twig_SimpleFilter('model', array($this, 'model')),
         );
     }
 
@@ -78,6 +90,16 @@ class ViewExtension extends Twig_Extension
     public function embed($html)
     {
         return (new Embera())->autoEmbed($html);
+    }
+
+    /**
+     * Return model for object
+     *
+     * @param object $name Object
+     */
+    public function model($name)
+    {
+        return $this->modelManager->getByInstance($name);
     }
 
     /**

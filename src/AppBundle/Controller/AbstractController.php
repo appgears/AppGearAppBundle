@@ -168,7 +168,7 @@ abstract class AbstractController extends Controller
                 }
 
                 foreach ($matches[1] as $match) {
-                    $value      = $this->getFromRequest($request, $match);
+                    $value = $this->getFromRequest($request, $match);
                     if ($value === null) {
                         $value = 'null';
                     }
@@ -195,6 +195,7 @@ abstract class AbstractController extends Controller
         // Get model ID from parameters and load model
         if (array_key_exists('_model', $parameters)) {
             $modelId = $parameters['_model'];
+            $modelId = $this->performExpression($request, $modelId);
             $model   = $this->modelManager->get($modelId);
         } elseif ($possibleModel !== null) {
             $modelId = $possibleModel->getName();
@@ -291,7 +292,7 @@ abstract class AbstractController extends Controller
     protected function viewResponse(View $view)
     {
         $response = new Response($this->viewManager->getViewService($view)->render());
-        
+
         if ($view->getUserSpecifiedContent() === false) {
             $response->setPublic();
             $response->setEtag(md5($response->getContent()));
