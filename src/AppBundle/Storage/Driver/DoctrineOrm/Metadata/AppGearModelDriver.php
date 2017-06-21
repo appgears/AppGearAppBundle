@@ -204,7 +204,12 @@ class AppGearModelDriver implements MappingDriver
                         'referencedColumnName' => 'id'
                     ];
 
-                    if ($property->getComposition()) {
+                    $targetProperty = null;
+                    if (isset($mapping['inversedBy'])) {
+                        $targetProperty = (new ModelService($property->getTarget()))->getProperty($mapping['inversedBy']);
+                    }
+
+                    if ($property->getComposition() || ($targetProperty !== null && $targetProperty->getComposition())) {
                         $joinColumn['onDelete'] = 'CASCADE';
                     }
 
