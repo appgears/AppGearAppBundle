@@ -32,11 +32,11 @@ class TranslationExtension extends Twig_Extension
      */
     public function translate(Property $property)
     {
-        foreach ($property->getExtensions() as $extension) {
-            if ($extension instanceof Translation) {
-                return $extension->getLabel();
-            }
+        $extension = (new PropertyService($relationship))->getExtension(Translation::class);
+        if ($extension !== null) {
+            return $extension->getLabel();
         }
+
         return $property->getName();
     }
 

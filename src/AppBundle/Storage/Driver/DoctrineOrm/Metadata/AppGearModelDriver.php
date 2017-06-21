@@ -9,6 +9,7 @@ use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\EntityService\PropertyService;
 use AppGear\CoreBundle\Model\ModelManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
@@ -156,6 +157,8 @@ class AppGearModelDriver implements MappingDriver
         /** @var ClassMetadataInfo $classMetadata */
 
         foreach ($model->getProperties() as $property) {
+            $columnExtension = (new PropertyService($property))->getExtension(Column::class);
+
             if ($property instanceof Field) {
                 $mapping = [
                     'fieldName' => $property->getName(),
@@ -163,17 +166,16 @@ class AppGearModelDriver implements MappingDriver
                     'nullable'  => true,
                     'options'   => []
                 ];
-                foreach ($property->getExtensions() as $extension) {
-                    if ($extension instanceof Column && $extension->getIdentifier()) {
-                        $mapping['id'] = true;
-                        if ($property instanceof Field\Integer) {
-                            $mapping['options']['unsigned'] = true;
-                        }
-                        $classMetadata->setIdGenerator(new IdentityGenerator());
-                        $classMetadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
-                        break;
+
+                if ($columnExtension !== null && $columnExtension->getIdentifier()) {
+                    $mapping['id'] = true;
+                    if ($property instanceof Field\Integer) {
+                        $mapping['options']['unsigned'] = true;
                     }
+                    $classMetadata->setIdGenerator(new IdentityGenerator());
+                    $classMetadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_IDENTITY);
                 }
+
                 $classMetadata->mapField($mapping);
             } elseif ($property instanceof Property\Relationship) {
                 $targetModel       = $property->getTarget();
@@ -184,21 +186,14 @@ class AppGearModelDriver implements MappingDriver
                     'targetEntity' => $targetEntityClass
                 ];
 
-                $extension = null;
-                foreach ($property->getExtensions() as $extension) {
-                    if ($extension instanceof Column) {
-                        break;
-                    }
-                }
-
-                if ($extension !== null) {
-                    if (strlen($mappedBy = $extension->getMappedBy())) {
+                if ($columnExtension !== null) {
+                    if (strlen($mappedBy = $columnExtension->getMappedBy())) {
                         $mapping['mappedBy'] = $mappedBy;
-                    } elseif ($inversedBy = $extension->getInversedBy()) {
+                    } elseif ($inversedBy = $columnExtension->getInversedBy()) {
                         $mapping['inversedBy'] = $inversedBy;
                     }
 
-                    if (strlen($orderBy = $extension->getOrderBy())) {
+                    if (strlen($orderBy = $columnExtension->getOrderBy())) {
                         $mapping['orderBy'] = [$orderBy => 'ASC'];
                     }
                 }

@@ -17,7 +17,7 @@ class GeneratorListener
      */
     public function addIdentifierProperty(GeneratorEvent $generatorEvent)
     {
-        $model   = $generatorEvent->getModel();
+        $model = $generatorEvent->getModel();
 
         /** @var Model $parent */
         if (null !== $parent = $model->getParent()) {
@@ -43,10 +43,9 @@ class GeneratorListener
     private function findIdentifierProperty(Model $model)
     {
         foreach ($model->getProperties() as $property) {
-            foreach ($property->getExtensions() as $extension) {
-                if ($extension instanceof Column && $extension->getIdentifier()) {
-                    return $property;
-                }
+            $columnExtension = (new PropertyService($property))->getExtension(Column::class);
+            if ($columnExtension !== null && $extension->getIdentifier()) {
+                return $property;
             }
         }
 

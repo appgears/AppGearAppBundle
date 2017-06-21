@@ -64,21 +64,19 @@ class RelatedDynamicType extends AbstractType
     private function getBacksideProperty(Relationship $relationship)
     {
         $backSideName = null;
-        foreach ($relationship->getExtensions() as $extension) {
-            if ($extension instanceof Column) {
-                if (strlen($mappedBy = $extension->getMappedBy())) {
-                    $backSideName = $mappedBy;
-                    break;
-                } elseif (strlen($inversedBy = $extension->getInversedBy())) {
-                    $backSideName = $inversedBy;
-                    break;
-                }
+
+        $extension = (new PropertyService($relationship))->getExtension(Column::class);
+        if ($extension !== null) {
+            if (strlen($mappedBy = $extension->getMappedBy())) {
+                $backSideName = $mappedBy;
+            } elseif (strlen($inversedBy = $extension->getInversedBy())) {
+                $backSideName = $inversedBy;
             }
         }
 
         if ($backSideName !== null) {
             $target = $relationship->getTarget();
-            $ms = new ModelService($target);
+            $ms     = new ModelService($target);
 
             return $ms->getProperty($backSideName);
         }
@@ -86,7 +84,8 @@ class RelatedDynamicType extends AbstractType
         return null;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public
+    function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => NoteFile::class,
