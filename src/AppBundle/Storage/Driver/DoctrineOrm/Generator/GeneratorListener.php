@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator;
 use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
+use AppGear\CoreBundle\EntityService\PropertyService;
 use AppGear\CoreBundle\Model\Generator\GeneratorEvent;
 use PhpParser\BuilderFactory;
 

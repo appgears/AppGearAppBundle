@@ -48,6 +48,10 @@ models:
 
   app.view.detail_view:
     parent: app.view
+    properties:
+      entity:
+        relationship:
+          type: core.property.relationship.toOne
 
   app.view.form_view:
     parent: app.view
