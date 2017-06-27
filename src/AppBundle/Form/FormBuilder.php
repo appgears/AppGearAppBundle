@@ -117,7 +117,7 @@ class FormBuilder
             $options['required'] = false;
             $formBuilder->add($propertyName, $type, $options);
         } elseif ($property instanceof Relationship) {
-            
+
             if (!$property->getComposition()) {
                 $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
                 $options      = [

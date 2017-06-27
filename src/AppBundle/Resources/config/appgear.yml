@@ -52,13 +52,10 @@ models:
       entity:
         relationship:
           type: core.property.relationship.toOne
-
-  app.view.form_view:
-    parent: app.view
-    properties:
-      form:
-        classType:
-          className: Symfony\Component\Form\Form
+      fields:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field
 
   app.view.list_view:
     parent: app.view
@@ -70,5 +67,31 @@ models:
           type: core.property.relationship.toOne
           target: core.model
 
+  app.view.field:
+    properties:
+      name:
+        field:
+          type: core.property.field.string_type
+      widget:
+        relationship:
+          type: core.property.relationship.toOne
+          target: app.view.field.widget
+
+  app.view.field.widget: ~
+  app.view.field.widget.collection:
+    parent: app.view.field.widget
+    properties:
+      widget:
+        relationship:
+          type: core.property.relationship.toOne
+          target: app.view.field.widget
+
   app.view.tree_view:
     parent: app.view.list_view
+
+  app.view.form_view:
+    parent: app.view
+    properties:
+      form:
+        classType:
+          className: Symfony\Component\Form\Form

@@ -12,6 +12,11 @@ class DetailView extends View
     protected $entity;
     
     /**
+     * Fields
+     */
+    protected $fields = array();
+    
+    /**
      * Set entity
      */
     public function setEntity($entity)
@@ -26,5 +31,22 @@ class DetailView extends View
     public function getEntity()
     {
         return $this->entity;
+    }
+    
+    /**
+     * Set fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+    
+    /**
+     * Get fields
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }
