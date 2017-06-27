@@ -43,6 +43,16 @@ class DetailViewService extends ViewService
     }
 
     /**
+     * @return array
+     */
+    protected function getFields()
+    {
+        $fields = [];
+
+        return $fields;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function collectData()
@@ -53,7 +63,9 @@ class DetailViewService extends ViewService
         $model  = $this->modelManager->getByInstance($entity);
 
         $this
+            ->addData('model', $model)
             ->addData('entity', $entity)
-            ->addData('model', $model);
+            ->addData('fields', $this)
+        ;
     }
 }
