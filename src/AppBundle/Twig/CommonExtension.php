@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Twig;
 
 use AppGear\PlatformBundle\Entity\Model\Property\Relationship;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Twig_Extension;
 use Twig_SimpleFilter;
 
@@ -18,7 +19,8 @@ class CommonExtension extends Twig_Extension
     {
         return array(
             new Twig_SimpleFilter('class', array($this, 'getShortClassName')),
-            new Twig_SimpleFilter('auto_convert_urls', array($this, 'autoConvertUrls'))
+            new Twig_SimpleFilter('auto_convert_urls', array($this, 'autoConvertUrls')),
+            new Twig_SimpleFilter('expression', array($this, 'expression'))
         );
     }
 
@@ -45,9 +47,25 @@ class CommonExtension extends Twig_Extension
      */
     public function autoConvertUrls($string)
     {
-        $pattern = '/(href="|src=")?([-a-zA-Zа-яёА-ЯЁ0-9@:%_\+.~#?&\/\/=]{2,256}\.[a-zа-яё]{2,4}\b(\/?[-\p{L}0-9@:%_\+.~#?&\/\/=\(\),]*)?)/u';
+        $pattern        = '/(href="|src=")?([-a-zA-Zа-яёА-ЯЁ0-9@:%_\+.~#?&\/\/=]{2,256}\.[a-zа-яё]{2,4}\b(\/?[-\p{L}0-9@:%_\+.~#?&\/\/=\(\),]*)?)/u';
         $stringFiltered = preg_replace_callback($pattern, array($this, 'callbackReplace'), $string);
+
         return $stringFiltered;
+    }
+
+    /**
+     * Evaluate expression language expression with entity as context
+     *
+     * @param object $entity     Entity
+     * @param string $expression Expression language expression
+     *
+     * @return string
+     */
+    public function expression($entity, $expression)
+    {
+        $language = new ExpressionLanguage();
+
+        return $language->evaluate($expression, ['entity' => $entity]);
     }
 
     /**

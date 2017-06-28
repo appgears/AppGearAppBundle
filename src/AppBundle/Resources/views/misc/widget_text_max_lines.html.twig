@@ -1,7 +1,7 @@
 {% block widget_text %}
     {% spaceless %}
         <div class="widget_text_max_lines" style="">
-            {{ attribute(entity, property.name)|nl2br|raw }}
+            {{ attribute(entity, field.property.name)|nl2br|raw }}
         </div>
         <a href="" class="widget_text_max_lines_expand">...</a>
     {% endspaceless %}

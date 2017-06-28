@@ -1,28 +1,89 @@
-{% block widget_property %}
+{# Widgets for fields #}
+
+{% block widget_field %}
     {% spaceless %}
-        {% if (property|class) != 'ToMany' %}
-            {% set _block = block('widget_' ~ (property|class|replace({'Type': ''})|lower)) %}
+        {% if field.widget is defined and field.widget is not null %}
+            {% set _widget = field.widget %}
+            {% set _value  = attribute(entity, field.property.name) %}
+            {{ block('widget') }}
+        {% elseif (field.property|class) == 'ToMany' %}
+            {{ block('widget_field_to_many')|raw }}
+        {% elseif (field.property|class) == 'ToOne' %}
+            {{ block('widget_field_to_one')|raw }}
+        {% else %}
+            {% set _block = block('widget_field_' ~ (field.property|class|replace({'Type': ''})|lower)) %}
             {% if _block is not empty %}
                 {{ _block|raw }}
             {% else %}
-                {{ attribute(entity, property.name) }}
+                {{ block('widget_field_default') }}
             {% endif %}
-        {% else %}
-            {% for item in attribute(entity, property.name) %}
-                {{ item }}
-            {% endfor %}
         {% endif %}
     {% endspaceless %}
 {% endblock %}
 
-{% block widget_text %}
-    {% spaceless %}
-        {{ attribute(entity, property.name)|nl2br|raw }}
-    {% endspaceless %}
+{% block widget_field_to_many %}
+    <ul>
+        {% for item in attribute(entity, field.property.name) %}
+            <li>{{ block('widget_field_to_one') }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
-{% block widget_datetime %}
-    {% spaceless %}
-        {{ attribute(entity, property.name)|date('Y-m-d H:i:s') }}
-    {% endspaceless %}
+{% block widget_field_to_one %}
+    {{ item }}
+{% endblock %}
+
+{% block widget_field_default %}
+    {{ attribute(entity, field.property.name) }}
+{% endblock %}
+
+{% block widget_field_text %}
+    {{ attribute(entity, field.property.name)|nl2br|raw }}
+{% endblock %}
+
+{% block widget_field_datetime %}
+    {{ attribute(entity, field.property.name)|date('Y-m-d H:i:s') }}
+{% endblock %}
+
+
+{# Widgets #}
+
+{% block widget %}
+    {% set _block = block('widget_' ~ (_widget|class)|lower) %}
+    {% if _block is not empty %}
+        {{ _block|raw }}
+    {% else %}
+        {{ block('widget_default') }}
+    {% endif %}
+{% endblock %}
+
+{% block widget_default %}
+    {{ _value }}
+{% endblock %}
+
+{% block widget_collection %}
+    <ul>
+        {% for item in _value %}
+            <li>
+                {% if _widget.widget is not null %}
+                    {% set _original_widget = _widget %}
+                    {% set _original_value = _value %}
+                    
+                    {% set _widget = _widget.widget %}
+                    {% set _value = item %}
+                    
+                    {{ block('widget') }}
+    
+                    {% set _widget = _original_widget %}
+                    {% set _value = _original_value %}
+                {% else %}
+                    {{ block('widget_default') }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block widget_expression %}
+    {{ _value|expression(_widget.expression) }}
 {% endblock %}

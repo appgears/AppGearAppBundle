@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\EntityService\View;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Entity\View\DetailView;
+use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 
@@ -47,9 +48,51 @@ class DetailViewService extends ViewService
      */
     protected function getFields()
     {
-        $fields = [];
+        $entity       = $this->getEntity();
+        $model        = $this->modelManager->getByInstance($entity);
+        $modelService = new ModelService($model);
 
-        return $fields;
+        if ([] !== $fields = $this->getFieldsFromView($modelService)) {
+            return $fields;
+        }
+
+        return $this->getFieldsFromModel();
+    }
+
+    /**
+     * @param ModelService $modelService
+     *
+     * @return array
+     */
+    protected function getFieldsFromView(ModelService $modelService)
+    {
+        return array_map(
+            function ($field) use ($modelService) {
+                /** @var View\Field $field */
+                return [
+                    'property' => $modelService->getProperty($field->getName()),
+                    'widget'   => $field->getWidget()
+                ];
+            },
+            $this->view->getFields()
+        );
+    }
+
+    /**
+     * @param ModelService $modelService
+     *
+     * @return array
+     */
+    protected function getFieldsFromModel(ModelService $modelService)
+    {
+        return array_map(
+            function ($property) {
+                return [
+                    'property' => $property
+                ];
+            },
+            $modelService->getAllProperties()
+        );
     }
 
     /**
@@ -65,7 +108,6 @@ class DetailViewService extends ViewService
         $this
             ->addData('model', $model)
             ->addData('entity', $entity)
-            ->addData('fields', $this)
-        ;
+            ->addData('fields', $this->getFields());
     }
 }

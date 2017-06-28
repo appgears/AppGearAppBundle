@@ -78,6 +78,7 @@ models:
           target: app.view.field.widget
 
   app.view.field.widget: ~
+
   app.view.field.widget.collection:
     parent: app.view.field.widget
     properties:
@@ -85,6 +86,13 @@ models:
         relationship:
           type: core.property.relationship.toOne
           target: app.view.field.widget
+
+  app.view.field.widget.expression:
+    parent: app.view.field.widget
+    properties:
+      expression:
+        field:
+          type: core.property.field.string_type
 
   app.view.tree_view:
     parent: app.view.list_view
