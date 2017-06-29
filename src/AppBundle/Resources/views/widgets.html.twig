@@ -2,7 +2,7 @@
 
 {% block widget_field %}
     {% spaceless %}
-        {% if field.widget is not null or field.property is null %}
+        {% if (field.widget is defined and field.widget is not null) or field.property is null %}
             {% set _widget = field.widget %}
             {% set _value  = null %}
             {% if field.property is not null %}
@@ -12,6 +12,7 @@
         {% elseif (field.property|class) == 'ToMany' %}
             {{ block('widget_field_to_many')|raw }}
         {% elseif (field.property|class) == 'ToOne' %}
+            {% set _value  = attribute(entity, field.property.name) %}
             {{ block('widget_field_to_one')|raw }}
         {% else %}
             {% set _block = block('widget_field_' ~ (field.property|class|replace({'Type': ''})|lower)) %}
@@ -27,13 +28,16 @@
 {% block widget_field_to_many %}
     <ul>
         {% for item in attribute(entity, field.property.name) %}
-            <li>{{ block('widget_field_to_one') }}</li>
+            <li>
+                {% set _value = item %}
+                {{ block('widget_field_to_one') }}
+            </li>
         {% endfor %}
     </ul>
 {% endblock %}
 
 {% block widget_field_to_one %}
-    {{ item }}
+    {{ _value }}
 {% endblock %}
 
 {% block widget_field_default %}

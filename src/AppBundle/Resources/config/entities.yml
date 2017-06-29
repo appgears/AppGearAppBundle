@@ -67,6 +67,14 @@ services:
       - name: appgear.entity_service.view
         model: app.view.detail_view
 
+  appgear.entity_service.view.list_view_service:
+    class: AppGear\AppBundle\EntityService\View\ListViewService
+    arguments:
+      - '@templating'
+    tags:
+      - name: appgear.entity_service.view
+        model: app.view.list_view
+
   appgear.entity_service.view.form_view_service:
     class: AppGear\AppBundle\EntityService\View\FormViewService
     arguments:

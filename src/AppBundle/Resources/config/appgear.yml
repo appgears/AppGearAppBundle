@@ -66,6 +66,10 @@ models:
         relationship:
           type: core.property.relationship.toOne
           target: core.model
+      fields:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field
 
   app.view.field:
     properties:

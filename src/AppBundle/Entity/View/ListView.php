@@ -17,6 +17,11 @@ class ListView extends View
     protected $model;
     
     /**
+     * Fields
+     */
+    protected $fields = array();
+    
+    /**
      * Set entities
      */
     public function setEntities($entities)
@@ -48,5 +53,22 @@ class ListView extends View
     public function getModel()
     {
         return $this->model;
+    }
+    
+    /**
+     * Set fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+    
+    /**
+     * Get fields
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }
