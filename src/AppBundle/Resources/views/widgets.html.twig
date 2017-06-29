@@ -2,9 +2,12 @@
 
 {% block widget_field %}
     {% spaceless %}
-        {% if field.widget is defined and field.widget is not null %}
+        {% if field.widget is not null or field.property is null %}
             {% set _widget = field.widget %}
-            {% set _value  = attribute(entity, field.property.name) %}
+            {% set _value  = null %}
+            {% if field.property is not null %}
+                {% set _value  = attribute(entity, field.property.name) %}
+            {% endif %}
             {{ block('widget') }}
         {% elseif (field.property|class) == 'ToMany' %}
             {{ block('widget_field_to_many')|raw }}
@@ -49,7 +52,10 @@
 {# Widgets #}
 
 {% block widget %}
-    {% set _block = block('widget_' ~ (_widget|class)|lower) %}
+    {% set _block = null %}
+    {% if _widget is not null %}
+        {% set _block = block('widget_' ~ (_widget|class)|lower) %}
+    {% endif %}
     {% if _block is not empty %}
         {{ _block|raw }}
     {% else %}
@@ -73,7 +79,7 @@
                     {% set _value = item %}
                     
                     {{ block('widget') }}
-    
+                    
                     {% set _widget = _original_widget %}
                     {% set _value = _original_value %}
                 {% else %}
@@ -85,5 +91,5 @@
 {% endblock %}
 
 {% block widget_expression %}
-    {{ _value|expression(_widget.expression) }}
+    {{ _widget.expression|expression(entity, _value) }}
 {% endblock %}

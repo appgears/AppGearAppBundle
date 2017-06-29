@@ -70,6 +70,7 @@ class DetailViewService extends ViewService
             function ($field) use ($modelService) {
                 /** @var View\Field $field */
                 return [
+                    'name'     => $field->getName(),
                     'property' => $modelService->getProperty($field->getName()),
                     'widget'   => $field->getWidget()
                 ];
@@ -88,6 +89,7 @@ class DetailViewService extends ViewService
         return array_map(
             function ($property) {
                 return [
+                    'name'     => $property->getName(),
                     'property' => $property
                 ];
             },
