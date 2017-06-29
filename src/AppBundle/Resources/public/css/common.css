@@ -6,3 +6,9 @@
     line-height: 1.42857143em; /* default line-height for bootstrapped table */
     max-height: 4.28em; /* by default, show only 3 lines - 3 x line-height */
 }
+
+/* For displays collection into detail or list view */
+td ul {
+    margin-bottom: 0px;
+    padding-left: 18px;
+}
