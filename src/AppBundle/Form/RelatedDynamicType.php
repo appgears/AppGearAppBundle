@@ -6,6 +6,7 @@ use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\EntityService\PropertyService;
 use Commerce\PlatformBundle\Entity\Database\NoteFile;
 use Cosmologist\Gears\ObjectType;
 use Symfony\Component\Form\AbstractType;
