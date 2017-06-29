@@ -56,7 +56,7 @@ class DetailViewService extends ViewService
             return $fields;
         }
 
-        return $this->getFieldsFromModel();
+        return $this->getFieldsFromModel($modelService);
     }
 
     /**

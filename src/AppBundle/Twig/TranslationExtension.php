@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Entity\Ui\Translation;
 use AppGear\AppBundle\Entity\View;
 use AppGear\CoreBundle\Entity\Property;
+use AppGear\CoreBundle\EntityService\PropertyService;
 use Twig_Extension;
 use Twig_SimpleFilter;
 
@@ -32,7 +33,7 @@ class TranslationExtension extends Twig_Extension
      */
     public function translate(Property $property)
     {
-        $extension = (new PropertyService($relationship))->getExtension(Translation::class);
+        $extension = (new PropertyService($property))->getExtension(Translation::class);
         if ($extension !== null) {
             return $extension->getLabel();
         }
