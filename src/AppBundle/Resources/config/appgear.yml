@@ -98,6 +98,26 @@ models:
         field:
           type: core.property.field.string_type
 
+  app.view.field.widget.link:
+    parent: app.view.field.widget
+    properties:
+      route:
+        field:
+          type: core.property.field.string_type
+      parameters:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field.widget.link.parameter
+
+  app.view.field.widget.link.parameter:
+    properties:
+      property:
+        field:
+          type: core.property.field.string_type
+      parameter:
+        field:
+          type: core.property.field.string_type
+
   app.view.tree_view:
     parent: app.view.list_view
 

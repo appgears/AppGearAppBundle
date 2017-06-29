@@ -97,3 +97,12 @@
 {% block widget_expression %}
     {{ _widget.expression|expression(entity, _value) }}
 {% endblock %}
+
+{% block widget_link %}
+    {% set parameters = {} %}
+    {% for parameter in _widget.parameters %}
+        {% set parameters = parameters|merge({(parameter.parameter): attribute(entity, parameter.property)}) %}
+    {% endfor %}
+    
+    <a href="{{ path(_widget.route, parameters) }}">{{ _value }}</a>
+{% endblock %}
