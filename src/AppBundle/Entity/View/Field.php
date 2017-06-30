@@ -11,6 +11,11 @@ class Field
     protected $name;
     
     /**
+     * Mapping
+     */
+    protected $mapping;
+    
+    /**
      * Widget
      */
     protected $widget;
@@ -30,6 +35,23 @@ class Field
     public function getName()
     {
         return $this->name;
+    }
+    
+    /**
+     * Set mapping
+     */
+    public function setMapping($mapping)
+    {
+        $this->mapping = $mapping;
+        return $this;
+    }
+    
+    /**
+     * Get mapping
+     */
+    public function getMapping()
+    {
+        return $this->mapping;
     }
     
     /**

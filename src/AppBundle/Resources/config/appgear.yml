@@ -76,6 +76,9 @@ models:
       name:
         field:
           type: core.property.field.string_type
+      mapping:
+        field:
+          type: core.property.field.string_type
       widget:
         relationship:
           type: core.property.relationship.toOne
