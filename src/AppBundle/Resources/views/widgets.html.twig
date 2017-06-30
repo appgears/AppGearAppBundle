@@ -41,7 +41,7 @@
 {% endblock %}
 
 {% block widget_field_default %}
-    {{ attribute(entity, field.property.name) }}
+    {{ entity|property_accessor(field.mapping) }}
 {% endblock %}
 
 {% block widget_field_text %}
@@ -49,7 +49,7 @@
 {% endblock %}
 
 {% block widget_field_datetime %}
-    {{ attribute(entity, field.property.name)|date('Y-m-d H:i:s') }}
+    {{ entity|property_accessor(field.mapping)|date('Y-m-d H:i:s') }}
 {% endblock %}
 
 
@@ -101,7 +101,8 @@
 {% block widget_link %}
     {% set parameters = {} %}
     {% for parameter in _widget.parameters %}
-        {% set parameters = parameters|merge({(parameter.parameter): attribute(entity, parameter.property)}) %}
+        {#{% set parameters = parameters|merge({(parameter.parameter): attribute(entity, parameter.property)}) %}#}
+        {% set parameters = parameters|merge({(parameter.parameter): 1}) %}
     {% endfor %}
     
     <a href="{{ path(_widget.route, parameters) }}">{{ _value }}</a>

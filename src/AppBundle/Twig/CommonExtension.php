@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Twig;
 
 use AppGear\PlatformBundle\Entity\Model\Property\Relationship;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Twig_Extension;
 use Twig_SimpleFilter;
 
@@ -20,7 +21,8 @@ class CommonExtension extends Twig_Extension
         return array(
             new Twig_SimpleFilter('class', array($this, 'getShortClassName')),
             new Twig_SimpleFilter('auto_convert_urls', array($this, 'autoConvertUrls')),
-            new Twig_SimpleFilter('expression', array($this, 'expression'))
+            new Twig_SimpleFilter('expression', array($this, 'expression')),
+            new Twig_SimpleFilter('property_accessor', array($this, 'propertyAccessor'))
         );
     }
 
@@ -67,6 +69,21 @@ class CommonExtension extends Twig_Extension
         $language = new ExpressionLanguage();
 
         return $language->evaluate($expression, ['entity' => $entity, 'value' => $value]);
+    }
+
+    /**
+     * Returns the value at the end of the property path of the object graph.
+     *
+     * @param object|array                 $objectOrArray The object or array to traverse
+     * @param string|PropertyPathInterface $propertyPath  The property path to read
+     *
+     * @return string
+     */
+    public function propertyAccessor($object, $propertyPath)
+    {
+        $accessor = new PropertyAccessor();
+
+        return $accessor->getValue($object, $propertyPath);
     }
 
     /**
