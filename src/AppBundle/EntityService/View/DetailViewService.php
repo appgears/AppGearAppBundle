@@ -69,8 +69,30 @@ class DetailViewService extends ViewService
         return array_map(
             function ($field) use ($modelService) {
                 /** @var View\Field $field */
+
+                $mapping = $field->getMapping();
+                $mapping = isset($mapping) ? $mapping : $field->getName();
+
+                if (null !== $mapping) {
+                    $parts = \explode('.', $mapping);
+
+                    $currentModel = $this->modelManager->getByInstance($this->getEntity());
+                    foreach ($parts as $part) {
+                        $modelService = new ModelService($currentModel);
+                        $property     = $modelService->getProperty($part);
+
+                        if ($property instanceof Relationship) {
+                            $currentModel = $property->getTarget();
+                        }
+                    }
+                } else {
+                    $model = $this->modelManager->getByInstance($this->getEntity());
+                    $property = (new ModelService($model))->getProperty($field->getName());
+                }
+
                 return [
                     'name'     => $field->getName(),
+                    'mapping'  => $mapping,
                     'property' => $modelService->getProperty($field->getName()),
                     'widget'   => $field->getWidget()
                 ];
