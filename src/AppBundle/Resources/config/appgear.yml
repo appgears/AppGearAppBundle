@@ -66,6 +66,10 @@ models:
         relationship:
           type: core.property.relationship.toOne
           target: core.model
+      top:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field
       fields:
         relationship:
           type: core.property.relationship.toMany
@@ -118,6 +122,13 @@ models:
         field:
           type: core.property.field.string_type
       parameter:
+        field:
+          type: core.property.field.string_type
+
+  app.view.field.widget.service:
+    parent: app.view.field.widget
+    properties:
+      id:
         field:
           type: core.property.field.string_type
 

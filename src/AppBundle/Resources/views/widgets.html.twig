@@ -106,3 +106,7 @@
     
     <a href="{{ path(_widget.route, parameters) }}">{{ _value }}</a>
 {% endblock %}
+
+{% block widget_service %}
+    {{ widget_service(_value, _widget) | raw }}
+{% endblock %}

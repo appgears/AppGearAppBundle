@@ -17,6 +17,11 @@ class ListView extends View
     protected $model;
     
     /**
+     * Top
+     */
+    protected $top = array();
+    
+    /**
      * Fields
      */
     protected $fields = array();
@@ -53,6 +58,23 @@ class ListView extends View
     public function getModel()
     {
         return $this->model;
+    }
+    
+    /**
+     * Set top
+     */
+    public function setTop($top)
+    {
+        $this->top = $top;
+        return $this;
+    }
+    
+    /**
+     * Get top
+     */
+    public function getTop()
+    {
+        return $this->top;
     }
     
     /**

@@ -16,23 +16,23 @@ class ListViewService extends ViewService
      *
      * @todo Merge with DetailViewService::getFields
      */
-    protected function getFields()
+    protected function getListFields()
     {
-        $modelService = new ModelService($this->view->getModel());
-
-        if ([] !== $fields = $this->getFieldsFromView()) {
+        if ([] !== $fields = $this->getFields($this->view->getFields())) {
             return $fields;
         }
 
-        return $this->getFieldsFromModel($modelService);
+        return $this->getFieldsFromModel();
     }
 
     /**
      * @todo Merge with DetailViewService::getFieldsFromView
      *
+     * @param View\Field[] $fields Fields
+     *
      * @return array
      */
-    protected function getFieldsFromView()
+    protected function getFields(array $fields)
     {
         return array_map(
             function ($field) {
@@ -64,19 +64,19 @@ class ListViewService extends ViewService
                     'widget'   => $field->getWidget()
                 ];
             },
-            $this->view->getFields()
+            $fields
         );
     }
 
     /**
      * @todo Merge with DetailViewService::getFieldsFromModel
      *
-     * @param ModelService $modelService
-     *
      * @return array
      */
-    protected function getFieldsFromModel(ModelService $modelService)
+    protected function getFieldsFromModel()
     {
+        $modelService = new ModelService($this->view->getModel());
+
         return array_map(
             function ($property) {
                 return [
@@ -95,6 +95,8 @@ class ListViewService extends ViewService
     {
         parent::collectData();
 
-        $this->addData('fields', $this->getFields());
+        $this
+            ->addData('top', $this->getFields($this->view->getTop()))
+            ->addData('fields', $this->getListFields());
     }
 }

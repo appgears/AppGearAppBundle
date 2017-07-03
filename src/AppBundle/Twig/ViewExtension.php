@@ -8,14 +8,23 @@ use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Model\ModelManager;
 use Embera\Embera;
 use League\CommonMark\CommonMarkConverter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig_Extension;
 use Twig_SimpleFilter;
+use Twig_SimpleFunction;
 
 /**
  * Twig extension for view
  */
 class ViewExtension extends Twig_Extension
 {
+    /**
+     * Service container
+     *
+     * @var ContainerInterface
+     */
+    private $container;
+
     /**
      * View manager
      *
@@ -33,12 +42,13 @@ class ViewExtension extends Twig_Extension
     /**
      * ViewExtension constructor.
      *
-     * @param ViewManager $viewManager View manager
-     *
-     * @oaram ModelManager $modelManager Model manager
+     * @param ContainerInterface $container    Service container
+     * @param ViewManager        $viewManager  View manager
+     * @param ModelManager       $modelManager Model manager
      */
-    public function __construct(ViewManager $viewManager, ModelManager $modelManager)
+    public function __construct(ContainerInterface $container, ViewManager $viewManager, ModelManager $modelManager)
     {
+        $this->container    = $container;
         $this->viewManager  = $viewManager;
         $this->modelManager = $modelManager;
     }
@@ -53,6 +63,16 @@ class ViewExtension extends Twig_Extension
             new Twig_SimpleFilter('markdown', array($this, 'markdown'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('view_render', array($this, 'render')),
             new Twig_SimpleFilter('model', array($this, 'model')),
+        );
+    }
+
+    /**
+     * * {@inheritdoc}
+     */
+    public function getFunctions()
+    {
+        return array(
+            new \Twig_SimpleFunction('widget_service', array($this, 'renderWidgetService')),
         );
     }
 
@@ -100,6 +120,21 @@ class ViewExtension extends Twig_Extension
     public function model($name)
     {
         return $this->modelManager->getByInstance($name);
+    }
+
+    /**
+     * Render widget service
+     *
+     * @param object            $entity Entity
+     * @param View\Field\Widget $widget Widget
+     */
+    public function renderWidgetService($entity, View\Field\Widget $widget)
+    {
+        if ($widget instanceof View\Field\Widget\Service) {
+            return $this->container->get($widget->getId())->render($entity, $widget);
+        }
+
+        return null;
     }
 
     /**
