@@ -6,7 +6,7 @@
             {% set _widget = field.widget %}
             {% set _value  = null %}
             {% if field.property is not null %}
-                {% set _value  = attribute(entity, field.property.name) %}
+                {% set _value  = entity|property_accessor(field.mapping) %}
             {% endif %}
             {{ block('widget') }}
         {% elseif (field.property|class) == 'ToMany' %}

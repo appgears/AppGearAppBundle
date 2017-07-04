@@ -81,6 +81,7 @@ class ListViewService extends ViewService
             function ($property) {
                 return [
                     'name'     => $property->getName(),
+                    'mapping'  => $property->getName(),
                     'property' => $property
                 ];
             },
