@@ -98,7 +98,7 @@ class Driver implements DriverInterface
             $right    = $node->nodes['right'];
             $operator = $node->attributes['operator'];
 
-            if ($operator === '==') {
+            if (\in_array($operator, ['==', '!='])) {
                 if ($left instanceof NameNode && $right instanceof ConstantNode) {
                     $name  = $left->attributes['name'];
                     $value = $right->attributes['value'];
@@ -106,9 +106,9 @@ class Driver implements DriverInterface
                     $property = $modelService->getProperty($name);
                     // Doctrine need "in" expression for relationships
                     if (($property instanceof Property\Relationship) && ($value !== null)) {
-                        $expr = $expr->in($name, [$value]);
+                        $expr = ($operator === '==') ? $expr->in($name, [$value]) : $expr->notIn($name, [$value]);
                     } else {
-                        $expr = $expr->eq($name, $value);
+                        $expr = ($operator === '==') ? $expr->eq($name, $value) : $expr->neq($name, $value);
                     }
                 } else {
                     throw new \RuntimeException(sprintf('Unsupported type of left or right node in expression "%s"', $expr));
