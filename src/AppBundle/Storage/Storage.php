@@ -74,4 +74,30 @@ class Storage
     {
         return $this->getRepository($model)->find($id);
     }
+
+    /**
+     * Save object to the storage.
+     *
+     * @param object $entity Entity
+     *
+     * @return void
+     */
+    public function save($entity)
+    {
+        $model  = $this->modelManager->getByInstance($entity);
+        $this->getRepository($model)->save($entity);
+    }
+
+    /**
+     * Remove entity from the storage
+     *
+     * @param object $entity Entity
+     *
+     * @return void
+     */
+    public function remove($entity)
+    {
+        $model  = $this->modelManager->getByInstance($entity);
+        $this->getRepository($model)->remove($entity);
+    }
 }

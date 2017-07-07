@@ -26,9 +26,8 @@ class RemoveController extends AbstractController
         }
         $id = $request->request->get('id');
 
-        $repository = $this->storage->getRepository($model);
-        $entity = $repository->find($id);
-        $repository->remove($entity);
+        $entity = $this->storage->find($model, $id);
+        $this->storage->remove($entity);
 
         if ($redirect = $this->buildRedirectResponse($request)) {
             return $redirect;

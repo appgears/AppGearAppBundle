@@ -149,13 +149,7 @@ class Repository
         $this->driver->save($object);
     }
 
-    /**
-     * Remove object from the storage
-     *
-     * @param object $object Object
-     *
-     * @return void
-     */
+
     public function remove($object)
     {
         $this->driver->remove($object);
