@@ -12,6 +12,14 @@ use Symfony\Bundle\TwigBundle\TwigEngine;
 class ListViewService extends ViewService
 {
     /**
+     * @return Model
+     */
+    protected function getModel()
+    {
+        return $this->view->getModel();
+    }
+
+    /**
      * @return array
      *
      * @todo Merge with DetailViewService::getFields
@@ -44,7 +52,7 @@ class ListViewService extends ViewService
                 if (null !== $mapping) {
                     $parts = \explode('.', $mapping);
 
-                    $currentModel = $this->view->getModel();
+                    $currentModel = $this->getModel();
                     foreach ($parts as $part) {
                         $modelService = new ModelService($currentModel);
                         $property     = $modelService->getProperty($part);
@@ -54,7 +62,7 @@ class ListViewService extends ViewService
                         }
                     }
                 } else {
-                    $property = (new ModelService($this->view->getModel()))->getProperty($field->getName());
+                    $property = (new ModelService($this->getModel()))->getProperty($field->getName());
                 }
 
                 return [
@@ -75,7 +83,7 @@ class ListViewService extends ViewService
      */
     protected function getFieldsFromModel()
     {
-        $modelService = new ModelService($this->view->getModel());
+        $modelService = new ModelService($this->getModel());
 
         return array_map(
             function ($property) {

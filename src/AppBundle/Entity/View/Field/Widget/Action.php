@@ -3,8 +3,18 @@
 namespace AppGear\AppBundle\Entity\View\Field\Widget;
 
 use AppGear\AppBundle\Entity\View\Field\Widget;
-class Link extends Widget
+class Action extends Widget
 {
+    
+    /**
+     * Type
+     */
+    protected $type = 'link';
+    
+    /**
+     * Prompt
+     */
+    protected $prompt = false;
     
     /**
      * Route
@@ -15,6 +25,40 @@ class Link extends Widget
      * Parameters
      */
     protected $parameters = array();
+    
+    /**
+     * Set type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+    
+    /**
+     * Get type
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+    
+    /**
+     * Set prompt
+     */
+    public function setPrompt($prompt)
+    {
+        $this->prompt = $prompt;
+        return $this;
+    }
+    
+    /**
+     * Get prompt
+     */
+    public function getPrompt()
+    {
+        return $this->prompt;
+    }
     
     /**
      * Set route

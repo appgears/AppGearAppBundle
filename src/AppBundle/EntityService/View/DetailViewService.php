@@ -31,6 +31,14 @@ class DetailViewService extends ViewService
     }
 
     /**
+     * @return Model
+     */
+    protected function getModel()
+    {
+        return $this->modelManager->getByInstance($this->view->getEntity());
+    }
+
+    /**
      * Get entity from view
      *
      * @return object
@@ -45,29 +53,29 @@ class DetailViewService extends ViewService
 
     /**
      * @return array
+     *
+     * @todo Merge with ListViewService::getFields
      */
-    protected function getFields()
+    protected function getDetailFields()
     {
-        $entity       = $this->getEntity();
-        $model        = $this->modelManager->getByInstance($entity);
-        $modelService = new ModelService($model);
-
-        if ([] !== $fields = $this->getFieldsFromView($modelService)) {
+        if ([] !== $fields = $this->getFields($this->view->getFields())) {
             return $fields;
         }
 
-        return $this->getFieldsFromModel($modelService);
+        return $this->getFieldsFromModel();
     }
 
     /**
-     * @param ModelService $modelService
+     * @todo Merge with ListViewService::getFieldsFromView
+     *
+     * @param View\Field[] $fields Fields
      *
      * @return array
      */
-    protected function getFieldsFromView(ModelService $modelService)
+    protected function getFields(array $fields)
     {
         return array_map(
-            function ($field) use ($modelService) {
+            function ($field) {
                 /** @var View\Field $field */
 
                 $mapping = $field->getMapping();
@@ -76,7 +84,7 @@ class DetailViewService extends ViewService
                 if (null !== $mapping) {
                     $parts = \explode('.', $mapping);
 
-                    $currentModel = $this->modelManager->getByInstance($this->getEntity());
+                    $currentModel = $this->getModel();
                     foreach ($parts as $part) {
                         $modelService = new ModelService($currentModel);
                         $property     = $modelService->getProperty($part);
@@ -86,32 +94,34 @@ class DetailViewService extends ViewService
                         }
                     }
                 } else {
-                    $model = $this->modelManager->getByInstance($this->getEntity());
-                    $property = (new ModelService($model))->getProperty($field->getName());
+                    $property = (new ModelService($this->getModel()))->getProperty($field->getName());
                 }
 
                 return [
                     'name'     => $field->getName(),
                     'mapping'  => $mapping,
-                    'property' => $modelService->getProperty($field->getName()),
+                    'property' => $property,
                     'widget'   => $field->getWidget()
                 ];
             },
-            $this->view->getFields()
+            $fields
         );
     }
 
     /**
-     * @param ModelService $modelService
+     * @todo Merge with ListViewService::getFieldsFromModel
      *
      * @return array
      */
-    protected function getFieldsFromModel(ModelService $modelService)
+    protected function getFieldsFromModel()
     {
+        $modelService = new ModelService($this->getModel());
+
         return array_map(
             function ($property) {
                 return [
                     'name'     => $property->getName(),
+                    'mapping'  => $property->getName(),
                     'property' => $property
                 ];
             },
@@ -126,12 +136,10 @@ class DetailViewService extends ViewService
     {
         parent::collectData();
 
-        $entity = $this->getEntity();
-        $model  = $this->modelManager->getByInstance($entity);
-
         $this
-            ->addData('model', $model)
-            ->addData('entity', $entity)
-            ->addData('fields', $this->getFields());
+            ->addData('model', $this->getModel())
+            ->addData('entity', $this->getEntity())
+            ->addData('top', $this->getFields($this->view->getTop()))
+            ->addData('fields', $this->getDetailFields());
     }
 }

@@ -43,11 +43,11 @@ class AppGearLoader extends Loader
      *
      * @return $this
      */
-    public function addRoute($alias, $controller, $pattern, $defaults, $requirements)
+    public function addRoute($alias, $controller, $pattern, $defaults, $requirements, $methods)
     {
         $defaults['_controller'] = $controller;
 
-        $route = new Route($pattern, $defaults, $requirements);
+        $route = new Route($pattern, $defaults, $requirements, [], '', [], $methods);
         $this->routes->add($alias, $route);
 
         return $this;

@@ -52,6 +52,10 @@ models:
       entity:
         relationship:
           type: core.property.relationship.toOne
+      top:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field
       fields:
         relationship:
           type: core.property.relationship.toMany
@@ -105,18 +109,26 @@ models:
         field:
           type: core.property.field.string_type
 
-  app.view.field.widget.link:
+  app.view.field.widget.action:
     parent: app.view.field.widget
     properties:
+      type:
+        field:
+          type: core.property.field.string_type
+          defaultValue: link
+      prompt:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
       route:
         field:
           type: core.property.field.string_type
       parameters:
         relationship:
           type: core.property.relationship.toMany
-          target: app.view.field.widget.link.parameter
+          target: app.view.field.widget.action.parameter
 
-  app.view.field.widget.link.parameter:
+  app.view.field.widget.action.parameter:
     properties:
       property:
         field:

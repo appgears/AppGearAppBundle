@@ -1,6 +1,6 @@
 <?php
 
-namespace AppGear\AppBundle\Entity\View\Field\Widget\Link;
+namespace AppGear\AppBundle\Entity\View\Field\Widget\Action;
 
 class Parameter
 {

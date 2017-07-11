@@ -12,6 +12,11 @@ class DetailView extends View
     protected $entity;
     
     /**
+     * Top
+     */
+    protected $top = array();
+    
+    /**
      * Fields
      */
     protected $fields = array();
@@ -31,6 +36,23 @@ class DetailView extends View
     public function getEntity()
     {
         return $this->entity;
+    }
+    
+    /**
+     * Set top
+     */
+    public function setTop($top)
+    {
+        $this->top = $top;
+        return $this;
+    }
+    
+    /**
+     * Get top
+     */
+    public function getTop()
+    {
+        return $this->top;
     }
     
     /**

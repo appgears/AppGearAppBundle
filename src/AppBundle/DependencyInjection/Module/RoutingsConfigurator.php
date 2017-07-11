@@ -23,27 +23,27 @@ class RoutingsConfigurator implements ConfiguratorInterface
 
         $rootNode
             ->prototype('array')
-            ->performNoDeepMerging()
-            ->children()
-            ->scalarNode('pattern')
-            ->isRequired()
-            ->end()
-            ->scalarNode('controller')
-            ->isRequired()
-            ->end()
-            ->arrayNode('defaults')
-            ->prototype('variable')
-            ->end()
-            ->end()
-            ->arrayNode('requirements')
-            ->prototype('scalar')
-            ->end()
-            ->end()
-            ->arrayNode('methods')
-            ->prototype('scalar')
-            ->end()
-            ->end()
-            ->end()
+                ->performNoDeepMerging()
+                ->children()
+                    ->scalarNode('pattern')
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('controller')
+                        ->isRequired()
+                    ->end()
+                    ->arrayNode('defaults')
+                        ->prototype('variable')
+                        ->end()
+                    ->end()
+                    ->arrayNode('requirements')
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
+                    ->arrayNode('methods')
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $rootNode;
@@ -64,7 +64,8 @@ class RoutingsConfigurator implements ConfiguratorInterface
                     $route['controller'],
                     $route['pattern'],
                     $route['defaults'],
-                    $route['requirements']
+                    $route['requirements'],
+                    $route['methods']
                 ]
             );
         }
