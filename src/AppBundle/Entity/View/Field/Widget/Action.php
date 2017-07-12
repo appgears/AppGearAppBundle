@@ -7,14 +7,14 @@ class Action extends Widget
 {
     
     /**
-     * Type
+     * Post
      */
-    protected $type = 'link';
+    protected $post = false;
     
     /**
-     * Prompt
+     * Confirm
      */
-    protected $prompt = false;
+    protected $confirm = false;
     
     /**
      * Route
@@ -27,37 +27,37 @@ class Action extends Widget
     protected $parameters = array();
     
     /**
-     * Set type
+     * Set post
      */
-    public function setType($type)
+    public function setPost($post)
     {
-        $this->type = $type;
+        $this->post = $post;
         return $this;
     }
     
     /**
-     * Get type
+     * Get post
      */
-    public function getType()
+    public function getPost()
     {
-        return $this->type;
+        return $this->post;
     }
     
     /**
-     * Set prompt
+     * Set confirm
      */
-    public function setPrompt($prompt)
+    public function setConfirm($confirm)
     {
-        $this->prompt = $prompt;
+        $this->confirm = $confirm;
         return $this;
     }
     
     /**
-     * Get prompt
+     * Get confirm
      */
-    public function getPrompt()
+    public function getConfirm()
     {
-        return $this->prompt;
+        return $this->confirm;
     }
     
     /**

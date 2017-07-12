@@ -106,7 +106,13 @@
         {% set parameters = parameters|merge({(parameter.parameter): entity|property_accessor(parameter.property)}) %}
     {% endfor %}
     
-    <a href="{{ path(_widget.route, parameters) }}"{% if _widget.type == 'button' %} class="btn btn-info btn-xs"{% endif %}>{{ _value }}</a>
+    {% if _widget.post %}
+        <form method="post" action="{{ path(_widget.route, parameters) }}">
+            <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
+        </form>
+    {% else %}
+        <a href="{{ path(_widget.route, parameters) }}"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</a>
+    {% endif %}
 {% endblock %}
 
 {% block widget_service %}

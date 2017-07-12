@@ -112,11 +112,11 @@ models:
   app.view.field.widget.action:
     parent: app.view.field.widget
     properties:
-      type:
+      post:
         field:
-          type: core.property.field.string_type
-          defaultValue: link
-      prompt:
+          type: core.property.field.boolean_type
+          defaultValue: false
+      confirm:
         field:
           type: core.property.field.boolean_type
           defaultValue: false
