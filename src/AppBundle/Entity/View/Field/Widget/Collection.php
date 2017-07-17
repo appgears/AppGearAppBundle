@@ -12,6 +12,11 @@ class Collection extends Widget
     protected $widget;
     
     /**
+     * Collapse
+     */
+    protected $collapse = false;
+    
+    /**
      * Set widget
      */
     public function setWidget($widget)
@@ -26,5 +31,22 @@ class Collection extends Widget
     public function getWidget()
     {
         return $this->widget;
+    }
+    
+    /**
+     * Set collapse
+     */
+    public function setCollapse($collapse)
+    {
+        $this->collapse = $collapse;
+        return $this;
+    }
+    
+    /**
+     * Get collapse
+     */
+    public function getCollapse()
+    {
+        return $this->collapse;
     }
 }

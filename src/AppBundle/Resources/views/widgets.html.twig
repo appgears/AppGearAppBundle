@@ -75,8 +75,10 @@
 
 {% block widget_collection %}
     <ul>
+        {% set _uniqid = ''|uniqid %}
+
         {% for item in _value %}
-            <li>
+            <li{% if _widget.collapse and (_value|length > 1) %}{% if loop.index0 != 0 %} class="collapse-{{ _uniqid }} collapse" {% else %} class="collapsor" data-toggle="collapse" data-target=".collapse-{{ _uniqid }}" aria-expanded="false"{% endif %}{% endif %}>
                 {% if _widget.widget is not null %}
                     {% set _original_widget = _widget %}
                     {% set _original_value = _value %}

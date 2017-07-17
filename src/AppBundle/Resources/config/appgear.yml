@@ -101,6 +101,10 @@ models:
         relationship:
           type: core.property.relationship.toOne
           target: app.view.field.widget
+      collapse:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
 
   app.view.field.widget.expression:
     parent: app.view.field.widget
