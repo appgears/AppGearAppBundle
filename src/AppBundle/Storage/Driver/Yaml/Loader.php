@@ -28,7 +28,7 @@ class Loader
     {
         $this->bundles = $bundles;
 
-        $this->load();
+        //$this->load();
     }
 
     /**

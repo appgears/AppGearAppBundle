@@ -34,8 +34,13 @@ services:
     arguments:
       - '%kernel.bundles%'
 
+  appgear.storage.driver.hydrator.simple:
+    class: AppGear\AppBundle\Storage\Driver\Yaml\Hydrator\SimpleHydrator
+
   appgear.storage.driver.hydrator.factory:
     class: AppGear\AppBundle\Storage\Driver\Yaml\HydratorFactory
+    arguments:
+      - '@appgear.storage.driver.hydrator.simple'
 
   appgear.storage.driver.doctrine_orm.generator.listener:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener

@@ -107,7 +107,6 @@ class Driver implements DriverInterface
      */
     private function buildCriteria($criteria, $node, $modelService)
     {
-        $expr     = Criteria::expr();
         if ($node instanceof BinaryNode) {
             $left     = $node->nodes['left'];
             $right    = $node->nodes['right'];
@@ -119,6 +118,9 @@ class Driver implements DriverInterface
                     $value = $right->attributes['value'];
 
                     $property = $modelService->getProperty($name);
+
+                    $expr = Criteria::expr();
+
                     // Doctrine need "in" expression for relationships
                     if (($property instanceof Property\Relationship) && ($value !== null)) {
                         $expr = ($operator === '==') ? $expr->in($name, [$value]) : $expr->notIn($name, [$value]);

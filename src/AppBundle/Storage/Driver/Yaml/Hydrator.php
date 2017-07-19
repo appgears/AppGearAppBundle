@@ -18,5 +18,5 @@ interface Hydrator
      *
      * @return object Instance
      */
-    public function hydrate($instance, $data);
+    public function hydrate($instance, array $data);
 }

@@ -6,17 +6,17 @@
  * Time: 17:23
  */
 
-namespace AppGear\AppBundle\Storage\Driver\Yaml;
+namespace AppGear\AppBundle\Storage\Driver\Yaml\Hydrator;
 
-interface Hydrator
+use AppGear\AppBundle\Storage\Driver\Yaml\Hydrator;
+
+class SimpleHydrator implements Hydrator
 {
     /**
-     * Hydrates data for single instance
-     *
-     * @param object $instance Instance
-     * @param array  $data     Data
-     *
-     * @return object Instance
+     * {@inheritdoc}
      */
-    public function hydrate($instance, array $data);
+    public function hydrate($instance, array $data)
+    {
+        return $instance;
+    }
 }

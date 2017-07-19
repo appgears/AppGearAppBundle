@@ -24,3 +24,8 @@ services:
   appgear.controller.view:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\ViewController
+
+  appgear.controller.test:
+    class: AppGear\AppBundle\Controller\TestController
+    arguments:
+      - '@appgear.storage'
