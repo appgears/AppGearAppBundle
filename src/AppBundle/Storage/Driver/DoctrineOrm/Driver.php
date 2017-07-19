@@ -89,9 +89,24 @@ class Driver implements DriverInterface
             $properties
         );
 
-        $node = $this->expressionLanguage->parse($expr, $names)->getNodes();
+        $node     = $this->expressionLanguage->parse($expr, $names)->getNodes();
+        $criteria = $this->buildCriteria(Criteria::create(), $node, $modelService);
 
-        $criteria = Criteria::create();
+        if (count($orderings)) {
+            $criteria->orderBy($orderings);
+        }
+
+        return $this->getObjectRepository($model)->matching($criteria);
+    }
+
+    /**
+     * @param $node
+     * @param $modelService
+     *
+     * @return Criteria
+     */
+    private function buildCriteria($criteria, $node, $modelService)
+    {
         $expr     = Criteria::expr();
         if ($node instanceof BinaryNode) {
             $left     = $node->nodes['left'];
@@ -113,19 +128,19 @@ class Driver implements DriverInterface
                 } else {
                     throw new \RuntimeException(sprintf('Unsupported type of left or right node in expression "%s"', $expr));
                 }
+
+                $criteria->andWhere($expr);
+            } elseif (\in_array($operator, ['and', '&&'])) {
+                $this->buildCriteria($criteria, $left, $modelService);
+                $this->buildCriteria($criteria, $right, $modelService);
             } else {
                 throw new \RuntimeException(sprintf('Unsupported operator "%s"', $operator));
             }
         } else {
             throw new \RuntimeException(sprintf('Unsupported note "%s" in expression "%s"', get_class($node), $expr));
         }
-        $criteria->andWhere($expr);
 
-        if (count($orderings)) {
-            $criteria->orderBy($orderings);
-        }
-
-        return $this->getObjectRepository($model)->matching($criteria);
+        return $criteria;
     }
 
     /**
