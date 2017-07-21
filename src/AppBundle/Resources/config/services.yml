@@ -31,13 +31,6 @@ services:
       tags:
           - { name: twig.extension }
 
-  appgear.twig.php_extension:
-      class: AppGear\AppBundle\Twig\PhpExtension
-      arguments:
-        - %app_gear_app.twig.php_extension.available_functions%
-      tags:
-          - { name: twig.extension }
-
   appgear.twig.translation_extension:
       class: AppGear\AppBundle\Twig\TranslationExtension
       tags:
