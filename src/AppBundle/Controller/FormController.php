@@ -145,7 +145,7 @@ class FormController extends AbstractController
                 return false;
             }
             if (!$form->isValid()) {
-                $this->logger->error((string) $form->getErrors());
+                $this->logger->error((string) $form->getErrors(true));
 
                 return false;
             }
