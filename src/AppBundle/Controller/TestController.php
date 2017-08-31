@@ -20,7 +20,7 @@ class TestController
 
     public function testAction(Request $request)
     {
-        $this->storage->getRepository('core.model')->findAll();
+        $model = $this->storage->find('core.model', 'core.model');
 
         return new Response('done');
     }

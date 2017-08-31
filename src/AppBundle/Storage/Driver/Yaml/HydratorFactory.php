@@ -15,7 +15,7 @@ class HydratorFactory
      *
      * @var Hydrator[]
      */
-    protected $registry;
+    protected $registry = [];
 
     /**
      * Default hydrator

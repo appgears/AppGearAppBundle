@@ -5,6 +5,8 @@ namespace AppGear\AppBundle\Storage\Driver\Yaml;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use RuntimeException;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Parser;
 
 /**
@@ -12,6 +14,11 @@ use Symfony\Component\Yaml\Parser;
  */
 class Loader
 {
+    /**
+     * @var KernelInterface
+     */
+    private $kernel;
+
     /**
      * All registered bundles
      *
@@ -22,11 +29,12 @@ class Loader
     /**
      * Constructor.
      *
-     * @param array $bundles All registered bundles
+     * @param KernelInterface $kernel
      */
-    public function __construct($bundles)
+    public function __construct(KernelInterface $kernel)
     {
-        $this->bundles = $bundles;
+        $this->kernel  = $kernel;
+        //$this->bundles = $bundles;
 
         //$this->load();
     }
@@ -53,19 +61,20 @@ class Loader
     {
         $configuration = $this->load();
 
-        if (!array_key_exists($model, $configuration)) {
+        // TODO: key 'models' only for BC
+        if (!array_key_exists($model, $configuration['models'])) {
             return [];
         }
 
         if ($id === null) {
-            return $configuration[$model];
+            return $configuration['models'][$model];
         }
 
-        if (!isset($configuration[$model][$id])) {
+        if (!isset($configuration['models'][$model][$id])) {
             throw new RuntimeException(sprintf('Record #"%s" for model "%s" not found', $id, $model));
         }
 
-        return $configuration[$model][$id];
+        return $configuration['models'][$model][$id];
     }
 
     /**
@@ -77,7 +86,7 @@ class Loader
     {
         $configuration = [];
 
-        foreach ($this->bundles as $bundle) {
+        foreach ($this->kernel->getBundles() as $bundle) {
             if ($this->hasConfiguration($bundle->getPath())) {
                 $configuration = array_merge_recursive(
                     $configuration,
@@ -112,6 +121,6 @@ class Loader
     {
         $yamlParser = new Parser();
 
-        return $yamlParser->parse(file_get_contents($bundlePath . '/Resources/config/datagrid/%s.yml'));
+        return $yamlParser->parse(file_get_contents($bundlePath . '/Resources/config/appgear.yml'));
     }
 }

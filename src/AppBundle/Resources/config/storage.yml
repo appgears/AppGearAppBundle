@@ -32,7 +32,7 @@ services:
   appgear.storage.driver.yaml.loader:
     class: AppGear\AppBundle\Storage\Driver\Yaml\Loader
     arguments:
-      - '%kernel.bundles%'
+      - '@kernel'
 
   appgear.storage.driver.hydrator.simple:
     class: AppGear\AppBundle\Storage\Driver\Yaml\Hydrator\SimpleHydrator
