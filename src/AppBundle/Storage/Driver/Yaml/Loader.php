@@ -57,24 +57,24 @@ class Loader
      *
      * @return array
      */
-    public function get($model, $id = null)
+    public function get($model, $id)
     {
         $configuration = $this->load();
 
-        // TODO: key 'models' only for BC
-        if (!array_key_exists($model, $configuration['models'])) {
+        // TODO: temp BC
+        if ($model === 'core.model') {
+            $model = 'models';
+        }
+
+        if (!array_key_exists($model, $configuration)) {
             return [];
         }
 
-        if ($id === null) {
-            return $configuration['models'][$model];
-        }
-
-        if (!isset($configuration['models'][$model][$id])) {
+        if (!isset($configuration[$model][$id])) {
             throw new RuntimeException(sprintf('Record #"%s" for model "%s" not found', $id, $model));
         }
 
-        return $configuration['models'][$model][$id];
+        return $configuration[$model][$id];
     }
 
     /**
