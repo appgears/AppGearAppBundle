@@ -7,10 +7,12 @@ use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
+use Cosmologist\Gears\ArrayType;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
@@ -82,12 +84,7 @@ class Driver implements DriverInterface
     {
         $modelService = new ModelService($this->modelManager->get($model));
         $properties   = $modelService->getAllProperties();
-        $names        = array_map(
-            function ($property) {
-                return $property->getName();
-            },
-            $properties
-        );
+        $names        = ArrayType::collect($properties, 'name');
 
         $node     = $this->expressionLanguage->parse($expr, $names)->getNodes();
         $criteria = $this->buildCriteria(Criteria::create(), $node, $modelService);
@@ -105,36 +102,64 @@ class Driver implements DriverInterface
      *
      * @return Criteria
      */
-    private function buildCriteria($criteria, $node, $modelService)
+    private function buildCriteria($criteria, $node, $modelService, $andWhere = true)
     {
         if ($node instanceof BinaryNode) {
             $left     = $node->nodes['left'];
             $right    = $node->nodes['right'];
             $operator = $node->attributes['operator'];
 
-            if (\in_array($operator, ['==', '!='])) {
-                if ($left instanceof NameNode && $right instanceof ConstantNode) {
-                    $name  = $left->attributes['name'];
-                    $value = $right->attributes['value'];
+            if (\in_array($operator, ['==', '!=', '<', '>', 'in'])) {
+                if ($left instanceof NameNode && ($right instanceof ConstantNode || $right instanceof ArrayNode)) {
+                    $name = $left->attributes['name'];
+                    if ($right instanceof ConstantNode) {
+                        $value = $right->attributes['value'];
+                    } else {
+                        // Extract array from ArrayNode
+                        $keys = $values = [];
+                        foreach ($right->nodes as $i => $node) {
+                            if ($i & 1) {
+                                $values[] = $node->attributes['value'];
+                            } else {
+                                $keys[] = $node->attributes['value'];
+                            }
+                        }
+                        $value = \array_combine($keys, $values);
+                    }
 
                     $property = $modelService->getProperty($name);
 
                     $expr = Criteria::expr();
 
-                    // Doctrine need "in" expression for relationships
-                    if (($property instanceof Property\Relationship) && ($value !== null)) {
-                        $expr = ($operator === '==') ? $expr->in($name, [$value]) : $expr->notIn($name, [$value]);
-                    } else {
-                        $expr = ($operator === '==') ? $expr->eq($name, $value) : $expr->neq($name, $value);
+                    if (\in_array($operator, ['==', '!='])) {
+                        // Doctrine need "in" expression for relationships
+                        if (($property instanceof Property\Relationship) && ($value !== null)) {
+                            $expr = ($operator === '==') ? $expr->in($name, [$value]) : $expr->notIn($name, [$value]);
+                        } else {
+                            $expr = ($operator === '==') ? $expr->eq($name, $value) : $expr->neq($name, $value);
+                        }
+                    } elseif ($operator === '>') {
+                        $expr = $expr->lt($name, $value);
+                    } elseif ($operator === '<') {
+                        $expr = $expr->gt($name, $value);
+                    } elseif ($operator === 'in') {
+                        $expr = $expr->in($name, $value);
                     }
                 } else {
                     throw new \RuntimeException(sprintf('Unsupported type of left or right node in expression "%s"', $expr));
                 }
 
-                $criteria->andWhere($expr);
+                if ($andWhere) {
+                    $criteria->andWhere($expr);
+                } else {
+                    $criteria->orWhere($expr);
+                }
             } elseif (\in_array($operator, ['and', '&&'])) {
                 $this->buildCriteria($criteria, $left, $modelService);
                 $this->buildCriteria($criteria, $right, $modelService);
+            } elseif (\in_array($operator, ['or', '||'])) {
+                $this->buildCriteria($criteria, $left, $modelService, false);
+                $this->buildCriteria($criteria, $right, $modelService, false);
             } else {
                 throw new \RuntimeException(sprintf('Unsupported operator "%s"', $operator));
             }
