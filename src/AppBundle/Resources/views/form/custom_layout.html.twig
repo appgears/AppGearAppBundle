@@ -1,0 +1,13 @@
+{% use "bootstrap_3_layout.html.twig" %}
+
+{%- block form_widget_compound -%}
+    {% if form.parent.parent is empty %}
+        {{ parent() }}
+    {% else %}
+        <div class="panel panel-default" style="border: 2px solid #ddd;">
+            <div class="panel-body">
+                {{ parent() }}
+            </div>
+        </div>
+    {% endif %}
+{%- endblock form_widget_compound -%}

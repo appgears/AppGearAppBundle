@@ -140,6 +140,8 @@ class DetailViewService extends ViewService
             ->addData('model', $this->getModel())
             ->addData('entity', $this->getEntity())
             ->addData('top', $this->getFields($this->view->getTop()))
-            ->addData('fields', $this->getDetailFields());
+            ->addData('fields', $this->getDetailFields())
+            ->addData('embedded', $this->getFields($this->view->getEmbedded()))
+        ;
     }
 }

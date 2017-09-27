@@ -43,9 +43,6 @@ models:
         field:
           type: core.property.field.boolean_type
 
-  app.view.container_view:
-    parent: app.view
-
   app.view.detail_view:
     parent: app.view
     properties:
@@ -57,6 +54,10 @@ models:
           type: core.property.relationship.toMany
           target: app.view.field
       fields:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field
+      embedded:
         relationship:
           type: core.property.relationship.toMany
           target: app.view.field
@@ -147,6 +148,15 @@ models:
       id:
         field:
           type: core.property.field.string_type
+
+  app.view.field.widget.view:
+    parent: app.view.field.widget
+    properties:
+      view:
+        relationship:
+          type: core.property.relationship.toOne
+          target: app.view
+
 
   app.view.tree_view:
     parent: app.view.list_view

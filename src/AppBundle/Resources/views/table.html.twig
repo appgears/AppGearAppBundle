@@ -1,0 +1,58 @@
+{% use "@app/widgets.html.twig" %}
+{% use "@app/misc/widget_text_max_lines.html.twig" %}
+
+<link href="{{ asset('bundles/app/css/common.css') }}" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="{{ asset('bundles/appgearapp/js/common.js') }}"></script>
+<script type="text/javascript" src="//cdn.rawgit.com/mgalante/jquery.redirect/master/jquery.redirect.js"></script>
+
+<div class="panel panel-default app-list-table">
+    
+    {% if top|length %}
+    <div class="panel-heading">
+        {#<a class="btn btn-info btn-xs" href="{{ path('admin.create', {model: (view.model.name|replace({'commerce.':''}))}) }}">Create</a>#}
+        {% for field in top %}
+            {{ block('widget_field') }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="panel-body padding-30">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-striped" data-toggle="table">
+                {% if view.entities|length %}
+                    <thead>
+                    <tr>
+                        {#<th></th>#}
+                        {% for field in fields %}
+                            <th>
+                                <div class="th-inner">
+                                    {{ field.name|humanize }}
+                                </div>
+                            </th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for entity in view.entities %}
+                        <tr>
+                            {#<td>
+                                <a href="{{ path('admin.edit', {id: entity.id, model: (view.model.name|replace({'commerce.':''}))}) }}" class="fa fa-pencil"></a>
+                                <a href="" onclick="if (confirm('Are you sure?')) {$.redirect('{{ path('admin.remove', {model: (view.model.name|replace({'commerce.':''}))}) }}', {id: {{ entity.id }}})}; return false;" class="fa fa-remove text-red"></a>
+                            </td>#}
+                            {% for field in fields %}
+                                <td>
+                                    {{ block('widget_field') }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% else %}
+                    <tr>
+                        <td class="text-center">No Data</td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>

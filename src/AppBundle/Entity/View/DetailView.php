@@ -22,6 +22,11 @@ class DetailView extends View
     protected $fields = array();
     
     /**
+     * Embedded
+     */
+    protected $embedded = array();
+    
+    /**
      * Set entity
      */
     public function setEntity($entity)
@@ -70,5 +75,22 @@ class DetailView extends View
     public function getFields()
     {
         return $this->fields;
+    }
+    
+    /**
+     * Set embedded
+     */
+    public function setEmbedded($embedded)
+    {
+        $this->embedded = $embedded;
+        return $this;
+    }
+    
+    /**
+     * Get embedded
+     */
+    public function getEmbedded()
+    {
+        return $this->embedded;
     }
 }

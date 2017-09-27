@@ -61,7 +61,7 @@ class ViewExtension extends Twig_Extension
         return array(
             new Twig_SimpleFilter('embed', array($this, 'embed'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('markdown', array($this, 'markdown'), array('is_safe' => array('html'))),
-            new Twig_SimpleFilter('view_render', array($this, 'render')),
+            new Twig_SimpleFilter('render', array($this, 'render')),
             new Twig_SimpleFilter('model', array($this, 'model')),
         );
     }
@@ -83,7 +83,7 @@ class ViewExtension extends Twig_Extension
      *
      * @return string
      */
-    public function render(View $view)
+    public function render($view)
     {
         return $this->viewManager->getViewService($view)->render();
     }

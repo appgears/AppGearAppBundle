@@ -120,3 +120,8 @@
 {% block widget_service %}
     {{ widget_service(_value, _widget) | raw }}
 {% endblock %}
+
+{% block widget_view %}
+    {#{% _widget.view.setEntity(_value) %}
+    {{ _widget.view | render | raw }}#}
+{% endblock %}

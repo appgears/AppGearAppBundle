@@ -1,0 +1,59 @@
+{% use "@app/widgets.html.twig" %}
+
+{% import _self as treeBuilder %}
+
+{% macro build(entities, model) %}
+    {% import _self as treeBuilder %}
+
+    {% for entity in entities %}
+        <tr class="treegrid-{{ entity.id }}{% if entity.parent is not null %} treegrid-parent-{{ entity.parent.id }}{% endif %}">
+            {% for property in model.properties %}
+                <td nowrap="nowrap">{{ block('widget_property') }}</td>
+            {% endfor %}
+            <td align="center">
+                <a class="btn btn-default btn-xs" href="{{ path('admin.edit', {id: entity.id, model: (model.name|replace({'commerce.':''}))}) }}">Edit</a>
+                <a class="btn btn-danger btn-xs" href="" onclick="if (confirm('Are you sure?')) {$.redirect('{{ path('admin.remove', {model: (model.name|replace({'commerce.':''}))}) }}', {id: {{ entity.id }}})}; return false;">Remove</a>
+            </td>
+        </tr>
+        {{ treeBuilder.build(entity.children, model) }}
+    {% endfor %}
+{% endmacro %}
+
+
+{#<script type="text/javascript" src="{{ asset('bundles/appgearapp/jquery.redirect.js') }}"></script>#}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-treegrid/0.2.0/css/jquery.treegrid.min.css">
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-treegrid/0.2.0/js/jquery.treegrid.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-treegrid/0.2.0/js/jquery.treegrid.bootstrap3.min.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $('.tree').treegrid({
+            initialState: 'collapsed'
+        });
+    })
+</script>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <a class="btn btn-info btn-xs" href="{{ path('admin.create', {model: (view.model.name|replace({'commerce.':''}))}) }}">Create</a>
+
+    </div>
+    <div class="panel-body padding-30">
+        <div class="table-responsive">
+
+            {% if view.entities|length %}
+                <table class="tree table table-bordered table-hover table-responsive table-striped">
+                    {{ treeBuilder.build(view.entities, view.model) }}
+                </table>
+            {% else %}
+                <table class="table table-hover table-bordered table-striped" data-toggle="table">
+                    <tr>
+                        <td class="text-center">No Data</td>
+                    </tr>
+                </table>
+            {% endif %}
+
+        </div>
+    </div>
+</div>

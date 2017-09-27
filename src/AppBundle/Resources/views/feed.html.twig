@@ -1,0 +1,36 @@
+{% use "@app/widgets.html.twig" %}
+{% use "@app/misc/widget_text_max_lines.html.twig" %}
+
+<link href="{{ asset('bundles/app/css/common.css') }}" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="{{ asset('bundles/app/css/common.css') }}"></script>
+<script type="text/javascript" src="//cdn.rawgit.com/mgalante/jquery.redirect/master/jquery.redirect.js"></script>
+
+<div class="panel panel-default app-list-feed">
+    
+    {% if top|length %}
+        <div class="panel-heading">
+            {% for field in top %}
+                {{ block('widget_field') }}
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="panel-body padding-30">
+        
+        {% for entity in view.entities %}
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered{% if loop.index is odd %} odd{% endif %}" data-toggle="table">
+                    {% for field in fields %}
+                        <tr>
+                            <td width="15%"><strong>{{ field.name|humanize }}</strong></td>
+                            <td>{{ block('widget_field') }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            
+            <div class="padding-bottom-10"></div>
+        {% endfor %}
+    
+    </div>
+</div>

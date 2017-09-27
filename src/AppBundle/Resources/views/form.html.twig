@@ -1,0 +1,11 @@
+{% form_theme form '@commerce/admin/form/custom_layout.html.twig' %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form method="post">
+            {% for fieldName in form|keys %}
+                {{ form_row(attribute(form, fieldName)) }}
+            {% endfor %}
+        </form>
+    </div>
+</div>

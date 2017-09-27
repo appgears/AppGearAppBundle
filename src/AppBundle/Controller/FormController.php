@@ -12,7 +12,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormController extends AbstractController
 {
@@ -86,17 +85,7 @@ class FormController extends AbstractController
         $viewParameters = $this->requireAttribute($request, '_view');
         $view           = $this->initialize($request, $viewParameters);
 
-        // Инициализируем FormView
-        // Если используется ContainerView, то FormView будет вложена в ContainerView
-        $formViewPath = $request->attributes->get('_form_view_path');
-        if ($formViewPath !== null) {
-            $accessor = new PropertyAccessor();
-            $formView = $accessor->getValue($view, $formViewPath);
-            $formView->setForm($form);
-        } else {
-            // Иначе текущее отображение и есть FormView
-            $view->setForm($form);
-        }
+        $view->setForm($form);
 
         return $this->viewResponse($view);
     }
