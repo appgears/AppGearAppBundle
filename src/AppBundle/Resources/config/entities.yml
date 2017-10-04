@@ -1,11 +1,5 @@
 services:
 
-  appgear.entity_extension.sluggable:
-    class: AppGear\AppBundle\EntityExtension\Sluggable
-    tags:
-      - name: extension.property.computed
-        model: app.ui.sluggable
-
   appgear.entity_service.property.field.boolean_type_servce:
     class: AppGear\AppBundle\EntityService\Property\Field\BooleanTypeService
     tags:
@@ -49,36 +43,3 @@ services:
         field: core.property.field.text_type
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.text_type
-
-  appgear.entity_service.view.view_service:
-    class: AppGear\AppBundle\EntityService\View\ViewService
-    arguments:
-      - '@templating'
-    tags:
-      - name: appgear.entity_service.view
-        model: app.view
-
-  appgear.entity_service.view.detail_view_service:
-    class: AppGear\AppBundle\EntityService\View\DetailViewService
-    arguments:
-      - '@templating'
-      - '@app_gear.core.model.manager'
-    tags:
-      - name: appgear.entity_service.view
-        model: app.view.detail_view
-
-  appgear.entity_service.view.list_view_service:
-    class: AppGear\AppBundle\EntityService\View\ListViewService
-    arguments:
-      - '@templating'
-    tags:
-      - name: appgear.entity_service.view
-        model: app.view.list_view
-
-  appgear.entity_service.view.form_view_service:
-    class: AppGear\AppBundle\EntityService\View\FormViewService
-    arguments:
-      - @templating
-    tags:
-      - name: appgear.entity_service.view
-        model: app.view.form_view

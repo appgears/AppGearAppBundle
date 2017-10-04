@@ -7,19 +7,23 @@
 
 <div class="panel panel-default app-list-table">
     
-    {% if top|length %}
-    <div class="panel-heading">
-        {#<a class="btn btn-info btn-xs" href="{{ path('admin.create', {model: (view.model.name|replace({'commerce.':''}))}) }}">Create</a>#}
-        {% for field in top %}
-            {{ block('widget_field') }}
-        {% endfor %}
-    </div>
+    {% set _model = data[0] | model %}
+    
+    {% if view.top|length %}
+        <div class="panel-heading">
+            {#<a class="btn btn-info btn-xs" href="{{ path('admin.create', {model: (view.model.name|replace({'commerce.':''}))}) }}">Create</a>#}
+            {% for field in (view.top | view_fields(_model)) %}
+                {{ block('widget_field') }}
+            {% endfor %}
+        </div>
     {% endif %}
+    
+    {% set fields = (view.fields | view_fields(_model)) %}
     
     <div class="panel-body padding-30">
         <div class="table-responsive">
             <table class="table table-hover table-bordered table-striped" data-toggle="table">
-                {% if view.entities|length %}
+                {% if data | length %}
                     <thead>
                     <tr>
                         {#<th></th>#}
@@ -33,7 +37,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for entity in view.entities %}
+                    {% for entity in data %}
                         <tr>
                             {#<td>
                                 <a href="{{ path('admin.edit', {id: entity.id, model: (view.model.name|replace({'commerce.':''}))}) }}" class="fa fa-pencil"></a>

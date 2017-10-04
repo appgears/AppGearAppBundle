@@ -22,9 +22,7 @@ services:
   appgear.view.manager:
     class: AppGear\AppBundle\View\ViewManager
     arguments:
-      - @app_gear.core.model.manager
-      - @app_gear.core.tagged_manager
-      - @service_container
+      - @twig
 
   appgear.twig.common_extension:
       class: AppGear\AppBundle\Twig\CommonExtension
@@ -40,7 +38,6 @@ services:
       class: AppGear\AppBundle\Twig\ViewExtension
       arguments:
           - @service_container
-          - @appgear.view.manager
           - @app_gear.core.model.manager
       tags:
           - { name: twig.extension }

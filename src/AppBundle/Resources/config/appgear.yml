@@ -46,9 +46,6 @@ models:
   app.view.detail_view:
     parent: app.view
     properties:
-      entity:
-        relationship:
-          type: core.property.relationship.toOne
       top:
         relationship:
           type: core.property.relationship.toMany
@@ -65,8 +62,6 @@ models:
   app.view.list_view:
     parent: app.view
     properties:
-      entities:
-        collection: []
       model:
         relationship:
           type: core.property.relationship.toOne

@@ -58,7 +58,7 @@ class FormController extends AbstractController
      */
     public function formAction(Request $request, $id = null)
     {
-        $modelId = $this->requireAttribute($request, '_model');
+        $modelId = $this->requireAttribute($request, 'model');
         $modelId = $this->performExpression($request, $modelId);
         $model   = $this->modelManager->get($modelId);
 
@@ -82,12 +82,10 @@ class FormController extends AbstractController
         }
 
         // Инициализируем отображение
-        $viewParameters = $this->requireAttribute($request, '_view');
+        $viewParameters = $this->requireAttribute($request, 'view');
         $view           = $this->initialize($request, $viewParameters);
 
-        $view->setForm($form);
-
-        return $this->viewResponse($view);
+        return $this->viewResponse($view, ['form' => $form->createView()]);
     }
 
     /**
