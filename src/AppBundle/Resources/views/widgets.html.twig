@@ -122,6 +122,5 @@
 {% endblock %}
 
 {% block widget_view %}
-    {#{% _widget.view.setEntity(_value) %}
-    {{ _widget.view | render | raw }}#}
+    {{ _widget.view | render( entity|property_accessor(field.mapping)) | raw }}
 {% endblock %}
