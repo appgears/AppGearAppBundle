@@ -32,15 +32,16 @@ class ViewController extends AbstractController
 
             $id         = $data['id'] ?? null;
             $expression = $data['expression'] ?? null;
+            $orderings  = $data['orderings'] ?? [];
 
             if ($id !== null) {
                 $id   = $this->performExpression($request, $id);
                 $data = $this->storage->find($model, $id);
             } elseif ($expression !== null) {
                 $expression = $this->performExpression($request, $expression);
-                $data       = $this->storage->getRepository($model)->findByExpr($expression);
+                $data       = $this->storage->getRepository($model)->findByExpr($expression, $orderings);
             } else {
-                $data = $this->storage->getRepository($model)->findAll();
+                $data = $this->storage->getRepository($model)->findBy([], $orderings);
             }
         }
 
