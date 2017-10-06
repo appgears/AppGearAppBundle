@@ -84,7 +84,7 @@ abstract class AbstractController extends Controller
      */
     protected function buildRedirectResponse(Request $request)
     {
-        if (!$redirect = $request->attributes->get('_success[_redirect]', null, true)) {
+        if (!$redirect = $request->attributes->get('success[redirect]', null, true)) {
             return null;
         }
 
@@ -114,7 +114,7 @@ abstract class AbstractController extends Controller
      */
     protected function buildSuccessResponse(Request $request, $entity)
     {
-        if (!$viewParameters = $request->attributes->get('_success[_view]', null, true)) {
+        if (!$viewParameters = $request->attributes->get('success[view]', null, true)) {
             return null;
         }
 
@@ -289,9 +289,10 @@ abstract class AbstractController extends Controller
      *
      * @return Response
      */
-    protected function viewResponse(View $view)
+    protected function viewResponse(View $view, array $data = [])
     {
-        $response = new Response($this->viewManager->getViewService($view)->render());
+        $content     = $this->viewManager->render($view, $data);
+        $response = new Response($content);
 
         if ($view->getUserSpecifiedContent() === false) {
             $response->setPublic();

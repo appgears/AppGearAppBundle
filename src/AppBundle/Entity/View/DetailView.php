@@ -7,11 +7,6 @@ class DetailView extends View
 {
     
     /**
-     * Entity
-     */
-    protected $entity;
-    
-    /**
      * Top
      */
     protected $top = array();
@@ -25,23 +20,6 @@ class DetailView extends View
      * Embedded
      */
     protected $embedded = array();
-    
-    /**
-     * Set entity
-     */
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-    
-    /**
-     * Get entity
-     */
-    public function getEntity()
-    {
-        return $this->entity;
-    }
     
     /**
      * Set top

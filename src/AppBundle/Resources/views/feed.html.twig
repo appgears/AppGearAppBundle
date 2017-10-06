@@ -7,30 +7,35 @@
 
 <div class="panel panel-default app-list-feed">
     
-    {% if top|length %}
-        <div class="panel-heading">
-            {% for field in top %}
-                {{ block('widget_field') }}
+    {% if data | length %}
+        {% set _model = data[0] | model %}
+        
+        {% if view.top | length %}
+            <div class="panel-heading">
+                {% for field in (view.top | view_fields(_model)) %}
+                    {{ block('widget_field') }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    
+        {% set fields = (view.fields | view_fields(_model)) %}
+        
+        <div class="panel-body padding-30">
+            {% for entity in data %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered{% if loop.index is odd %} odd{% endif %}" data-toggle="table">
+                        {% for field in fields %}
+                            <tr>
+                                <td width="15%"><strong>{{ field.name|humanize }}</strong></td>
+                                <td>{{ block('widget_field') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                
+                <div class="padding-bottom-10"></div>
             {% endfor %}
+        
         </div>
     {% endif %}
-    
-    <div class="panel-body padding-30">
-        
-        {% for entity in view.entities %}
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered{% if loop.index is odd %} odd{% endif %}" data-toggle="table">
-                    {% for field in fields %}
-                        <tr>
-                            <td width="15%"><strong>{{ field.name|humanize }}</strong></td>
-                            <td>{{ block('widget_field') }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            
-            <div class="padding-bottom-10"></div>
-        {% endfor %}
-    
-    </div>
 </div>
