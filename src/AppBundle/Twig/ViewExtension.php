@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
 use Embera\Embera;
@@ -26,13 +27,6 @@ class ViewExtension extends Twig_Extension
     private $container;
 
     /**
-     * View manager
-     *
-     * @var ViewManager
-     */
-    private $viewManager;
-
-    /**
      * Model manager
      *
      * @var ModelManager
@@ -49,7 +43,6 @@ class ViewExtension extends Twig_Extension
     public function __construct(ContainerInterface $container, ModelManager $modelManager)
     {
         $this->container    = $container;
-        //$this->viewManager  = $viewManager;
         $this->modelManager = $modelManager;
     }
 
@@ -81,12 +74,16 @@ class ViewExtension extends Twig_Extension
      * Render the view
      *
      * @param View $view View
+     * @param mixed $data Data
      *
      * @return string
      */
-    public function render($view)
+    public function render(View $view, $data = null)
     {
-        //return $this->viewManager->getViewService($view)->render();
+        // Avoid circular reference problem
+        $viewManager = $this->container->get('appgear.view.manager');
+
+        return $viewManager->render($view, ['data' => $data]);
     }
 
     /**
