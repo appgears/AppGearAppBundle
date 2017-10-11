@@ -105,11 +105,17 @@
 {% block widget_action %}
     {% set parameters = {} %}
     {% for parameter in _widget.parameters %}
-        {% set parameters = parameters|merge({(parameter.parameter): entity|property_accessor(parameter.property)}) %}
+        {% if parameter.property | length %}
+            {% set parameter_value = entity|property_accessor(parameter.property) %}
+        {% else %}
+            {% set parameter_value = parameter.value %}
+        {% endif %}
+        
+        {% set parameters = parameters|merge({(parameter.parameter): parameter_value}) %}
     {% endfor %}
     
     {% if _widget.post %}
-        <form method="post" action="{{ path(_widget.route, parameters) }}">
+        <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">
             <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
         </form>
     {% else %}
