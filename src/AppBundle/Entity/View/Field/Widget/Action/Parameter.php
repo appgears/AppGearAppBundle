@@ -6,14 +6,36 @@ class Parameter
 {
     
     /**
+     * Parameter
+     */
+    protected $parameter;
+    
+    /**
      * Property
      */
     protected $property;
     
     /**
-     * Parameter
+     * Value
      */
-    protected $parameter;
+    protected $value;
+    
+    /**
+     * Set parameter
+     */
+    public function setParameter($parameter)
+    {
+        $this->parameter = $parameter;
+        return $this;
+    }
+    
+    /**
+     * Get parameter
+     */
+    public function getParameter()
+    {
+        return $this->parameter;
+    }
     
     /**
      * Set property
@@ -33,19 +55,19 @@ class Parameter
     }
     
     /**
-     * Set parameter
+     * Set value
      */
-    public function setParameter($parameter)
+    public function setValue($value)
     {
-        $this->parameter = $parameter;
+        $this->value = $value;
         return $this;
     }
     
     /**
-     * Get parameter
+     * Get value
      */
-    public function getParameter()
+    public function getValue()
     {
-        return $this->parameter;
+        return $this->value;
     }
 }

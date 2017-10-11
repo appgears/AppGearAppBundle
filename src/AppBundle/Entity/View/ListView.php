@@ -22,6 +22,11 @@ class ListView extends View
     protected $fields = array();
     
     /**
+     * ShowCount
+     */
+    protected $showCount = false;
+    
+    /**
      * Set model
      */
     public function setModel($model)
@@ -70,5 +75,22 @@ class ListView extends View
     public function getFields()
     {
         return $this->fields;
+    }
+    
+    /**
+     * Set showCount
+     */
+    public function setShowCount($showCount)
+    {
+        $this->showCount = $showCount;
+        return $this;
+    }
+    
+    /**
+     * Get showCount
+     */
+    public function getShowCount()
+    {
+        return $this->showCount;
     }
 }

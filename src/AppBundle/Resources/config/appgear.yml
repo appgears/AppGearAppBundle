@@ -74,6 +74,10 @@ models:
         relationship:
           type: core.property.relationship.toMany
           target: app.view.field
+      showCount:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
 
   app.view.field:
     properties:
@@ -130,10 +134,13 @@ models:
 
   app.view.field.widget.action.parameter:
     properties:
+      parameter:
+        field:
+          type: core.property.field.string_type
       property:
         field:
           type: core.property.field.string_type
-      parameter:
+      value:
         field:
           type: core.property.field.string_type
 

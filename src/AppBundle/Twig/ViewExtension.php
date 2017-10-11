@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Twig;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
 use Embera\Embera;

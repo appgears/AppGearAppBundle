@@ -10,14 +10,20 @@
     {% if data | length %}
         {% set _model = data[0] | model %}
         
-        {% if view.top | length %}
+        {% if (view.top | length) or (view.showCount) %}
             <div class="panel-heading">
                 {% for field in (view.top | view_fields(_model)) %}
                     {{ block('widget_field') }}
                 {% endfor %}
+                
+                {% if view.showCount %}
+                    <div class="pull-right">
+                        Count: {{ data | length }}
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
-    
+        
         {% set fields = (view.fields | view_fields(_model)) %}
         
         <div class="panel-body padding-30">
