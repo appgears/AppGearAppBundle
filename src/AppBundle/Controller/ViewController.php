@@ -25,10 +25,10 @@ class ViewController extends AbstractController
         if (null !== $data = $request->get('data')) {
 
             $model = $data['model'] ?? null;
-
             if ($model === null) {
                 throw new InvalidArgumentException('ViewController: "data" parameter does not contain "model" parameter');
             }
+            $model = $this->performExpression($request, $model);
 
             $id         = $data['id'] ?? null;
             $expression = $data['expression'] ?? null;
