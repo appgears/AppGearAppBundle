@@ -139,12 +139,14 @@ class ViewExtension extends Twig_Extension
      * Get view fields
      *
      * @param array $fields
-     * @param Model $model
+     * @param object $entity
      *
      * @return array
      */
-    public function viewFields(array $fields, Model $model)
+    public function viewFields(array $fields, $entity)
     {
+        $model = $this->modelManager->getByInstance($entity);
+
         return array_map(
             function ($field) use ($model) {
                 /** @var View\Field $field */

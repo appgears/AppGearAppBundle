@@ -7,18 +7,16 @@
 
 <div class="panel panel-default app-list-table">
     
-    {% set _model = data[0] | model %}
-    
     {% if view.top|length %}
         <div class="panel-heading">
             {#<a class="btn btn-info btn-xs" href="{{ path('admin.create', {model: (view.model.name|replace({'commerce.':''}))}) }}">Create</a>#}
-            {% for field in (view.top | view_fields(_model)) %}
+            {% for field in (view.top | view_fields(data[0])) %}
                 {{ block('widget_field') }}
             {% endfor %}
         </div>
     {% endif %}
     
-    {% set fields = (view.fields | view_fields(_model)) %}
+    {% set fields = (view.fields | view_fields(data[0])) %}
     
     <div class="panel-body padding-30">
         <div class="table-responsive">
