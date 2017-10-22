@@ -12,11 +12,6 @@ class Action extends Widget
     protected $post = false;
     
     /**
-     * Confirm
-     */
-    protected $confirm = false;
-    
-    /**
      * Route
      */
     protected $route;
@@ -25,6 +20,16 @@ class Action extends Widget
      * Parameters
      */
     protected $parameters = array();
+    
+    /**
+     * Confirm
+     */
+    protected $confirm = false;
+    
+    /**
+     * Method
+     */
+    protected $method;
     
     /**
      * Set post
@@ -41,23 +46,6 @@ class Action extends Widget
     public function getPost()
     {
         return $this->post;
-    }
-    
-    /**
-     * Set confirm
-     */
-    public function setConfirm($confirm)
-    {
-        $this->confirm = $confirm;
-        return $this;
-    }
-    
-    /**
-     * Get confirm
-     */
-    public function getConfirm()
-    {
-        return $this->confirm;
     }
     
     /**
@@ -92,5 +80,39 @@ class Action extends Widget
     public function getParameters()
     {
         return $this->parameters;
+    }
+    
+    /**
+     * Set confirm
+     */
+    public function setConfirm($confirm)
+    {
+        $this->confirm = $confirm;
+        return $this;
+    }
+    
+    /**
+     * Get confirm
+     */
+    public function getConfirm()
+    {
+        return $this->confirm;
+    }
+    
+    /**
+     * Set method
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+        return $this;
+    }
+    
+    /**
+     * Get method
+     */
+    public function getMethod()
+    {
+        return $this->method;
     }
 }

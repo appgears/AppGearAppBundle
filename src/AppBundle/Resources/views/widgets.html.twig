@@ -113,13 +113,17 @@
         
         {% set parameters = parameters|merge({(parameter.parameter): parameter_value}) %}
     {% endfor %}
-    
-    {% if _widget.post %}
-        <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">
-            <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
-        </form>
+
+    {% if _widget.method == 'ajax' %}
+        <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="if (confirm('Are you sure?')) $.ajax({url: '{{ path(_widget.route, parameters) }}', method: {% if _widget.post %}'POST'{% else %}'GET'{% endif %}}).done(function() {location.reload();});"{% endif %}>{{ _value }}</button>
     {% else %}
-        <a href="{{ path(_widget.route, parameters) }}"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</a>
+        {% if _widget.post %}
+            <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">
+                <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
+            </form>
+        {% else %}
+            <a href="{{ path(_widget.route, parameters) }}"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</a>
+        {% endif %}
     {% endif %}
 {% endblock %}
 

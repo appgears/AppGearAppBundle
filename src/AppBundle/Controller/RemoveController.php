@@ -17,14 +17,14 @@ class RemoveController extends AbstractController
      */
     public function removeAction(Request $request)
     {
-        $modelId = $this->requireAttribute($request, '_model');
+        $modelId = $this->requireAttribute($request, 'model');
         $modelId = $this->performExpression($request, $modelId);
         $model   = $this->modelManager->get($modelId);
 
-        if (!$request->request->has('id')) {
+        if (!$request->attributes->has('id')) {
             throw new BadRequestHttpException('Undefined id parameter');
         }
-        $id = $request->request->get('id');
+        $id = $request->attributes->get('id');
 
         $entity = $this->storage->find($model, $id);
         $this->storage->remove($entity);
@@ -32,6 +32,6 @@ class RemoveController extends AbstractController
         if ($redirect = $this->buildRedirectResponse($request)) {
             return $redirect;
         }
-        return new Response('Deleted!');
+        return new Response();
     }
 }

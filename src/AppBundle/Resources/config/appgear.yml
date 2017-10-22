@@ -120,10 +120,6 @@ models:
         field:
           type: core.property.field.boolean_type
           defaultValue: false
-      confirm:
-        field:
-          type: core.property.field.boolean_type
-          defaultValue: false
       route:
         field:
           type: core.property.field.string_type
@@ -131,6 +127,13 @@ models:
         relationship:
           type: core.property.relationship.toMany
           target: app.view.field.widget.action.parameter
+      confirm:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
+      method:
+        field:
+          type: core.property.field.string_type
 
   app.view.field.widget.action.parameter:
     properties:
