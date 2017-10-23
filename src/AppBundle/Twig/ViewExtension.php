@@ -4,7 +4,6 @@ namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
-use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
@@ -173,7 +172,8 @@ class ViewExtension extends Twig_Extension
                     'name'     => $field->getName(),
                     'mapping'  => $mapping,
                     'property' => $property,
-                    'widget'   => $field->getWidget()
+                    'widget'   => $field->getWidget(),
+                    'group'    => $field->getGroup()
                 ];
             },
             $fields

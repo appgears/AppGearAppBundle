@@ -21,6 +21,11 @@ class Field
     protected $widget;
     
     /**
+     * Group
+     */
+    protected $group;
+    
+    /**
      * Set name
      */
     public function setName($name)
@@ -69,5 +74,22 @@ class Field
     public function getWidget()
     {
         return $this->widget;
+    }
+    
+    /**
+     * Set group
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
+        return $this;
+    }
+    
+    /**
+     * Get group
+     */
+    public function getGroup()
+    {
+        return $this->group;
     }
 }

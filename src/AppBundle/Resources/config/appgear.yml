@@ -91,6 +91,9 @@ models:
         relationship:
           type: core.property.relationship.toOne
           target: app.view.field.widget
+      group:
+        field:
+          type: core.property.field.string_type
 
   app.view.field.widget: ~
 
