@@ -5,6 +5,7 @@ namespace AppGear\AppBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 class RemoveController extends AbstractController
 {
@@ -19,6 +20,9 @@ class RemoveController extends AbstractController
     {
         $modelId = $this->requireAttribute($request, 'model');
         $modelId = $this->performExpression($request, $modelId);
+
+        $this->securityManager->isModelGranted(BasicPermissionMap::PERMISSION_DELETE, $modelId);
+
         $model   = $this->modelManager->get($modelId);
 
         if (!$request->attributes->has('id')) {

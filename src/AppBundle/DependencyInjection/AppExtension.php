@@ -23,6 +23,7 @@ class AppExtension extends Extension
         $loader->load('controllers.yml');
         $loader->load('entities.yml');
         $loader->load('form.yml');
+        $loader->load('security.yml');
         $loader->load('services.yml');
         $loader->load('storage.yml');
 

@@ -1,0 +1,8 @@
+services:
+
+  appgear.security.manager:
+      class: AppGear\AppBundle\Security\SecurityManager
+      arguments:
+        - '@security.authorization_checker'
+        - '@app_gear.core.model.manager'
+      public: false

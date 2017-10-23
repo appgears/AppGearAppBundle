@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Controller;
 
 use AppGear\AppBundle\Entity\View;
+use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -42,20 +43,30 @@ abstract class AbstractController extends Controller
     protected $viewManager;
 
     /**
+     * Security manager
+     * 
+     * @var SecurityManager
+     */
+    protected $securityManager;
+
+    /**
      * CrudController constructor.
      *
-     * @param Storage      $storage      Storage
-     * @param ModelManager $modelManager Model manager
-     * @param ViewManager  $viewManager  View manager
+     * @param Storage         $storage         Storage
+     * @param ModelManager    $modelManager    Model manager
+     * @param ViewManager     $viewManager     View manager
+     * @param SecurityManager $securityManager Security manager
      */
     public function __construct(
         Storage $storage,
         ModelManager $modelManager,
-        ViewManager $viewManager
+        ViewManager $viewManager,
+        SecurityManager $securityManager
     ) {
-        $this->storage      = $storage;
-        $this->modelManager = $modelManager;
-        $this->viewManager  = $viewManager;
+        $this->storage         = $storage;
+        $this->modelManager    = $modelManager;
+        $this->viewManager     = $viewManager;
+        $this->securityManager = $securityManager;
     }
 
     /**
@@ -291,7 +302,7 @@ abstract class AbstractController extends Controller
      */
     protected function viewResponse(View $view, array $data = [])
     {
-        $content     = $this->viewManager->render($view, $data);
+        $content  = $this->viewManager->render($view, $data);
         $response = new Response($content);
 
         if ($view->getUserSpecifiedContent() === false) {
