@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
@@ -20,22 +21,25 @@ class RemoveController extends AbstractController
     {
         $modelId = $this->requireAttribute($request, 'model');
         $modelId = $this->performExpression($request, $modelId);
-
-        $this->securityManager->isModelGranted(BasicPermissionMap::PERMISSION_DELETE, $modelId);
-
         $model   = $this->modelManager->get($modelId);
 
         if (!$request->attributes->has('id')) {
             throw new BadRequestHttpException('Undefined id parameter');
         }
-        $id = $request->attributes->get('id');
 
+        $id     = $request->attributes->get('id');
         $entity = $this->storage->find($model, $id);
+
+        if (!$this->securityManager->check(BasicPermissionMap::PERMISSION_DELETE, $entity)) {
+            throw new AccessDeniedHttpException();
+        }
+
         $this->storage->remove($entity);
 
         if ($redirect = $this->buildRedirectResponse($request)) {
             return $redirect;
         }
+
         return new Response();
     }
 }

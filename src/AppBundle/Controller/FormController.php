@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Controller;
 
 use AppGear\AppBundle\Form\FormBuilder;
+use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -29,20 +30,22 @@ class FormController extends AbstractController
     /**
      * CrudController constructor.
      *
-     * @param Storage         $storage      Storage
-     * @param ModelManager    $modelManager Model manager
-     * @param ViewManager     $viewManager  View manager
-     * @param FormBuilder     $formBuilder  Form builder for model
-     * @param LoggerInterface $logger       Logger
+     * @param Storage         $storage         Storage
+     * @param ModelManager    $modelManager    Model manager
+     * @param ViewManager     $viewManager     View manager
+     * @param SecurityManager $securityManager Security manager
+     * @param FormBuilder     $formBuilder     Form builder for model
+     * @param LoggerInterface $logger          Logger
      */
     public function __construct(
         Storage $storage,
         ModelManager $modelManager,
         ViewManager $viewManager,
+        SecurityManager $securityManager,
         FormBuilder $formBuilder,
         LoggerInterface $logger
     ) {
-        parent::__construct($storage, $modelManager, $viewManager);
+        parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
         $this->formBuilder = $formBuilder;
         $this->logger      = $logger;

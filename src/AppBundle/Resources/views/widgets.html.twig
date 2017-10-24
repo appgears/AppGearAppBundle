@@ -115,7 +115,7 @@
     {% endfor %}
 
     {% if _widget.method == 'ajax' %}
-        <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="if (confirm('Are you sure?')) $.ajax({url: '{{ path(_widget.route, parameters) }}', method: {% if _widget.post %}'POST'{% else %}'GET'{% endif %}}).done(function() {location.reload();});"{% endif %}>{{ _value }}</button>
+        <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}">{{ _value }}</button>
     {% else %}
         {% if _widget.post %}
             <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">

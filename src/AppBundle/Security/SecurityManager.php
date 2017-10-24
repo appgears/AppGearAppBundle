@@ -36,24 +36,18 @@ class SecurityManager
         $this->checker      = $checker;
     }
 
-    public function checkModelAccess(string $permission, string $model)
-    {
-        if (!$this->isModelGranted($permission, $model)) {
-            throw new AccessDeniedException();
-        }
-    }
-
     /**
      * Check if permission is granted to model
      *
      * @param string $permission
-     * @param string $model
+     * @param object $object
      *
      * @return bool
      */
-    public function check(string $permission, string $model): bool
+    public function check(string $permission, $object): bool
     {
-        $fqcn  = $this->modelManager->fullClassName($model);
+        $model = $this->modelManager->getByInstance($object);
+        $fqcn  = $this->modelManager->fullClassName($model->getName());
 
         $objectIdentity = new ObjectIdentity(
             self::CLASS_SCOPE_OBJECT_IDENTIFIER_VALUE,
