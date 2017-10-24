@@ -5,7 +5,6 @@ namespace AppGear\AppBundle\Security;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class SecurityManager
 {
