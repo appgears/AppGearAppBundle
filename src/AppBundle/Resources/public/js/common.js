@@ -29,4 +29,13 @@ $(document).ready(function () {
             }
         });
     });
+    
+    $('.btn-compound-add-item').click(function () {
+        var group = $('[data-prototype]').filter(':parent').first();
+        var prototype = group.data('prototype');
+
+        prototype = prototype.replace(/__name__/g, group.children().length);
+
+        group.append(prototype);
+    });
 });

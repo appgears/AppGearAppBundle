@@ -4,7 +4,7 @@
     {% if compound %}
         {% if form.parent.parent is empty %}
             {{- block('form_widget_compound') -}}
-            <button class="btn btn-default btn-compound-add-item"><i class="fa fa-plus"></i>Add Item</button>
+            <button type="button" class="btn btn-default btn-compound-add-item"><i class="fa fa-plus"></i>Add Item</button>
         {% else %}
             {{- block('form_widget_compound') -}}
         {% endif %}
