@@ -1,10 +1,23 @@
 {% use "bootstrap_3_layout.html.twig" %}
 
+{%- block form_widget -%}
+    {% if compound %}
+        {% if form.parent.parent is empty %}
+            {{- block('form_widget_compound') -}}
+            <button class="btn btn-default btn-compound-add-item"><i class="fa fa-plus"></i>Add Item</button>
+        {% else %}
+            {{- block('form_widget_compound') -}}
+        {% endif %}
+    {% else %}
+        {{- block('form_widget_simple') -}}
+    {% endif %}
+{%- endblock form_widget -%}
+
 {%- block form_widget_compound -%}
     {% if form.parent.parent is empty %}
         {{ parent() }}
     {% else %}
-        <div class="panel panel-default" style="border: 2px solid #ddd;">
+        <div class="panel panel-default" style="border: 1px solid #ddd;">
             <div class="panel-body">
                 {{ parent() }}
             </div>
