@@ -145,7 +145,7 @@ class FormBuilder
                     $propertyName,
                     CollectionType::class,
                     [
-                        'entry_type' => new RelatedDynamicType($this, $property),
+                        'entry_type' => new RelatedDynamicType($this, $property, $this->modelManager),
                         'allow_add'  => true,
                         'options'    => ['label' => false] // Removing indexes (labels) for collection items
                     ]

@@ -3,12 +3,11 @@
 namespace AppGear\AppBundle\Form;
 
 use AppGear\AppBundle\Entity\Storage\Column;
-use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\EntityService\PropertyService;
-use Commerce\PlatformBundle\Entity\Database\NoteFile;
-use Cosmologist\Gears\ObjectType;
+use AppGear\CoreBundle\Model\ModelManager;
+use Commerce\PlatformBundle\Entity\Shop\Order\Item;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -33,17 +32,29 @@ class RelatedDynamicType extends AbstractType
     private $formBuilder;
 
     /**
+     * Model manager
+     *
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    /**
      * RelatedDynamicType constructor.
      *
      * @param FormBuilder  $formBuilder  AppGear form builder
      * @param Relationship $relationship Relationship
+     * @param ModelManager $modelManager Model manager
      */
-    public function __construct(FormBuilder $formBuilder, Relationship $relationship)
+    public function __construct(FormBuilder $formBuilder, Relationship $relationship, ModelManager $modelManager)
     {
         $this->formBuilder  = $formBuilder;
         $this->relationship = $relationship;
+        $this->modelManager = $modelManager;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $ms = new ModelService($this->relationship->getTarget());
@@ -85,11 +96,13 @@ class RelatedDynamicType extends AbstractType
         return null;
     }
 
-    public
-    function setDefaultOptions(OptionsResolverInterface $resolver)
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => NoteFile::class,
-        ));
+        $fqcn = $this->modelManager->fullClassName($this->relationship->getTarget());
+
+        $resolver->setDefaults(['data_class' => $fqcn]);
     }
 }
