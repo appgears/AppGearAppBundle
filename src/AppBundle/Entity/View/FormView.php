@@ -12,6 +12,11 @@ class FormView extends View
     protected $form;
     
     /**
+     * Fields
+     */
+    protected $fields = array();
+    
+    /**
      * Set form
      */
     public function setForm($form)
@@ -26,5 +31,22 @@ class FormView extends View
     public function getForm()
     {
         return $this->form;
+    }
+    
+    /**
+     * Set fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+    
+    /**
+     * Get fields
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

@@ -175,3 +175,13 @@ models:
       form:
         classType:
           className: Symfony\Component\Form\Form
+      fields:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.form.field
+
+  app.view.form.field:
+    properties:
+      name:
+        field:
+          type: core.property.field.string_type
