@@ -138,16 +138,17 @@ class ViewExtension extends Twig_Extension
     /**
      * Get view fields
      *
-     * @param array $fields
+     * @param array  $fields
      * @param object $entity
+     * @param bool   $getFromModelIfNoFields
      *
      * @return array
      */
-    public function viewFields(array $fields, $entity)
+    public function viewFields(array $fields, $entity, $getFromModelIfNoFields = true)
     {
         $model = $this->modelManager->getByInstance($entity);
 
-        if (count($fields) === 0) {
+        if (count($fields) === 0 && $getFromModelIfNoFields) {
             $fields = $this->getFieldsFromModel($model);
         }
 
