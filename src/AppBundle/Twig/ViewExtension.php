@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
+use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Model\ModelManager;
@@ -146,6 +147,10 @@ class ViewExtension extends Twig_Extension
     {
         $model = $this->modelManager->getByInstance($entity);
 
+        if (count($fields) === 0) {
+            $fields = $this->getFieldsFromModel($model);
+        }
+
         return array_map(
             function ($field) use ($model) {
                 /** @var View\Field $field */
@@ -179,6 +184,27 @@ class ViewExtension extends Twig_Extension
             $fields
         );
     }
+
+    /**
+     * @return array
+     */
+    private function getFieldsFromModel(Model $model)
+    {
+        $modelService = new ModelService($model);
+
+        return array_map(
+            function ($property) {
+                $viewField = new View\Field();
+                $viewField
+                    ->setName($property->getName())
+                    ->setMapping($property->getName());
+
+                return $viewField;
+            },
+            $modelService->getAllProperties()
+        );
+    }
+
 
     /**
      * {@inheritdoc};
