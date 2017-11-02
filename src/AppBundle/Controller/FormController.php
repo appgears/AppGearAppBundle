@@ -13,6 +13,8 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 class FormController extends AbstractController
 {
@@ -67,6 +69,13 @@ class FormController extends AbstractController
 
         // Загружаем существующую сущность или создаем новую
         $entity = $this->loadEntity($model, $id);
+
+        // Проверяем доступ
+        if ($id === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $entity)) {
+            throw new AccessDeniedHttpException();
+        } elseif ($id !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $entity)) {
+            throw new AccessDeniedHttpException();
+        }
 
         // Собираем форму
         $form = $this->getForm($model, $entity);
