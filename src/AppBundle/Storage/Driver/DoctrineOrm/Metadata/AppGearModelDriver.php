@@ -214,6 +214,10 @@ class AppGearModelDriver implements MappingDriver
                     }
 
                     $mapping['joinColumns'][] = $joinColumn;
+                } else {
+                    if ($property->getComposition()) {
+                        $mapping['cascade'] = ['persist', 'remove'];
+                    }
                 }
 
                 if ($property instanceof Property\Relationship\ToOne) {
