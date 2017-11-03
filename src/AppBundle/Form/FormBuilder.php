@@ -2,7 +2,6 @@
 
 namespace AppGear\AppBundle\Form;
 
-use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\AppBundle\Form\Transformer\ChoicesCollectionToValuesTransformer;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
@@ -10,7 +9,7 @@ use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
-use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -92,8 +91,7 @@ class FormBuilder
      */
     public function build(FormBuilderInterface $formBuilder, Model $model)
     {
-        $modelService = new ModelService($model);
-        foreach ($modelService->getAllProperties() as $property) {
+        foreach (ModelHelper::getProperties($model) as $property) {
             $this->addProperty($formBuilder, $property);
         }
 
@@ -116,8 +114,8 @@ class FormBuilder
             list($type, $options) = $this->resolveFieldType($property);
             $options['required'] = false;
             $formBuilder->add($propertyName, $type, $options);
-        } elseif ($property instanceof Relationship) {
 
+        } elseif ($property instanceof Relationship) {
             if (!$property->getComposition()) {
                 $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
                 $options      = [

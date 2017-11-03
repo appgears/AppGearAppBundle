@@ -6,7 +6,7 @@ use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Relationship;
-use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Embera\Embera;
 use League\CommonMark\CommonMarkConverter;
@@ -37,7 +37,6 @@ class ViewExtension extends Twig_Extension
      * ViewExtension constructor.
      *
      * @param ContainerInterface $container    Service container
-     * @param ViewManager        $viewManager  View manager
      * @param ModelManager       $modelManager Model manager
      */
     public function __construct(ContainerInterface $container, ModelManager $modelManager)
@@ -163,15 +162,14 @@ class ViewExtension extends Twig_Extension
                     $parts = \explode('.', $mapping);
 
                     foreach ($parts as $part) {
-                        $modelService = new ModelService($model);
-                        $property     = $modelService->getProperty($part);
+                        $property = ModelHelper::getProperty($model, $part);
 
                         if ($property instanceof Relationship) {
                             $model = $property->getTarget();
                         }
                     }
                 } else {
-                    $property = (new ModelService($this->getModel()))->getProperty($field->getName());
+                    $property = ModelHelper::getProperty($this->getModel(), $field->getName());
                 }
 
                 return [
@@ -191,8 +189,6 @@ class ViewExtension extends Twig_Extension
      */
     private function getFieldsFromModel(Model $model)
     {
-        $modelService = new ModelService($model);
-
         return array_map(
             function ($property) {
                 $viewField = new View\Field();
@@ -202,7 +198,7 @@ class ViewExtension extends Twig_Extension
 
                 return $viewField;
             },
-            $modelService->getAllProperties()
+            ModelHelper::getProperties($model)
         );
     }
 

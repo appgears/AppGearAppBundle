@@ -4,10 +4,9 @@ namespace AppGear\AppBundle\Form;
 
 use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\CoreBundle\Entity\Property\Relationship;
-use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\EntityService\PropertyService;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
-use Commerce\PlatformBundle\Entity\Shop\Order\Item;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -57,9 +56,7 @@ class RelatedDynamicType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $ms = new ModelService($this->relationship->getTarget());
-
-        foreach ($ms->getAllProperties() as $property) {
+        foreach (ModelHelper::getProperties($this->relationship->getTarget()) as $property) {
             $backSideProperty = null;
             if ($property instanceof Relationship) {
                 $backSideProperty = $this->getBacksideProperty($property);
@@ -87,10 +84,8 @@ class RelatedDynamicType extends AbstractType
         }
 
         if ($backSideName !== null) {
-            $target = $relationship->getTarget();
-            $ms     = new ModelService($target);
 
-            return $ms->getProperty($backSideName);
+            return ModelHelper::getProperty($relationship->getTarget(), $backSideName);
         }
 
         return null;

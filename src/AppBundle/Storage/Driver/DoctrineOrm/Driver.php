@@ -4,8 +4,8 @@ namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
 use AppGear\AppBundle\Storage\DriverInterface;
 use AppGear\CoreBundle\Entity\Property;
-use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Cosmologist\Gears\ArrayType;
 use Doctrine\Common\Collections\Criteria;
@@ -82,12 +82,10 @@ class Driver implements DriverInterface
      */
     public function findByExpr($model, $expr, array $orderings = [])
     {
-        $modelService = new ModelService($this->modelManager->get($model));
-        $properties   = $modelService->getAllProperties();
-        $names        = ArrayType::collect($properties, 'name');
+        $names        = ArrayType::collect(ModelHelper::getProperties($model), 'name');
 
         $node     = $this->expressionLanguage->parse($expr, $names)->getNodes();
-        $criteria = $this->buildCriteria(Criteria::create(), $node, $modelService);
+        $criteria = $this->buildCriteria($model, Criteria::create(), $node);
 
         if (count($orderings)) {
             $criteria->orderBy($orderings);
@@ -97,12 +95,14 @@ class Driver implements DriverInterface
     }
 
     /**
-     * @param $node
-     * @param $modelService
+     * @param      $model
+     * @param      $criteria
+     * @param      $node
+     * @param bool $andWhere
      *
-     * @return Criteria
+     * @return mixed
      */
-    private function buildCriteria($criteria, $node, $modelService, $andWhere = true)
+    private function buildCriteria($model, $criteria, $node, $andWhere = true)
     {
         if ($node instanceof BinaryNode) {
             $left     = $node->nodes['left'];
@@ -127,7 +127,7 @@ class Driver implements DriverInterface
                         $value = \array_combine($keys, $values);
                     }
 
-                    $property = $modelService->getProperty($name);
+                    $property = ModelHelper::getProperty($model, $name);
 
                     $expr = Criteria::expr();
 

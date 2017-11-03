@@ -10,7 +10,7 @@ use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Collection;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
-use AppGear\CoreBundle\EntityService\ModelService;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -44,7 +44,7 @@ abstract class AbstractController extends Controller
 
     /**
      * Security manager
-     * 
+     *
      * @var SecurityManager
      */
     protected $securityManager;
@@ -75,7 +75,7 @@ abstract class AbstractController extends Controller
      * @param Request $request   Request
      * @param string  $attribute Required attribute
      *
-     * @return string Attribute value
+     * @return string|array Attribute value
      */
     protected function requireAttribute(Request $request, $attribute)
     {
@@ -245,8 +245,7 @@ abstract class AbstractController extends Controller
             $instance = $this->modelManager->instance($modelId);
         }
 
-        $properties = (new ModelService($model))->getAllProperties();
-        foreach ($properties as $property) {
+        foreach (ModelHelper::getProperties($model) as $property) {
             $propertyName = $property->getName();
             if (array_key_exists($propertyName, $parameters)) {
                 $value              = null;

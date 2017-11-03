@@ -8,8 +8,8 @@ use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
-use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\EntityService\PropertyService;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
@@ -108,7 +108,7 @@ class AppGearModelDriver implements MappingDriver
 
         $this->mapProperties($metadata, $model);
 
-        if ($parents = (new ModelService($model))->getParents()) {
+        if ($parents = ModelHelper::getParents($model)) {
             $parents = array_map(function ($parent) {
                 return $this->modelManager->fullClassName($parent->getName());
             }, $parents);
@@ -206,7 +206,7 @@ class AppGearModelDriver implements MappingDriver
 
                     $targetProperty = null;
                     if (isset($mapping['inversedBy'])) {
-                        $targetProperty = (new ModelService($property->getTarget()))->getProperty($mapping['inversedBy']);
+                        $targetProperty = ModelHelper::getProperty($property->getTarget(), $mapping['inversedBy']);
                     }
 
                     if ($property->getComposition() || ($targetProperty !== null && $targetProperty->getComposition())) {
@@ -267,8 +267,7 @@ class AppGearModelDriver implements MappingDriver
         }
 
         $oppositePropertyName = (isset($mapping['inversedBy'])) ? $mapping['inversedBy'] : $mapping['mappedBy'];
-        $modelService         = new ModelService($property->getTarget());
-        $oppositeProperty     = $modelService->getProperty($oppositePropertyName);
+        $oppositeProperty     = ModelHelper::getProperty($property->getTarget(), $oppositePropertyName);
 
         return ($oppositeProperty instanceof Property\Relationship\ToMany);
     }

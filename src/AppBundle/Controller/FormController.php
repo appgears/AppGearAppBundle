@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\Controller;
 
+use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Form\FormBuilder;
 use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
@@ -9,7 +10,7 @@ use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,33 +72,40 @@ class FormController extends AbstractController
         $entity = $this->loadEntity($model, $id);
 
         // Проверяем доступ
-        if ($id === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $entity)) {
-            throw new AccessDeniedHttpException();
-        } elseif ($id !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $entity)) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->checkAccess($entity);
 
         // Собираем форму
-        $form = $this->getForm($model, $entity);
+        $formBuilder = $this->getFormBuilder($model, $entity);
+        $form        = $formBuilder->getForm();
 
         // Если форма была отправлена и успешно обработана
         if ($this->submitForm($request, $form)) {
+            $this->updateMappedRelationshipForCollection($formBuilder);
             $this->saveEntity($model, $entity);
 
-            if ($redirect = $this->buildRedirectResponse($request)) {
-                return $redirect;
-            } elseif ($response = $this->buildSuccessResponse($request, $entity)) {
-                return $response;
-            }
-
-            return new Response();
+            return $this->buildResponse($request, $entity);
         }
 
         // Инициализируем отображение
         $viewParameters = $this->requireAttribute($request, 'view');
+        /** @var View $view */
         $view           = $this->initialize($request, $viewParameters);
 
         return $this->viewResponse($view, ['form' => $form->createView()]);
+    }
+
+    /**
+     * Check access
+     *
+     * @param object $entity Entity
+     */
+    public function checkAccess($entity)
+    {
+        if ($entity->getId() === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $entity)) {
+            throw new AccessDeniedHttpException();
+        } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $entity)) {
+            throw new AccessDeniedHttpException();
+        }
     }
 
     /**
@@ -106,11 +114,11 @@ class FormController extends AbstractController
      * @param Model  $model  Model
      * @param object $entity Entity
      *
-     * @return FormInterface
+     * @return FormBuilderInterface
      */
-    protected function getForm(Model $model, $entity)
+    protected function getFormBuilder(Model $model, $entity)
     {
-        return $this->formBuilder->build($this->formBuilder->create($entity), $model)->getForm();
+        return $this->formBuilder->build($this->formBuilder->create($entity), $model);
     }
 
     /**
@@ -130,29 +138,41 @@ class FormController extends AbstractController
     /**
      * Handle request with form
      *
-     * @param Request $request Request
-     * @param Form    $form    Form
+     * @param Request       $request Request
+     * @param FormInterface $form    Form
      *
      * @return bool True if form passed and successfully submitted
      */
-    protected function submitForm(Request $request, Form $form)
+    protected function submitForm(Request $request, FormInterface $form)
     {
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-
-            if (!$form->isSubmitted()) {
-                return false;
-            }
-            if (!$form->isValid()) {
-                $this->logger->error((string) $form->getErrors(true));
-
-                return false;
-            }
-
-            return true;
+        if (!$request->isMethod('POST')) {
+            return false;
         }
 
-        return false;
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted()) {
+            return false;
+        }
+        if (!$form->isValid()) {
+            $this->logger->error((string) $form->getErrors(true));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function updateMappedRelationshipForCollection(FormBuilderInterface $formBuilder)
+    {
+        $data = $formBuilder->getData();
+
+        foreach ($formBuilder as $field) {
+            $type = $field->getType()->getName();
+            if ($type === 'collection') {
+                gettype($field);
+            }
+        }
     }
 
     /**
@@ -164,5 +184,25 @@ class FormController extends AbstractController
     protected function saveEntity(Model $model, $entity)
     {
         $this->storage->getRepository($model)->save($entity);
+    }
+
+    /**
+     * Build response
+     *
+     * @param Request $request
+     * @param object  $entity
+     *
+     * @return Response
+     */
+    protected function buildResponse(Request $request, $entity)
+    {
+        if ($response = $this->buildRedirectResponse($request)) {
+            return $response;
+        }
+        if ($response = $this->buildSuccessResponse($request, $entity)) {
+            return $response;
+        }
+
+        return new Response();
     }
 }
