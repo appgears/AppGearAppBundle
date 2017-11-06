@@ -198,7 +198,7 @@ class ViewExtension extends Twig_Extension
 
                 return $viewField;
             },
-            ModelHelper::getProperties($model)
+            iterator_to_array(ModelHelper::getProperties($model))
         );
     }
 

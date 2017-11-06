@@ -2,9 +2,8 @@
 
 namespace AppGear\AppBundle\Form;
 
-use AppGear\AppBundle\Entity\Storage\Column;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\CoreBundle\Entity\Property\Relationship;
-use AppGear\CoreBundle\EntityService\PropertyService;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\AbstractType;
@@ -59,7 +58,7 @@ class RelatedDynamicType extends AbstractType
         foreach (ModelHelper::getProperties($this->relationship->getTarget()) as $property) {
             $backSideProperty = null;
             if ($property instanceof Relationship) {
-                $backSideProperty = $this->getBacksideProperty($property);
+                $backSideProperty = StorageHelper::getBacksideProperty($property);
             }
 
             if ($backSideProperty !== null && $backSideProperty === $this->relationship) {
@@ -68,27 +67,6 @@ class RelatedDynamicType extends AbstractType
 
             $this->formBuilder->addProperty($builder, $property);
         }
-    }
-
-    private function getBacksideProperty(Relationship $relationship)
-    {
-        $backSideName = null;
-
-        $extension = (new PropertyService($relationship))->getExtension(Column::class);
-        if ($extension !== null) {
-            if (strlen($mappedBy = $extension->getMappedBy())) {
-                $backSideName = $mappedBy;
-            } elseif (strlen($inversedBy = $extension->getInversedBy())) {
-                $backSideName = $inversedBy;
-            }
-        }
-
-        if ($backSideName !== null) {
-
-            return ModelHelper::getProperty($relationship->getTarget(), $backSideName);
-        }
-
-        return null;
     }
 
     /**

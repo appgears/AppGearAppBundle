@@ -108,7 +108,7 @@ class AppGearModelDriver implements MappingDriver
 
         $this->mapProperties($metadata, $model);
 
-        if ($parents = ModelHelper::getParents($model)) {
+        if ($parents = iterator_to_array(ModelHelper::getParents($model))) {
             $parents = array_map(function ($parent) {
                 return $this->modelManager->fullClassName($parent->getName());
             }, $parents);

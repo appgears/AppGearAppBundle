@@ -82,7 +82,8 @@ class Driver implements DriverInterface
      */
     public function findByExpr($model, $expr, array $orderings = [])
     {
-        $names        = ArrayType::collect(ModelHelper::getProperties($model), 'name');
+        $model = $this->modelManager->get($model);
+        $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
 
         $node     = $this->expressionLanguage->parse($expr, $names)->getNodes();
         $criteria = $this->buildCriteria($model, Criteria::create(), $node);
@@ -155,11 +156,11 @@ class Driver implements DriverInterface
                     $criteria->orWhere($expr);
                 }
             } elseif (\in_array($operator, ['and', '&&'])) {
-                $this->buildCriteria($criteria, $left, $modelService);
-                $this->buildCriteria($criteria, $right, $modelService);
+                $this->buildCriteria($model, $criteria, $left);
+                $this->buildCriteria($model, $criteria, $right);
             } elseif (\in_array($operator, ['or', '||'])) {
-                $this->buildCriteria($criteria, $left, $modelService, false);
-                $this->buildCriteria($criteria, $right, $modelService, false);
+                $this->buildCriteria($model, $criteria, $left, false);
+                $this->buildCriteria($model, $criteria, $right, false);
             } else {
                 throw new \RuntimeException(sprintf('Unsupported operator "%s"', $operator));
             }

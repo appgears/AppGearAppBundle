@@ -4,10 +4,12 @@ namespace AppGear\AppBundle\Controller;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Form\FormBuilder;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 class FormController extends AbstractController
@@ -80,7 +83,7 @@ class FormController extends AbstractController
 
         // Если форма была отправлена и успешно обработана
         if ($this->submitForm($request, $form)) {
-            $this->updateMappedRelationshipForCollection($formBuilder);
+            $this->updateMappedRelationshipForCollection($formBuilder, $model);
             $this->saveEntity($model, $entity);
 
             return $this->buildResponse($request, $entity);
@@ -89,7 +92,7 @@ class FormController extends AbstractController
         // Инициализируем отображение
         $viewParameters = $this->requireAttribute($request, 'view');
         /** @var View $view */
-        $view           = $this->initialize($request, $viewParameters);
+        $view = $this->initialize($request, $viewParameters);
 
         return $this->viewResponse($view, ['form' => $form->createView()]);
     }
@@ -163,14 +166,26 @@ class FormController extends AbstractController
         return true;
     }
 
-    protected function updateMappedRelationshipForCollection(FormBuilderInterface $formBuilder)
+    /**
+     * Set relationship from related backside
+     *
+     * @param FormBuilderInterface $formBuilder Form builder
+     * @param Model                $model       Model
+     */
+    protected function updateMappedRelationshipForCollection(FormBuilderInterface $formBuilder, Model $model)
     {
-        $data = $formBuilder->getData();
+        $data     = $formBuilder->getData();
+        $accessor = new PropertyAccessor();
 
         foreach ($formBuilder as $field) {
-            $type = $field->getType()->getName();
-            if ($type === 'collection') {
-                gettype($field);
+            if ($field->getType()->getName() === 'collection') {
+                $property = ModelHelper::getRelationship($model, $field->getName());
+                if (null !== $backsideProperty = StorageHelper::getBacksideProperty($property)) {
+                    $relatedData = $accessor->getValue($data, $property->getName());
+                    foreach ($relatedData as $relatedItem) {
+                        $accessor->setValue($relatedItem, $backsideProperty->getName(), $data);
+                    }
+                }
             }
         }
     }
