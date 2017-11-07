@@ -50,7 +50,8 @@ class FormController extends AbstractController
         SecurityManager $securityManager,
         FormBuilder $formBuilder,
         LoggerInterface $logger
-    ) {
+    )
+    {
         parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
         $this->formBuilder = $formBuilder;
@@ -85,7 +86,7 @@ class FormController extends AbstractController
             $this->updateMappedRelationshipForCollection($formBuilder, $model);
             $this->saveEntity($model, $entity);
 
-            return $this->buildResponse($request, $entity);
+            return $this->buildResponse($request, $model, $entity);
         }
 
         // Инициализируем отображение
@@ -157,7 +158,7 @@ class FormController extends AbstractController
             return false;
         }
         if (!$form->isValid()) {
-            $this->logger->error((string) $form->getErrors(true));
+            $this->logger->error((string)$form->getErrors(true));
 
             return false;
         }
@@ -203,17 +204,18 @@ class FormController extends AbstractController
     /**
      * Build response
      *
-     * @param Request $request
-     * @param object  $entity
+     * @param Request $request Request
+     * @param Model   $model   Entity model
+     * @param object  $entity  Entity
      *
      * @return Response
      */
-    protected function buildResponse(Request $request, $entity)
+    protected function buildResponse(Request $request, Model $model, $entity)
     {
-        if ($response = $this->buildRedirectResponse($request)) {
+        if ($response = $this->buildRedirectResponse($request, $model, $entity)) {
             return $response;
         }
-        if ($response = $this->buildSuccessResponse($request, $entity)) {
+        if ($response = $this->buildSuccessResponse($request, $model, $entity)) {
             return $response;
         }
 

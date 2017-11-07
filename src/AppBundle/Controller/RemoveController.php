@@ -36,7 +36,7 @@ class RemoveController extends AbstractController
 
         $this->storage->remove($entity);
 
-        if ($redirect = $this->buildRedirectResponse($request)) {
+        if ($redirect = $this->buildRedirectResponse($request, $model, $entity)) {
             return $redirect;
         }
 

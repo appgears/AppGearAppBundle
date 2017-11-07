@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class AbstractController extends Controller
 {
@@ -62,7 +63,8 @@ abstract class AbstractController extends Controller
         ModelManager $modelManager,
         ViewManager $viewManager,
         SecurityManager $securityManager
-    ) {
+    )
+    {
         $this->storage         = $storage;
         $this->modelManager    = $modelManager;
         $this->viewManager     = $viewManager;
@@ -90,10 +92,12 @@ abstract class AbstractController extends Controller
      * Perform redirect if redirect is configured
      *
      * @param Request $request Request
+     * @param Model   $model   Model
+     * @param object  $entity  Entity
      *
      * @return null|RedirectResponse
      */
-    protected function buildRedirectResponse(Request $request)
+    protected function buildRedirectResponse(Request $request, Model $model, $entity)
     {
         if (!$redirect = $request->attributes->get('success[redirect]', null, true)) {
             return null;
@@ -103,10 +107,14 @@ abstract class AbstractController extends Controller
             return $this->redirectToRoute($redirect);
         } elseif (is_array($redirect) && array_key_exists('name', $redirect)) {
             $route      = $redirect['name'];
-            $parameters = array_key_exists('parameters', $redirect) ? $redirect['parameters'] : [];
+            $parameters = $redirect['parameters'] ?? [];
+
+            $accessor = new PropertyAccessor();
+            $context  = (object) compact('request', 'model', 'entity');
+
             $parameters = array_map(
-                function ($parameter) use ($request) {
-                    return $this->performExpression($request, $parameter);
+                function ($parameter) use ($accessor, $context) {
+                    return $accessor->getValue($context, $parameter);
                 },
                 $parameters
             );
@@ -119,11 +127,12 @@ abstract class AbstractController extends Controller
      * Build view response for successfully action
      *
      * @param Request $request Request
+     * @param Model   $model   Entity model
      * @param object  $entity  Entity
      *
      * @return null|Response
      */
-    protected function buildSuccessResponse(Request $request, $entity)
+    protected function buildSuccessResponse(Request $request, Model $model, $entity)
     {
         if (!$viewParameters = $request->attributes->get('success[view]', null, true)) {
             return null;
