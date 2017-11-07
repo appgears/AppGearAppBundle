@@ -61,15 +61,14 @@ class FormController extends AbstractController
      * Action for form view and process
      *
      * @param Request $request Request
+     * @param string  $model   Model name
      * @param mixed   $id      Entity ID
      *
      * @return Response
      */
-    public function formAction(Request $request, $id = null)
+    public function formAction(Request $request, $model, $id = null)
     {
-        $modelId = $this->requireAttribute($request, 'model');
-        $modelId = $this->performExpression($request, $modelId);
-        $model   = $this->modelManager->get($modelId);
+        $model = $this->modelManager->get($model);
 
         // Загружаем существующую сущность или создаем новую
         $entity = $this->loadEntity($model, $id);
