@@ -122,7 +122,16 @@
                 <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
             </form>
         {% else %}
-            <a href="{{ path(_widget.route, parameters) }}"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</a>
+            {% set attrs = {'href':  path(_widget.route, parameters)} %}
+            
+            {% if _widget.confirm %}
+                {% set attrs = attrs|merge({'onClick': 'return confirm("Are you sure?")'}) %}
+            {% endif %}
+            {% if _widget.newWindow %}
+                {% set attrs = attrs|merge({'target': '_blank'}) %}
+            {% endif %}
+            
+            <a{{ attrs|htmlAttributes }}>{{ _value }}</a>
         {% endif %}
     {% endif %}
 {% endblock %}

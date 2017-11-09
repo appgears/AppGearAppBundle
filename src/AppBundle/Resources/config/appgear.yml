@@ -137,6 +137,10 @@ models:
       method:
         field:
           type: core.property.field.string_type
+      newWindow:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
 
   app.view.field.widget.action.parameter:
     properties:

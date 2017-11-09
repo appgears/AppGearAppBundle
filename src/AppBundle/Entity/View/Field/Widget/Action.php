@@ -32,6 +32,11 @@ class Action extends Widget
     protected $method;
     
     /**
+     * NewWindow
+     */
+    protected $newWindow = false;
+    
+    /**
      * Set post
      */
     public function setPost($post)
@@ -114,5 +119,22 @@ class Action extends Widget
     public function getMethod()
     {
         return $this->method;
+    }
+    
+    /**
+     * Set newWindow
+     */
+    public function setNewWindow($newWindow)
+    {
+        $this->newWindow = $newWindow;
+        return $this;
+    }
+    
+    /**
+     * Get newWindow
+     */
+    public function getNewWindow()
+    {
+        return $this->newWindow;
     }
 }
