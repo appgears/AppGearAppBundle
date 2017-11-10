@@ -8,6 +8,7 @@ use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Cosmologist\Gears\ArrayType;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -20,11 +21,11 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 class Driver implements DriverInterface
 {
     /**
-     * Object manager
+     * Object $registry
      *
-     * @var ObjectManager
+     * @var Registry
      */
-    protected $objectManager;
+    protected $registry;
 
     /**
      * Model manager
@@ -43,12 +44,12 @@ class Driver implements DriverInterface
     /**
      * Constructor
      *
-     * @param ObjectManager $objectManager Manager registry
-     * @param ModelManager  $modelManager  Model manager
+     * @param Registry     $registry     Doctrine registry
+     * @param ModelManager $modelManager Model manager
      */
-    public function __construct(ObjectManager $objectManager, ModelManager $modelManager)
+    public function __construct(Registry $registry, ModelManager $modelManager)
     {
-        $this->objectManager      = $objectManager;
+        $this->registry           = $registry;
         $this->modelManager       = $modelManager;
         $this->expressionLanguage = new ExpressionLanguage();
     }
@@ -176,8 +177,10 @@ class Driver implements DriverInterface
      */
     public function save($object)
     {
-        $this->objectManager->persist($object);
-        $this->objectManager->flush();
+        $manager = $this->registry->getManagerForClass(get_class($object));
+
+        $manager->persist($object);
+        $manager->flush();
     }
 
     /**
@@ -185,8 +188,10 @@ class Driver implements DriverInterface
      */
     public function remove($object)
     {
-        $this->objectManager->remove($object);
-        $this->objectManager->flush();
+        $manager = $this->registry->getManagerForClass(get_class($object));
+
+        $manager->remove($object);
+        $manager->objectManager->flush();
     }
 
     /**
@@ -198,8 +203,8 @@ class Driver implements DriverInterface
      */
     protected function getObjectRepository($model)
     {
-        $fqcn = $this->modelManager->fullClassName($model);
-
-        return $this->objectManager->getRepository($fqcn);
+        return $this->registry->getRepository(
+            $this->modelManager->fullClassName($model)
+        );
     }
 }

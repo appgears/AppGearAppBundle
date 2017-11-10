@@ -15,7 +15,7 @@ services:
   appgear.storage.driver.doctrine_orm:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Driver
     arguments:
-      - '@doctrine.orm.entity_manager'
+      - '@doctrine'
       - '@app_gear.core.model.manager'
     tags:
         - { name: appgear.storage.driver, alias: doctrine_orm }

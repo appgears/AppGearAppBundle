@@ -7,6 +7,7 @@ models:
           type: core.property.field.string_type
 
   app.storage.column:
+    parent: core.extension.property
     properties:
       identifier:
         field:
@@ -24,13 +25,6 @@ models:
   app.ui.translation:
     properties:
       label:
-        field:
-          type: core.property.field.string_type
-
-  app.ui.sluggable:
-    parent: core.extension.property.computed
-    properties:
-      field:
         field:
           type: core.property.field.string_type
 
