@@ -139,10 +139,9 @@ class AppGearModelDriver implements MappingDriver
      */
     public function isTransient($className)
     {
-
         $model = $this->modelManager->getByInstance($className);
 
-        return $model->getAbstract();
+        return $model->getAbstract() === false;
     }
 
     /**
