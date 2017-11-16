@@ -62,6 +62,14 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
+    public function countBy($model, array $criteria)
+    {
+        throw new \RuntimeException('Not implemented yet');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find($model, $id)
     {
         return $this->hydratorFactory->get($model)->hydrate(
@@ -73,7 +81,15 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function findByExpr($model, $expr, array $orderings = [])
+    public function findByExpr($model, $expression, array $orderBy = null, $limit = null, $offset = null)
+    {
+        throw new \RuntimeException('Not implemented yet');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function countByExpr($model, $expression)
     {
         throw new \RuntimeException('Not implemented yet');
     }

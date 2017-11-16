@@ -29,6 +29,18 @@ interface DriverInterface
     public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null);
 
     /**
+     * Finds objects by a set of criteria.
+     *
+     * Optionally sorting and limiting details can be passed.
+     *
+     * @param string $model Model
+     * @param array  $criteria
+     *
+     * @return array The objects.
+     */
+    public function countBy($model, array $criteria);
+
+    /**
      * Finds an object by its primary key / identifier.
      *
      * @param string $model Model
@@ -41,14 +53,26 @@ interface DriverInterface
     /**
      * Finds entities by criteria expression.
      *
-     * @param string $model     Model
-     * @param string $expr      Expression language criteria string
-     * @param array  $orderings The orderings
-     *                          Keys are field and values are the order, being either ASC or DESC.
+     * @param string   $model      Model
+     * @param string   $expression Expression language criteria string
+     * @param array    $orderBy    The orderings
+     *                             Keys are field and values are the order, being either ASC or DESC.
+     * @param int|null $limit
+     * @param int|null $offset
      *
      * @return array The objects.
      */
-    public function findByExpr($model, $expr, array $orderings = []);
+    public function findByExpr($model, $expression, array $orderBy = null, $limit = null, $offset = null);
+
+    /**
+     * Counts entities by criteria expression.
+     *
+     * @param string $model      Model
+     * @param string $expression Expression language criteria string
+     *
+     * @return int Count
+     */
+    public function countByExpr($model, $expression);
 
     /**
      * Save object to the storage.

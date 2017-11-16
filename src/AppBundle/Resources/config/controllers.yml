@@ -26,6 +26,10 @@ services:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\ViewController
 
+  appgear.controller.list:
+    parent: appgear.controller
+    class: AppGear\AppBundle\Controller\ListController
+
   appgear.controller.test:
     class: AppGear\AppBundle\Controller\TestController
     arguments:

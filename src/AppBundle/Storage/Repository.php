@@ -81,6 +81,20 @@ class Repository
     }
 
     /**
+     * Counts objects by a set of criteria.
+     *
+     * Optionally sorting and limiting details can be passed.
+     *
+     * @param array $criteria
+     *
+     * @return int Count
+     */
+    public function countBy(array $criteria)
+    {
+        return $this->driver->countBy($this->model, $criteria);
+    }
+
+    /**
      * Finds a single object by a set of criteria.
      *
      * Optionally sorting and limiting details can be passed.
@@ -106,15 +120,29 @@ class Repository
     /**
      * Finds entities by criteria expression.
      *
-     * @param string $expr      Expression language criteria string
-     * @param array  $orderings The orderings
+     * @param string   $expr    Expression language criteria string
+     * @param array    $orderBy The orderings
      *                          Keys are field and values are the order, being either ASC or DESC.
+     * @param int|null $limit
+     * @param int|null $offset
      *
      * @return array The objects.
      */
-    public function findByExpr($expr, array $orderings = [])
+    public function findByExpr($expr, array $orderBy = null, $limit = null, $offset = null)
     {
-        return $this->driver->findByExpr($this->model, $expr, $orderings);
+        return $this->driver->findByExpr($this->model, $expr, $orderBy, $limit, $offset);
+    }
+
+    /**
+     * Entities count by criteria expression.
+     *
+     * @param string $expr Expression language criteria string
+     *
+     * @return int Count
+     */
+    public function countByExpr($expr)
+    {
+        return $this->driver->countByExpr($this->model, $expr);
     }
 
     /**
@@ -148,7 +176,6 @@ class Repository
     {
         $this->driver->save($object);
     }
-
 
     public function remove($object)
     {

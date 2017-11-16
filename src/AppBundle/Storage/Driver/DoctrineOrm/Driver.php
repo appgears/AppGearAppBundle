@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
 use AppGear\AppBundle\Storage\DriverInterface;
+use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Helper\ModelHelper;
@@ -12,6 +13,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
@@ -73,6 +75,17 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
+    public function countBy($model, array $criteria)
+    {
+        $fqcn    = $this->modelManager->fullClassName($model);
+        $manager = $this->registry->getManagerForClass($fqcn);
+
+        return $manager->getUnitOfWork()->getEntityPersister($fqcn)->count($criteria);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find($model, $id)
     {
         return $this->getObjectRepository($model)->find($id);
@@ -81,30 +94,50 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function findByExpr($model, $expr, array $orderings = [])
+    public function findByExpr($model, $expression, array $orderBy = null, $limit = null, $offset = null)
     {
         $model = $this->modelManager->get($model);
         $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
 
-        $node     = $this->expressionLanguage->parse($expr, $names)->getNodes();
+        $node     = $this->expressionLanguage->parse($expression, $names)->getNodes();
         $criteria = $this->buildCriteria($model, Criteria::create(), $node);
 
-        if (count($orderings)) {
-            $criteria->orderBy($orderings);
+        if (null !== $orderBy) {
+            $criteria->orderBy($orderBy);
+        }
+        if (null !== $limit) {
+            $criteria->setMaxResults($limit);
+        }
+        if (null !== $offset) {
+            $criteria->setMaxResults($offset);
         }
 
         return $this->getObjectRepository($model)->matching($criteria);
     }
 
     /**
-     * @param      $model
-     * @param      $criteria
-     * @param      $node
-     * @param bool $andWhere
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    private function buildCriteria($model, $criteria, $node, $andWhere = true)
+    public function countByExpr($model, $expression)
+    {
+        $model = $this->modelManager->get($model);
+        $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
+
+        $node     = $this->expressionLanguage->parse($expression, $names)->getNodes();
+        $criteria = $this->buildCriteria($model, Criteria::create(), $node);
+
+        return $this->getObjectRepository($model)->matching($criteria)->count();
+    }
+
+    /**
+     * @param Model    $model
+     * @param Criteria $criteria
+     * @param          $node
+     * @param bool     $andWhere
+     *
+     * @return Criteria
+     */
+    private function buildCriteria(Model $model, Criteria $criteria, $node, $andWhere = true)
     {
         if ($node instanceof BinaryNode) {
             $left     = $node->nodes['left'];
@@ -199,7 +232,7 @@ class Driver implements DriverInterface
      *
      * @param string $model Model
      *
-     * @return ObjectRepository
+     * @return EntityRepository
      */
     protected function getObjectRepository($model)
     {

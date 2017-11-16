@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\Controller;
 
+use AppGear\AppBundle\Entity\View;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +19,8 @@ class ViewController extends AbstractController
     public function viewAction(Request $request): Response
     {
         $viewParameters = $this->requireAttribute($request, 'view');
-        $view           = $this->initialize($request, $viewParameters);
-
-        $data = null;
+        /** @var View $view */
+        $view = $this->initialize($request, $viewParameters);
 
         if (null !== $data = $request->get('data')) {
 
