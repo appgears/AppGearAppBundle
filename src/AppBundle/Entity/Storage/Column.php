@@ -2,7 +2,8 @@
 
 namespace AppGear\AppBundle\Entity\Storage;
 
-class Column
+use AppGear\CoreBundle\Entity\Extension\Property;
+class Column extends Property
 {
     
     /**

@@ -6,6 +6,13 @@ models:
         field:
           type: core.property.field.string_type
 
+  app.storage.table:
+    parent: core.extension.model
+    properties:
+      name:
+        field:
+          type: core.property.field.string_type
+
   app.storage.column:
     parent: core.extension.property
     properties:

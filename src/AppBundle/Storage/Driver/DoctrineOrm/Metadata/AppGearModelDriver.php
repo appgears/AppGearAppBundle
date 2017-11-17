@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata;
 
 use AppGear\AppBundle\Entity\Storage\Column;
+use AppGear\AppBundle\Entity\Storage\Table;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
@@ -86,7 +87,12 @@ class AppGearModelDriver implements MappingDriver
 
         $model = $this->modelManager->getByInstance($className);
 
-        $metadata->setPrimaryTable(['name' => $this->buildTableName($className)]);
+        /** @var $tableExtension Table */
+        if (null !== $tableExtension = ModelHelper::getExtension($model, Table::class)) {
+            $metadata->setPrimaryTable(['name' => $tableExtension->getName()]);
+        } else {
+            $metadata->setPrimaryTable(['name' => $this->buildTableName($className)]);
+        }
 
         // Если текущая сущность не абстрактная, то надо добавить её в discriminator map
         if (!$model->getAbstract() && count($this->modelManager->children($model->getName())) > 0) {
