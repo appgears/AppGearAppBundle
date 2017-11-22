@@ -1,6 +1,3 @@
-parameters:
-  appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver.supported_model_prefixes: []
-
 services:
 
   appgear.storage:
@@ -46,10 +43,3 @@ services:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener
     tags:
         - { name: kernel.event_listener, event: 'appgear.core.model.generator.generate.after', method: addIdentifierProperty }
-
-  appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver:
-    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
-    calls:
-      - [setModelManager, ['@app_gear.core.model.manager']]
-      - [setTaggedManager, ['@app_gear.core.tagged_manager']]
-      - [setSupportedModelPrefixes, ['%appgear.storage.driver.doctrine_orm.metadata.appgear_model_driver.supported_model_prefixes%']]

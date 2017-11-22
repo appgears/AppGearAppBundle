@@ -36,9 +36,9 @@ class AppGearModelDriver implements MappingDriver
     /**
      * Supported model prefixes
      *
-     * @var string[]
+     * @var array
      */
-    private $supportedModelPrefixes;
+    private $prefixes = [];
 
     /**
      * @param ModelManager $modelManager
@@ -67,13 +67,13 @@ class AppGearModelDriver implements MappingDriver
     /**
      * Set supported model prefixes
      *
-     * @param array $supportedModelPrefixes Supported model prefixes
+     * @param string[] $prefixes Supported prefixes
      *
      * @return $this
      */
-    public function setSupportedModelPrefixes(array $supportedModelPrefixes)
+    public function setPrefixes(array $prefixes = [])
     {
-        $this->supportedModelPrefixes = $supportedModelPrefixes;
+        $this->prefixes = $prefixes;
 
         return $this;
     }
@@ -130,7 +130,7 @@ class AppGearModelDriver implements MappingDriver
         $classNames       = [];
         $registeredModels = $this->modelManager->all();
         foreach ($registeredModels as $model) {
-            foreach ($this->supportedModelPrefixes as $prefix) {
+            foreach ($this->prefixes as $prefix) {
                 if (strpos($model->getName(), $prefix) === 0) {
                     $classNames[] = $this->modelManager->fullClassName($model->getName());
                 }
@@ -145,6 +145,18 @@ class AppGearModelDriver implements MappingDriver
      */
     public function isTransient($className)
     {
+        $supported = false;
+        foreach ($this->prefixes as $prefix) {
+            $prefix = $this->modelManager->fullClassName($prefix);
+            if (strpos($className, $prefix) === 0) {
+                $supported = true;
+            }
+        }
+
+        if (!$supported) {
+            return true;
+        }
+
         $model = $this->modelManager->getByInstance($className);
 
         return $model->getAbstract() === false;

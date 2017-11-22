@@ -2,7 +2,6 @@
 
 namespace AppGear\AppBundle\DependencyInjection;
 
-use Cosmologist\Gears\ArrayType;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -11,6 +10,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class AppExtension extends Extension
 {
+    public $driversMap = [
+        'doctrine-orm' => 'appgear.storage.driver.doctrine_orm'
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -47,9 +50,8 @@ class AppExtension extends Extension
             $managerDef->addArgument(new Reference($config['default_driver']));
         }
 
-        foreach ($config['drivers'] as $driver => $options) {
-            $managerDef->addMethodCall('addDriver', [new Reference($driver), $options['prefixes']]);
-            $container->setParameter($driver . '.metadata.appgear_model_driver.supported_model_prefixes', $options['prefixes']);
+        foreach ($config['drivers'] as $name => $options) {
+            $managerDef->addMethodCall('addDriver', [new Reference($this->driversMap[$options['type']]), $options['prefixes']]);
         }
     }
 

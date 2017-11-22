@@ -236,8 +236,11 @@ class Driver implements DriverInterface
      */
     protected function getObjectRepository($model)
     {
-        return $this->registry->getRepository(
-            $this->modelManager->fullClassName($model)
-        );
+        $fqcn = $this->modelManager->fullClassName($model);
+
+        /** @var EntityRepository $repository */
+        $repository = $this->registry->getManagerForClass($fqcn)->getRepository($fqcn);
+
+        return $repository;
     }
 }
