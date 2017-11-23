@@ -41,41 +41,17 @@ class AppGearModelDriver implements MappingDriver
     private $prefixes = [];
 
     /**
-     * @param ModelManager $modelManager
+     * AppGearModelDriver constructor.
      *
-     * @return $this
+     * @param ModelManager  $modelManager  Model manager
+     * @param TaggedManager $taggedManager Tagged manager
+     * @param array         $prefixes      Supported model prefixes
      */
-    public function setModelManager($modelManager)
+    public function __construct(ModelManager $modelManager, TaggedManager $taggedManager, array $prefixes)
     {
-        $this->modelManager = $modelManager;
-
-        return $this;
-    }
-
-    /**
-     * @param TaggedManager $taggedManager
-     *
-     * @return $this
-     */
-    public function setTaggedManager($taggedManager)
-    {
+        $this->modelManager  = $modelManager;
         $this->taggedManager = $taggedManager;
-
-        return $this;
-    }
-
-    /**
-     * Set supported model prefixes
-     *
-     * @param string[] $prefixes Supported prefixes
-     *
-     * @return $this
-     */
-    public function setPrefixes(array $prefixes = [])
-    {
-        $this->prefixes = $prefixes;
-
-        return $this;
+        $this->prefixes      = $prefixes;
     }
 
     /**

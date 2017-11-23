@@ -43,3 +43,11 @@ services:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener
     tags:
         - { name: kernel.event_listener, event: 'appgear.core.model.generator.generate.after', method: addIdentifierProperty }
+
+
+  appgear.storage.driver.doctrine_orm.metadata_driver:
+    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Metadata\AppGearModelDriver
+    abstract: true
+    arguments:
+        - '@app_gear.core.model.manager'
+        - '@app_gear.core.tagged_manager'

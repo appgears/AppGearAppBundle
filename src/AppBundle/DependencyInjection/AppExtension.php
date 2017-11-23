@@ -53,6 +53,9 @@ class AppExtension extends Extension
         foreach ($config['drivers'] as $name => $options) {
             $managerDef->addMethodCall('addDriver', [new Reference($this->driversMap[$options['type']]), $options['prefixes']]);
         }
+
+        // For AppGearModelDriverCompilerPass
+        $container->setParameter('appgear.storage.drivers', $config['drivers']);
     }
 
     /**
