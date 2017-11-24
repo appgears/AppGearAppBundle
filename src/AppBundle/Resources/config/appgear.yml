@@ -127,6 +127,9 @@ models:
       route:
         field:
           type: core.property.field.string_type
+      link:
+        field:
+          type: core.property.field.string_type
       parameters:
         relationship:
           type: core.property.relationship.toMany

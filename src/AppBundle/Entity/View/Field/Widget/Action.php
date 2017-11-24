@@ -17,6 +17,11 @@ class Action extends Widget
     protected $route;
     
     /**
+     * Link
+     */
+    protected $link;
+    
+    /**
      * Parameters
      */
     protected $parameters = array();
@@ -68,6 +73,23 @@ class Action extends Widget
     public function getRoute()
     {
         return $this->route;
+    }
+    
+    /**
+     * Set link
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
+        return $this;
+    }
+    
+    /**
+     * Get link
+     */
+    public function getLink()
+    {
+        return $this->link;
     }
     
     /**

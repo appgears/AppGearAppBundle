@@ -122,7 +122,13 @@
                 <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
             </form>
         {% else %}
-            {% set attrs = {'href':  path(_widget.route, parameters)} %}
+            {% if _widget.route | length %}
+                {% set href = path(_widget.route, parameters) %}
+            {% else %}
+                {% set href = _widget.link | string_named_sprintf(parameters) %}
+            {% endif %}
+            
+            {% set attrs = {'href':  href} %}
             
             {% if _widget.confirm %}
                 {% set attrs = attrs|merge({'onClick': 'return confirm("Are you sure?")'}) %}
