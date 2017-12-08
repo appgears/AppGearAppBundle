@@ -16,6 +16,11 @@ class Field
     protected $mapping;
     
     /**
+     * Transformer
+     */
+    protected $transformer;
+    
+    /**
      * Widget
      */
     protected $widget;
@@ -57,6 +62,23 @@ class Field
     public function getMapping()
     {
         return $this->mapping;
+    }
+    
+    /**
+     * Set transformer
+     */
+    public function setTransformer($transformer)
+    {
+        $this->transformer = $transformer;
+        return $this;
+    }
+    
+    /**
+     * Get transformer
+     */
+    public function getTransformer()
+    {
+        return $this->transformer;
     }
     
     /**
