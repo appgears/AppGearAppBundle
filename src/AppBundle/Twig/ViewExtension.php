@@ -3,7 +3,6 @@
 namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
-use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\Helper\ModelHelper;
@@ -72,7 +71,7 @@ class ViewExtension extends Twig_Extension
     /**
      * Render the view
      *
-     * @param View $view View
+     * @param View  $view View
      * @param mixed $data Data
      *
      * @return string
@@ -113,6 +112,8 @@ class ViewExtension extends Twig_Extension
      * Return model for object
      *
      * @param object $name Object
+     *
+     * @return Model
      */
     public function model($name)
     {
@@ -124,6 +125,8 @@ class ViewExtension extends Twig_Extension
      *
      * @param object            $entity Entity
      * @param View\Field\Widget $widget Widget
+     *
+     * @return null
      */
     public function renderWidgetService($entity, View\Field\Widget $widget)
     {

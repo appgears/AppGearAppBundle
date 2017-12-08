@@ -74,8 +74,8 @@ class CommonExtension extends Twig_Extension
     /**
      * Returns the value at the end of the property path of the object graph.
      *
-     * @param object|array                 $objectOrArray The object or array to traverse
-     * @param string|PropertyPathInterface $propertyPath  The property path to read
+     * @param object|array $object       The object or array to traverse
+     * @param string       $propertyPath The property path to read
      *
      * @return string
      */

@@ -76,23 +76,31 @@
 {% block widget_collection %}
     <ul>
         {% set _uniqid = ''|uniqid %}
-
-        {% for item in _value %}
-            <li{% if _widget.collapse and (_value|length > 1) %}{% if loop.index0 != 0 %} class="collapse-{{ _uniqid }} collapse" {% else %} class="collapsor" data-toggle="collapse" data-target=".collapse-{{ _uniqid }}" aria-expanded="false"{% endif %}{% endif %}>
-                {% if _widget.widget is not null %}
-                    {% set _original_widget = _widget %}
-                    {% set _original_value = _value %}
-                    
-                    {% set _widget = _widget.widget %}
-                    {% set _value = item %}
-                    
-                    {{ block('widget') }}
-                    
-                    {% set _widget = _original_widget %}
-                    {% set _value = _original_value %}
+        
+        {% set collection_value = _value %}
+        {% set collection_widget = _widget %}
+        
+        {% for item in collection_value %}
+            
+            {% set attrs = {} %}
+            {% if collection_widget.collapse and (collection_value|length > 1) %}
+                {% if loop.index0 != 0 %}
+                    {% set attrs = {'class': 'collapse-' ~ _uniqid ~ ' collapse'} %}
                 {% else %}
-                    {{ block('widget_default') }}
+                    {% set attrs = {'class': 'collapsor', 'data-toggle': 'collapse', 'data-target': '.collapse-' ~ _uniqid, 'aria-expanded': 'false'} %}
                 {% endif %}
+            {% endif %}
+            
+            <li{{ attrs|htmlAttributes }}>
+                {% set _value = item %}
+                
+                {% if collection_widget.widget is not null %}
+                    {% set _widget = collection_widget.widget %}
+                {% else %}
+                    {% set _widget = null %}
+                {% endif %}
+    
+                {{ block('widget') }}
             </li>
         {% endfor %}
     </ul>
@@ -113,7 +121,7 @@
         
         {% set parameters = parameters|merge({(parameter.parameter): parameter_value}) %}
     {% endfor %}
-
+    
     {% if _widget.method == 'ajax' %}
         <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}">{{ _value }}</button>
     {% else %}
@@ -144,6 +152,12 @@
 
 {% block widget_service %}
     {{ widget_service(_value, _widget) | raw }}
+{% endblock %}
+
+{% block widget_audio %}
+    <audio controls>
+        <source src="audio/music.mp3" type="audio/mpeg">
+    </audio>
 {% endblock %}
 
 {% block widget_view %}
