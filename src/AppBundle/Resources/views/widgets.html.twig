@@ -99,7 +99,7 @@
                 {% else %}
                     {% set _widget = null %}
                 {% endif %}
-    
+                
                 {{ block('widget') }}
             </li>
         {% endfor %}
@@ -162,4 +162,15 @@
 
 {% block widget_view %}
     {{ _widget.view | render( entity|property_accessor(field.mapping)) | raw }}
+{% endblock %}
+
+{% block widget_style %}
+    {% set classes = [] %}
+    {% for tag in _widget.tags %}
+        {% if tag.expression|expression(entity) %}
+            {% set classes = classes|merge([tag.name]) %}
+        {% endif %}
+    {% endfor %}
+    
+    <span{% if classes|length %} class="{{ classes|join(' ') }}"{% endif %}>{{ _value }}</span>
 {% endblock %}

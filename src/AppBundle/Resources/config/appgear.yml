@@ -186,6 +186,22 @@ models:
           type: core.property.relationship.toOne
           target: app.view
 
+  app.view.field.widget.style:
+    parent: app.view.field.widget
+    properties:
+      tags:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field.widget.style.tag
+
+  app.view.field.widget.style.tag:
+    properties:
+      name:
+        field:
+          type: core.property.field.string_type
+      expression:
+        field:
+          type: core.property.field.string_type
 
   app.view.tree_view:
     parent: app.view.list_view
