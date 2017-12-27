@@ -19,8 +19,14 @@ class ViewController extends AbstractController
     public function viewAction(Request $request): Response
     {
         $viewParameters = $this->requireAttribute($request, 'view');
-        /** @var View $view */
-        $view = $this->initialize($request, $viewParameters);
+
+        if (is_scalar($viewParameters)) {
+            /** @var View $view */
+            $view = $this->storage->find('app.view', $viewParameters);
+        } else {
+            /** @var View $view */
+            $view = $this->initialize($request, $viewParameters);
+        }
 
         if (null !== $data = $request->get('data')) {
 

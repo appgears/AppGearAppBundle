@@ -20,7 +20,7 @@ class TestController
 
     public function testAction(Request $request)
     {
-        $model = $this->storage->find('core.model', 'core.model');
+        $model = $this->storage->find('app.view.list_view', 'admin.shop.order.list');
 
         return new Response('done');
     }

@@ -13,10 +13,10 @@ interface Hydrator
     /**
      * Hydrates data for single instance
      *
-     * @param object $instance Instance
-     * @param array  $data     Data
+     * @param string $model Model name
+     * @param array  $data  Data
      *
      * @return object Instance
      */
-    public function hydrate($instance, array $data);
+    public function hydrate(string $model, array $data);
 }

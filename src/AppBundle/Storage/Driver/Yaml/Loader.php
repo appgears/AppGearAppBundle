@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Storage\Driver\Yaml;
 
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
+use AppGear\CoreBundle\Model\ModelManager;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -20,23 +21,20 @@ class Loader
     private $kernel;
 
     /**
-     * All registered bundles
-     *
-     * @var array
+     * @var ModelManager
      */
-    private $bundles;
+    private $modelManager;
 
     /**
      * Constructor.
      *
      * @param KernelInterface $kernel
+     * @param ModelManager    $modelManager
      */
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, ModelManager $modelManager)
     {
-        $this->kernel  = $kernel;
-        //$this->bundles = $bundles;
-
-        //$this->load();
+        $this->kernel       = $kernel;
+        $this->modelManager = $modelManager;
     }
 
     /**
@@ -61,20 +59,15 @@ class Loader
     {
         $configuration = $this->load();
 
-        // TODO: temp BC
-        if ($model === 'core.model') {
-            $model = 'models';
+        $childrenModels = [$this->modelManager->get($model)] + $this->modelManager->children($model);
+
+        foreach ($childrenModels as $childModel) {
+            if (isset($configuration[$childModel->getName()][$id])) {
+                return [$childModel->getName(), $configuration[$childModel->getName()][$id]];
+            }
         }
 
-        if (!array_key_exists($model, $configuration)) {
-            return [];
-        }
-
-        if (!isset($configuration[$model][$id])) {
-            throw new RuntimeException(sprintf('Record #"%s" for model "%s" not found', $id, $model));
-        }
-
-        return $configuration[$model][$id];
+        throw new RuntimeException(sprintf('Record #"%s" for model "%s" not found', $id, $model));
     }
 
     /**
@@ -107,7 +100,7 @@ class Loader
      */
     protected function hasConfiguration($bundlePath)
     {
-        return file_exists($bundlePath . '/Resources/config/appgear.yml');
+        return file_exists($bundlePath . '/Resources/config/appgear1.yml');
     }
 
     /**
@@ -121,6 +114,6 @@ class Loader
     {
         $yamlParser = new Parser();
 
-        return $yamlParser->parse(file_get_contents($bundlePath . '/Resources/config/appgear.yml'));
+        return $yamlParser->parse(file_get_contents($bundlePath . '/Resources/config/appgear1.yml'));
     }
 }

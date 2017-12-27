@@ -22,7 +22,6 @@ services:
     arguments:
       - '@appgear.storage.driver.yaml.loader'
       - '@appgear.storage.driver.hydrator.factory'
-      - '@app_gear.core.model.manager'
     tags:
         - { name: appgear.storage.driver, alias: yaml }
 
@@ -30,9 +29,12 @@ services:
     class: AppGear\AppBundle\Storage\Driver\Yaml\Loader
     arguments:
       - '@kernel'
+      - '@app_gear.core.model.manager'
 
   appgear.storage.driver.hydrator.simple:
     class: AppGear\AppBundle\Storage\Driver\Yaml\Hydrator\SimpleHydrator
+    arguments:
+      - '@app_gear.core.model.manager'
 
   appgear.storage.driver.hydrator.factory:
     class: AppGear\AppBundle\Storage\Driver\Yaml\HydratorFactory
