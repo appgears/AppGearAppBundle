@@ -19,8 +19,14 @@ class ListController extends AbstractController
     public function listAction(Request $request, string $model): Response
     {
         $viewParameters = $this->requireAttribute($request, 'view');
-        /** @var View $view */
-        $view = $this->initialize($request, $viewParameters);
+
+        if (is_scalar($viewParameters)) {
+            /** @var View $view */
+            $view = $this->storage->find('app.view.list_view', $viewParameters);
+        } else {
+            /** @var View $view */
+            $view = $this->initialize($request, $viewParameters);
+        }
 
         $expression = $request->get('data[expression]', null, true);
         $orderings  = $request->get('data[orderings]', [], true);
