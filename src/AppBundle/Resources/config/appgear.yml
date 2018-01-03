@@ -186,6 +186,9 @@ models:
           type: core.property.relationship.toOne
           target: app.view
 
+  app.view.field.widget.phone:
+    parent: app.view.field.widget
+
   app.view.field.widget.style:
     parent: app.view.field.widget
     properties:

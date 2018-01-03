@@ -164,6 +164,10 @@
     {{ _widget.view | render( entity|property_accessor(field.mapping)) | raw }}
 {% endblock %}
 
+{% block widget_phone %}
+    <a href="tel://{{ _value }}">{{ _value }}</a>
+{% endblock %}
+
 {% block widget_style %}
     {% set classes = [] %}
     {% for tag in _widget.tags %}
