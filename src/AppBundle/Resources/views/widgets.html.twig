@@ -154,12 +154,6 @@
     {{ widget_service(_value, _widget) | raw }}
 {% endblock %}
 
-{% block widget_audio %}
-    <audio controls>
-        <source src="audio/music.mp3" type="audio/mpeg">
-    </audio>
-{% endblock %}
-
 {% block widget_view %}
     {{ _widget.view | render( entity|property_accessor(field.mapping)) | raw }}
 {% endblock %}
