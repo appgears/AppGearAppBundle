@@ -43,12 +43,14 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
      */
     public function loadChoiceList($value = null)
     {
-        $items   = $this->storage->getRepository($this->model->getName())->findAll();
+        $items = $this->storage->getRepository($this->model->getName())->findAll();
+
         $choices = [];
         foreach ($items as $item) {
-            $key = method_exists($item , '__toString') ? (string) $item : $this->model->getName() . ' #' . $item->getId();
-            $choices[$key] = $item;
+            $choices[(string)$item] = $item;
         }
+
+        ksort($choices);
 
         $list = new ArrayChoiceList($choices, function ($el) {
             return $el->getId();
@@ -69,8 +71,9 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
         $values = array_map(
             function ($item) {
                 if (is_object($item)) {
-                    return (string) $item->getId();
+                    return (string)$item->getId();
                 }
+
                 return $item;
             },
             $values
@@ -89,9 +92,9 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
         // Maintain order and indices of the given objects
         foreach ($choices as $i => $object) {
             if (is_object($object)) {
-                $values[$i] = (string) $object->getId();
+                $values[$i] = (string)$object->getId();
             } else {
-                $values[$i] = (string) $object;
+                $values[$i] = (string)$object;
             }
         }
 
