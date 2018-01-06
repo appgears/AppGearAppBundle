@@ -8,6 +8,14 @@ services:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.boolean_type
 
+  appgear.entity_service.property.field.date_type_servce:
+    class: AppGear\AppBundle\EntityService\Property\Field\DateTypeService
+    tags:
+      - name: form.property.field.service
+        field: core.property.field.date_type
+      - name: storage.platform.mysql.property.field.service
+        field: core.property.field.date_type
+
   appgear.entity_service.property.field.datetime_type_servce:
     class: AppGear\AppBundle\EntityService\Property\Field\DateTimeTypeService
     tags:

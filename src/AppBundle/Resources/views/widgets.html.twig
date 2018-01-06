@@ -50,6 +50,10 @@
     {{ attribute(entity, field.property.name)|nl2br|raw }}
 {% endblock %}
 
+{% block widget_field_date %}
+    {{ entity|property_accessor(field.mapping)|date('Y-m-d') }}
+{% endblock %}
+
 {% block widget_field_datetime %}
     {{ entity|property_accessor(field.mapping)|date('Y-m-d H:i:s') }}
 {% endblock %}
