@@ -2,7 +2,7 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% for fieldName in form|keys %}
                 {{ form_row(attribute(form, fieldName)) }}
             {% endfor %}

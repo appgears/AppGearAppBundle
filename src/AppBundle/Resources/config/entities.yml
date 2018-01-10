@@ -1,6 +1,6 @@
 services:
 
-  appgear.entity_service.property.field.boolean_type_servce:
+  appgear.entity_service.property.field.boolean_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\BooleanTypeService
     tags:
       - name: form.property.field.service
@@ -8,7 +8,7 @@ services:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.boolean_type
 
-  appgear.entity_service.property.field.date_type_servce:
+  appgear.entity_service.property.field.date_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\DateTypeService
     tags:
       - name: form.property.field.service
@@ -16,7 +16,7 @@ services:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.date_type
 
-  appgear.entity_service.property.field.datetime_type_servce:
+  appgear.entity_service.property.field.datetime_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\DateTimeTypeService
     tags:
       - name: form.property.field.service
@@ -24,19 +24,25 @@ services:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.datetime_type
 
-  appgear.entity_service.property.field.float_type_servce:
+  appgear.entity_service.property.field.file_type_service:
+    class: AppGear\AppBundle\EntityService\Property\Field\FileTypeService
+    tags:
+      - name: form.property.field.service
+        field: core.property.field.file_type
+
+  appgear.entity_service.property.field.float_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\FloatTypeService
     tags:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.float_type
 
-  appgear.entity_service.property.field.integer_type_servce:
+  appgear.entity_service.property.field.integer_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\IntegerTypeService
     tags:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.integer_type
 
-  appgear.entity_service.property.field.markdown_type_servce:
+  appgear.entity_service.property.field.markdown_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\MarkdownTypeService
     tags:
       - name: form.property.field.service
@@ -44,7 +50,7 @@ services:
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.markdown_type
 
-  appgear.entity_service.property.field.text_type_servce:
+  appgear.entity_service.property.field.text_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\TextTypeService
     tags:
       - name: form.property.field.service

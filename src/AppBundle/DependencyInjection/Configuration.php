@@ -53,6 +53,17 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('upload')
+                    ->isRequired()
+                    ->children()
+                        ->scalarNode('directory')
+                            ->isRequired()
+                        ->end()
+                        ->scalarNode('file_prefix')
+                            ->isRequired()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

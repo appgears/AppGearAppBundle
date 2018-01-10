@@ -30,6 +30,9 @@ class AppExtension extends Extension
         $loader->load('services.yml');
         $loader->load('storage.yml');
 
+        $container->setParameter('appgear.application.upload.directory', $config['upload']['directory']);
+        $container->setParameter('appgear.application.upload.file_prefix', $config['upload']['file_prefix']);
+
         $container->setParameter('appgear.application.route404.enabled', $config['route404']['enabled']);
         $container->setParameter('appgear.application.route404.route', $config['route404']['route']);
 

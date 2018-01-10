@@ -16,6 +16,8 @@ services:
     class: AppGear\AppBundle\Controller\FormController
     arguments:
       - '@appgear.form.builder'
+      - '%appgear.application.upload.directory%'
+      - '%appgear.application.upload.file_prefix%'
       - '@logger'
 
   appgear.controller.remove:

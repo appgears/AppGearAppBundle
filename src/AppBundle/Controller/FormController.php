@@ -14,6 +14,8 @@ use AppGear\CoreBundle\Model\ModelManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -28,6 +30,17 @@ class FormController extends AbstractController
      * @var FormBuilder
      */
     protected $formBuilder;
+
+    /**
+     * @var string
+     */
+    protected $uploadDirectory;
+
+    /**
+     * @var string
+     */
+    protected $uploadFilePrefix;
+
     /**
      * @var LoggerInterface
      */
@@ -49,13 +62,16 @@ class FormController extends AbstractController
         ViewManager $viewManager,
         SecurityManager $securityManager,
         FormBuilder $formBuilder,
+        string $uploadDirectory,
+        string $uploadFilePrefix,
         LoggerInterface $logger
-    )
-    {
+    ) {
         parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
-        $this->formBuilder = $formBuilder;
-        $this->logger      = $logger;
+        $this->formBuilder      = $formBuilder;
+        $this->uploadDirectory  = $uploadDirectory;
+        $this->uploadFilePrefix = $uploadFilePrefix;
+        $this->logger           = $logger;
     }
 
     /**
@@ -79,10 +95,12 @@ class FormController extends AbstractController
 
         // Собираем форму
         $formBuilder = $this->getFormBuilder($model, $entity);
-        $form        = $formBuilder->getForm();
+        $this->initFiles($formBuilder, $entity);
+        $form = $formBuilder->getForm();
 
         // Если форма была отправлена и успешно обработана
         if ($this->submitForm($request, $form)) {
+            $this->uploadFiles($formBuilder, $entity);
             $this->updateMappedRelationshipForCollection($formBuilder, $model);
             $this->saveEntity($model, $entity);
 
@@ -158,12 +176,67 @@ class FormController extends AbstractController
             return false;
         }
         if (!$form->isValid()) {
-            $this->logger->error((string)$form->getErrors(true));
+            $this->logger->error((string) $form->getErrors(true));
 
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * When creating a form to edit an already persisted item, the file form type still expects a  File instance.
+     * As the persisted entity now contains only the relative file path, you first have to concatenate the configured
+     * upload path with the stored filename and create a new File class.
+     *
+     * @param FormBuilderInterface $formBuilder
+     */
+    protected function initFiles(FormBuilderInterface $formBuilder, $entity)
+    {
+        $accessor = new PropertyAccessor();
+
+        /** @var FormBuilderInterface $field */
+        foreach ($formBuilder as $field) {
+            if ($field->getType()->getName() === 'file') {
+                $fieldName = $field->getName();
+
+                $file = $accessor->getValue($entity, $fieldName);
+                if (!is_string($file)) {
+                    continue;
+                }
+
+                $file = new File($this->uploadDirectory . str_replace($this->uploadFilePrefix, '', $file));
+
+                $accessor->setValue($entity, $fieldName, $file);
+            }
+        }
+    }
+
+    /**
+     * @param FormBuilderInterface $formBuilder
+     */
+    protected function uploadFiles(FormBuilderInterface $formBuilder, $data)
+    {
+//        $data     = $formBuilder->getData();
+        $accessor = new PropertyAccessor();
+
+        /** @var FormBuilderInterface $field */
+        foreach ($formBuilder as $field) {
+            if ($field->getType()->getName() === 'file') {
+                $fieldName = $field->getName();
+
+                /** @var UploadedFile $file */
+                $file = $accessor->getValue($data, $fieldName);
+                if (!($file instanceof UploadedFile)) {
+                    continue;
+                }
+
+                $fileName = $this->uploadFilePrefix . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $file->guessExtension();
+                $file->move($this->uploadDirectory, $fileName);
+
+                $accessor->setValue($data, $fieldName, $fileName);
+            }
+        }
     }
 
     /**
