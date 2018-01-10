@@ -24,3 +24,13 @@
         </div>
     {% endif %}
 {%- endblock form_widget_compound -%}
+
+{% block checkbox_widget -%}
+    <label class="checkbox">
+        <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        <i></i>
+        
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' control-label')|trim}) -%}
+        {{ name|humanize }}
+    </label>
+{%- endblock checkbox_widget %}
