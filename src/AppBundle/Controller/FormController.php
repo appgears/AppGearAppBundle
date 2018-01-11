@@ -47,6 +47,11 @@ class FormController extends AbstractController
     private $logger;
 
     /**
+     * @var array
+     */
+    private $existingFileFields = [];
+
+    /**
      * CrudController constructor.
      *
      * @param Storage         $storage         Storage
@@ -205,6 +210,9 @@ class FormController extends AbstractController
                     continue;
                 }
 
+                // Avoid erasing field value when form will saved without new file
+                $this->existingFileFields[$fieldName] = $file;
+
                 $file = new File($this->uploadDirectory . str_replace($this->uploadFilePrefix, '', $file));
 
                 $accessor->setValue($entity, $fieldName, $file);
@@ -215,9 +223,9 @@ class FormController extends AbstractController
     /**
      * @param FormBuilderInterface $formBuilder
      */
-    protected function uploadFiles(FormBuilderInterface $formBuilder, $data)
+    protected function uploadFiles(FormBuilderInterface $formBuilder)
     {
-//        $data     = $formBuilder->getData();
+        $data     = $formBuilder->getData();
         $accessor = new PropertyAccessor();
 
         /** @var FormBuilderInterface $field */
@@ -228,6 +236,12 @@ class FormController extends AbstractController
                 /** @var UploadedFile $file */
                 $file = $accessor->getValue($data, $fieldName);
                 if (!($file instanceof UploadedFile)) {
+
+                    // Avoid erasing field value when form will saved without new file
+                    if (isset($this->existingFileFields[$fieldName])) {
+                        $accessor->setValue($data, $fieldName, $this->existingFileFields[$fieldName]);
+                    }
+
                     continue;
                 }
 

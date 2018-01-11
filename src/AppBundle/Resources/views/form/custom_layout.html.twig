@@ -25,6 +25,15 @@
     {% endif %}
 {%- endblock form_widget_compound -%}
 
+{% block form_widget_simple -%}
+    {% if type is defined and type == 'file' and  form.vars.data.filename is defined %}
+        <br>
+        <b>{{ form.vars.data.filename }}</b>
+    {% endif %}
+    
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
 {% block checkbox_widget -%}
     <label class="checkbox">
         <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
