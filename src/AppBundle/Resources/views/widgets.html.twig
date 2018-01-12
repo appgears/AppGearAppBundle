@@ -164,6 +164,8 @@
 
 {% block widget_phone %}
     <a href="tel:{{ _value }}">{{ _value }}</a>
+    &nbsp;<a href="viber://chat?number={{ _value|replace('+', '') }}" class="fab fa-viber" title="Viber"></a>
+    &nbsp;<a href="https://api.whatsapp.com/send?phone={{ _value|replace('+', '') }}" class="fab fa-whatsapp" title="WhatsApp"></a>
 {% endblock %}
 
 {% block widget_style %}
