@@ -39,14 +39,13 @@ class SecurityManager
      * Check if permission is granted to model
      *
      * @param string $permission
-     * @param object $object
+     * @param string $model
      *
      * @return bool
      */
-    public function check(string $permission, $object): bool
+    public function check(string $permission, string $model): bool
     {
-        $model = $this->modelManager->getByInstance($object);
-        $fqcn  = $this->modelManager->fullClassName($model->getName());
+        $fqcn = $this->modelManager->fullClassName($model);
 
         $objectIdentity = new ObjectIdentity(
             self::CLASS_SCOPE_OBJECT_IDENTIFIER_VALUE,

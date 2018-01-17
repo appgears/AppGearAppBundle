@@ -96,7 +96,7 @@ class FormController extends AbstractController
         $entity = $this->loadEntity($model, $id);
 
         // Проверяем доступ
-        $this->checkAccess($entity);
+        $this->checkAccess((string) $model, $entity);
 
         // Собираем форму
         $formBuilder = $this->getFormBuilder($model, $entity);
@@ -123,13 +123,14 @@ class FormController extends AbstractController
     /**
      * Check access
      *
+     * @param string $model
      * @param object $entity Entity
      */
-    public function checkAccess($entity)
+    public function checkAccess($model, $entity)
     {
-        if ($entity->getId() === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $entity)) {
+        if ($entity->getId() === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $model)) {
             throw new AccessDeniedHttpException();
-        } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $entity)) {
+        } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $model)) {
             throw new AccessDeniedHttpException();
         }
     }

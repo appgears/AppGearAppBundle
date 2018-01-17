@@ -21,7 +21,12 @@ class RemoveController extends AbstractController
     {
         $modelId = $this->requireAttribute($request, 'model');
         $modelId = $this->performExpression($request, $modelId);
-        $model   = $this->modelManager->get($modelId);
+
+        if (!$this->securityManager->check(BasicPermissionMap::PERMISSION_DELETE, $modelId)) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $model = $this->modelManager->get($modelId);
 
         if (!$request->attributes->has('id')) {
             throw new BadRequestHttpException('Undefined id parameter');
@@ -29,10 +34,6 @@ class RemoveController extends AbstractController
 
         $id     = $request->attributes->get('id');
         $entity = $this->storage->find($model, $id);
-
-        if (!$this->securityManager->check(BasicPermissionMap::PERMISSION_DELETE, $entity)) {
-            throw new AccessDeniedHttpException();
-        }
 
         $this->storage->remove($entity);
 
