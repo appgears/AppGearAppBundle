@@ -147,6 +147,10 @@ models:
         relationship:
           type: core.property.relationship.toMany
           target: app.view.field.widget.action.parameter
+      postParameters:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field.widget.action.parameter
       confirm:
         field:
           type: core.property.field.boolean_type

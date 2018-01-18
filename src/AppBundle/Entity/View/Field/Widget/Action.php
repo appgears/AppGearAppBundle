@@ -27,6 +27,11 @@ class Action extends Widget
     protected $parameters = array();
     
     /**
+     * PostParameters
+     */
+    protected $postParameters = array();
+    
+    /**
      * Confirm
      */
     protected $confirm = false;
@@ -107,6 +112,23 @@ class Action extends Widget
     public function getParameters()
     {
         return $this->parameters;
+    }
+    
+    /**
+     * Set postParameters
+     */
+    public function setPostParameters($postParameters)
+    {
+        $this->postParameters = $postParameters;
+        return $this;
+    }
+    
+    /**
+     * Get postParameters
+     */
+    public function getPostParameters()
+    {
+        return $this->postParameters;
     }
     
     /**

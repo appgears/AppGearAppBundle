@@ -20,19 +20,26 @@ services:
       - '%appgear.application.upload.file_prefix%'
       - '@logger'
 
-  appgear.controller.remove:
-    parent: appgear.controller
-    class: AppGear\AppBundle\Controller\RemoveController
-
-  appgear.controller.view:
-    parent: appgear.controller
-    class: AppGear\AppBundle\Controller\ViewController
-
   appgear.controller.list:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\ListController
+
+  appgear.controller.remove:
+    parent: appgear.controller
+    class: AppGear\AppBundle\Controller\RemoveController
 
   appgear.controller.test:
     class: AppGear\AppBundle\Controller\TestController
     arguments:
       - '@appgear.storage'
+
+  appgear.controller.update:
+    class: AppGear\AppBundle\Controller\UpdateController
+    arguments:
+      - '@appgear.storage'
+      - '@appgear.security.manager'
+      - '@app_gear.core.model.manager'
+
+  appgear.controller.view:
+    parent: appgear.controller
+    class: AppGear\AppBundle\Controller\ViewController

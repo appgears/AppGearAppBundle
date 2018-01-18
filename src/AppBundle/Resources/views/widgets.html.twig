@@ -115,6 +115,7 @@
 {% endblock %}
 
 {% block widget_action %}
+    {# GET parameters dictionary #}
     {% set parameters = {} %}
     {% for parameter in _widget.parameters %}
         {% if parameter.property | length %}
@@ -126,11 +127,29 @@
         {% set parameters = parameters|merge({(parameter.parameter): parameter_value}) %}
     {% endfor %}
     
+    {# POST parameters dictionary #}
+    {% set postParameters = {} %}
+    {% set postParametersStrings = [] %}
+    {% for parameter in _widget.postParameters %}
+        {% if parameter.property | length %}
+            {% set parameter_value = entity|property_accessor(parameter.property) %}
+        {% else %}
+            {% set parameter_value = parameter.value %}
+        {% endif %}
+        
+        {% set postParameters = postParameters|merge({(parameter.parameter): parameter_value}) %}
+        {% set postParametersStrings = postParametersStrings|merge(['"' ~ parameter.parameter ~ '":"' ~ parameter_value ~ '"']) %}
+    {% endfor %}
+    {% set postParametersString = '{' ~ (postParametersStrings|join(',')) ~ '}' %}
+    
     {% if _widget.method == 'ajax' %}
-        <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}">{{ _value }}</button>
+        <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}" data-appgear-widget-action-post-parameters='{{ postParametersString }}'>{{ _value }}</button>
     {% else %}
         {% if _widget.post %}
             <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">
+                {% for parameterName, parameterValue in postParameters %}
+                    <input type="hidden" name="{{ parameterName }}" value="{{ parameterValue }}"/>
+                {% endfor %}
                 <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
             </form>
         {% else %}

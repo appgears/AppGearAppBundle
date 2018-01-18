@@ -37,6 +37,7 @@ $(document).ready(function () {
         $.ajax({
             url: data.appgearWidgetActionUrl,
             method: method,
+            data: JSON.parse(data.appgearWidgetActionPostParameters),
             statusCode: {
                 200: function (data) {
                     if (data.length > 0) {
