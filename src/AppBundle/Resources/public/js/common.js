@@ -1,6 +1,6 @@
-function smartyAlert(message) {
+function smartyAlert(message, type = 'success') {
     var alertHtml =
-        `<div class="alert alert-success margin-bottom-30">
+        `<div class="alert alert-` + type + ` margin-bottom-30">
             <button type="button" class="close" data-dismiss="alert">
             <span aria-hidden="true">×</span>
         <span class="sr-only">Close</span>
@@ -47,7 +47,10 @@ $(document).ready(function () {
                     }
                 },
                 403: function () {
-                    alert("Access Denied!");
+                    smartyAlert('Access Denied!', 'warning');
+                },
+                404: function () {
+                    smartyAlert('Not Found!', 'warning');
                 }
             }
         });
