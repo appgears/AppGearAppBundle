@@ -3,7 +3,9 @@
 namespace AppGear\AppBundle\Security;
 
 use AppGear\CoreBundle\Model\ModelManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class SecurityManager
@@ -14,25 +16,42 @@ class SecurityManager
     const CLASS_SCOPE_OBJECT_IDENTIFIER_VALUE = 'class';
 
     /**
-     * @var ModelManager
-     */
-    protected $modelManager;
-
-    /**
      * @var AuthorizationCheckerInterface
      */
     protected $checker;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
+     * @var ModelManager
+     */
+    protected $modelManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * SecurityManager constructor.
      *
      * @param AuthorizationCheckerInterface $checker
+     * @param TokenStorageInterface         $tokenStorage
      * @param ModelManager                  $modelManager
+     * @param LoggerInterface               $logger
      */
-    public function __construct(AuthorizationCheckerInterface $checker, ModelManager $modelManager)
+    public function __construct(AuthorizationCheckerInterface $checker,
+                                TokenStorageInterface $tokenStorage,
+                                ModelManager $modelManager,
+                                LoggerInterface $logger)
     {
         $this->modelManager = $modelManager;
         $this->checker      = $checker;
+        $this->tokenStorage = $tokenStorage;
+        $this->logger       = $logger;
     }
 
     /**
@@ -51,6 +70,15 @@ class SecurityManager
 
         $objectIdentity = new ObjectIdentity($id, $fqcn);
 
-        return $this->checker->isGranted($permission, $objectIdentity);
+        $isGranted = $this->checker->isGranted($permission, $objectIdentity);
+
+        if (!$isGranted) {
+            $token    = $this->tokenStorage->getToken();
+            $username = ($token !== null) ? $token->getUsername() : null;
+
+            $this->logger->notice('Access denied', compact('username', 'permission', 'model', 'id'));
+        }
+
+        return $isGranted;
     }
 }

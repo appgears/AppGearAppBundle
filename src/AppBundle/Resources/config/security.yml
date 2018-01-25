@@ -4,5 +4,9 @@ services:
       class: AppGear\AppBundle\Security\SecurityManager
       arguments:
         - '@security.authorization_checker'
+        - '@security.token_storage'
         - '@app_gear.core.model.manager'
+        - '@logger'
       public: false
+      tags:
+        - { name: monolog.logger, channel: security }
