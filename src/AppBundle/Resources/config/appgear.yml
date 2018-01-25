@@ -63,6 +63,9 @@ models:
   app.view.list_view:
     parent: app.view
     properties:
+      title:
+        field:
+          type: core.property.field.string_type
       model:
         relationship:
           type: core.property.relationship.toOne

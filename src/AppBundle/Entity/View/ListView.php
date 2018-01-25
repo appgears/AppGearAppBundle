@@ -7,6 +7,11 @@ class ListView extends View
 {
     
     /**
+     * Title
+     */
+    protected $title;
+    
+    /**
      * Model
      */
     protected $model;
@@ -25,6 +30,23 @@ class ListView extends View
      * ShowCount
      */
     protected $showCount = false;
+    
+    /**
+     * Set title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+    
+    /**
+     * Get title
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
     
     /**
      * Set model
