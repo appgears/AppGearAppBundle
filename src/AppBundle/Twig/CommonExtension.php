@@ -3,6 +3,10 @@
 namespace AppGear\AppBundle\Twig;
 
 use AppGear\PlatformBundle\Entity\Model\Property\Relationship;
+use Exception;
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Twig_Extension;
@@ -22,7 +26,9 @@ class CommonExtension extends Twig_Extension
             new Twig_SimpleFilter('class', array($this, 'getShortClassName')),
             new Twig_SimpleFilter('auto_convert_urls', array($this, 'autoConvertUrls')),
             new Twig_SimpleFilter('expression', array($this, 'expression')),
-            new Twig_SimpleFilter('property_accessor', array($this, 'propertyAccessor'))
+            new Twig_SimpleFilter('property_accessor', array($this, 'propertyAccessor')),
+            new Twig_SimpleFilter('phone_format', array($this, 'formatPhone')),
+            new Twig_SimpleFilter('phone_valid', array($this, 'isValidPhone')),
         );
     }
 
@@ -84,6 +90,47 @@ class CommonExtension extends Twig_Extension
         $accessor = new PropertyAccessor();
 
         return $accessor->getValue($object, $propertyPath);
+    }
+
+    /**
+     * Is phone number valid
+     *
+     * @param string $phone Phone number
+     *
+     * @return bool
+     */
+    public function isValidPhone(string $phone)
+    {
+        $phoneUtil = PhoneNumberUtil::getInstance();
+        try {
+            $phoneUtil->parse($phone, 'RU');
+
+            return true;
+        } catch (Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
+     * Format phone string
+     *
+     * @param string $phone Phone number
+     *
+     * @return string
+     */
+    public function formatPhone(string $phone)
+    {
+        $phoneUtil = PhoneNumberUtil::getInstance();
+        try {
+            $phoneNumber = $phoneUtil->parse($phone, 'RU');
+            $phone       = $phoneUtil->format($phoneNumber, PhoneNumberFormat::E164);
+
+            return $phone;
+        } catch (Exception $e) {
+        }
+
+        return $phone;
     }
 
     /**
