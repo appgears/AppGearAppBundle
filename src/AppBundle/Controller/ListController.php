@@ -29,6 +29,7 @@ class ListController extends AbstractController
         }
 
         $expression = $request->get('data[expression]', null, true);
+        $criteria   = $request->get('data[criteria]', null, true);
         $orderings  = $request->get('data[orderings]', [], true);
 
         $page   = $request->get('page', null);
@@ -45,6 +46,8 @@ class ListController extends AbstractController
             if ($offset !== null) {
                 $count = $this->storage->getRepository($model)->countByExpr($expression);
             }
+        } elseif (is_scalar($criteria)) {
+            $criteria = $this->storage->getRepository('app.storage.criteria.composite')->find($criteria);
         } else {
             $data = $this->storage->getRepository($model)->findBy([], $orderings, $limit, $offset);
 
@@ -53,6 +56,6 @@ class ListController extends AbstractController
             }
         }
 
-        return $this->viewResponse($view, compact('request','model', 'data', 'count', 'page', 'limit', 'offset'));
+        return $this->viewResponse($view, compact('request', 'model', 'data', 'count', 'page', 'limit', 'offset'));
     }
 }

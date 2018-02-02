@@ -29,6 +29,32 @@ models:
         field:
           type: core.property.field.string_type
 
+  app.storage.criteria: ~
+
+  app.storage.criteria.composite:
+    parent: app.storage.criteria
+    properties:
+      operator:
+        field:
+          type: core.property.field.string_type
+      expressions:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.storage.criteria
+
+  app.storage.criteria.expression:
+    parent: app.storage.criteria
+    properties:
+      field:
+        field:
+          type: core.property.field.string_type
+      comparison:
+        field:
+          type: core.property.field.string_type
+      value:
+        field:
+          type: core.property.field.mixed_type
+
   app.ui.translation:
     properties:
       label:
