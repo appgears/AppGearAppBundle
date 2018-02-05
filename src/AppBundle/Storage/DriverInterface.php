@@ -2,6 +2,8 @@
 
 namespace AppGear\AppBundle\Storage;
 
+use AppGear\AppBundle\Entity\Storage\Criteria;
+
 interface DriverInterface
 {
     /**
@@ -19,26 +21,26 @@ interface DriverInterface
      * Optionally sorting and limiting details can be passed.
      *
      * @param string     $model Model
-     * @param array      $criteria
+     * @param Criteria   $criteria
      * @param array|null $orderBy
      * @param int|null   $limit
      * @param int|null   $offset
      *
      * @return array The objects.
      */
-    public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null);
+    public function findBy($model, Criteria $criteria = null, array $orderBy = null, $limit = null, $offset = null);
 
     /**
-     * Finds objects by a set of criteria.
+     * Counts objects by a set of criteria.
      *
      * Optionally sorting and limiting details can be passed.
      *
-     * @param string $model Model
-     * @param array  $criteria
+     * @param string   $model Model
+     * @param Criteria $criteria
      *
-     * @return array The objects.
+     * @return int Count
      */
-    public function countBy($model, array $criteria);
+    public function countBy($model, Criteria $criteria = null);
 
     /**
      * Finds an object by its primary key / identifier.

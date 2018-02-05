@@ -2,7 +2,8 @@
 
 namespace AppGear\AppBundle\Entity\Storage\Criteria;
 
-class Expression
+use AppGear\AppBundle\Entity\Storage\Criteria;
+class Expression extends Criteria
 {
     
     /**

@@ -2,18 +2,17 @@
 
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
+use AppGear\AppBundle\Entity\Storage\Criteria as StorageCriteria;
 use AppGear\AppBundle\Storage\DriverInterface;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
-use AppGear\CoreBundle\EntityService\ModelService;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Cosmologist\Gears\ArrayType;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Collections\Criteria as DoctrineCriteria;
 use Doctrine\ORM\EntityRepository;
+use RuntimeException;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
@@ -59,6 +58,14 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
+    public function find($model, $id)
+    {
+        return $this->getObjectRepository($model)->find($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function findAll($model)
     {
         return $this->getObjectRepository($model)->findAll();
@@ -67,28 +74,86 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function findBy($model, array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy($model, StorageCriteria $criteria = null, array $orderBy = null, $limit = null, $offset = null)
     {
-        return $this->getObjectRepository($model)->findBy($criteria, $orderBy, $limit, $offset);
+        $doctrineCriteria = DoctrineCriteria::create();
+        $this->convertCriteria($this->modelManager->get($model), $doctrineCriteria, $criteria);
+
+        if (null !== $orderBy) {
+            $doctrineCriteria->orderBy($orderBy);
+        }
+        if (null !== $limit) {
+            $doctrineCriteria->setMaxResults($limit);
+        }
+        if (null !== $offset) {
+            $doctrineCriteria->setFirstResult($offset);
+        }
+
+        return $this->getObjectRepository($model)->matching($doctrineCriteria);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function countBy($model, array $criteria)
+    public function countBy($model, StorageCriteria $criteria = null)
     {
-        $fqcn    = $this->modelManager->fullClassName($model);
-        $manager = $this->registry->getManagerForClass($fqcn);
+        $doctrineCriteria = DoctrineCriteria::create();
+        $this->convertCriteria($this->modelManager->get($model), $doctrineCriteria, $criteria);
 
-        return $manager->getUnitOfWork()->getEntityPersister($fqcn)->count($criteria);
+        return $this->getObjectRepository($model)->matching($doctrineCriteria)->count();
     }
 
     /**
-     * {@inheritdoc}
+     * @param DoctrineCriteria $doctrineCriteria
+     * @param StorageCriteria  $storageCriteria
+     * @param bool             $andWhere
+     *
+     * @return DoctrineCriteria
      */
-    public function find($model, $id)
+    private function convertCriteria(Model $model, DoctrineCriteria $doctrineCriteria, StorageCriteria $storageCriteria = null, $andWhere = true)
     {
-        return $this->getObjectRepository($model)->find($id);
+        if ($storageCriteria === null) {
+            return $doctrineCriteria;
+        }
+
+        if ($storageCriteria instanceof StorageCriteria\Composite) {
+            foreach ($storageCriteria->getExpressions() as $expression) {
+                $this->convertCriteria($model, $doctrineCriteria, $expression, $storageCriteria->getOperator() === 'AND');
+            }
+        } elseif ($storageCriteria instanceof StorageCriteria\Expression) {
+            $doctrineExpression = DoctrineCriteria::expr();
+
+            $field      = $storageCriteria->getField();
+            $comparison = $storageCriteria->getComparison();
+            $value      = $storageCriteria->getValue();
+
+            if (\in_array($comparison, ['eq', 'neq'])) {
+                $property = ModelHelper::getProperty($model, $field);
+
+                // Doctrine need "in" expression for relationships
+                if (($property instanceof Property\Relationship) && ($value !== null)) {
+                    $doctrineExpression = ($comparison === '==') ? $doctrineExpression->in($field, [$value]) : $doctrineExpression->notIn($field, [$value]);
+                } else {
+                    $doctrineExpression = ($comparison === 'eq') ? $doctrineExpression->eq($field, $value) : $doctrineExpression->neq($field, $value);
+                }
+            } elseif ($comparison === '>') {
+                $doctrineExpression = $doctrineExpression->lt($field, $value);
+            } elseif ($comparison === '<') {
+                $doctrineExpression = $doctrineExpression->gt($field, $value);
+            } elseif ($comparison === 'in') {
+                $doctrineExpression = $doctrineExpression->in($field, $value);
+            } else {
+                throw new RuntimeException("Unknown criteria comparison: $comparison");
+            }
+
+            if ($andWhere) {
+                $doctrineCriteria->andWhere($doctrineExpression);
+            } else {
+                $doctrineCriteria->orWhere($doctrineExpression);
+            }
+        }
+
+        return $doctrineCriteria;
     }
 
     /**
@@ -100,7 +165,7 @@ class Driver implements DriverInterface
         $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
 
         $node     = $this->expressionLanguage->parse($expression, $names)->getNodes();
-        $criteria = $this->buildCriteria($model, Criteria::create(), $node);
+        $criteria = $this->buildCriteria($model, DoctrineCriteria::create(), $node);
 
         if (null !== $orderBy) {
             $criteria->orderBy($orderBy);
@@ -109,7 +174,7 @@ class Driver implements DriverInterface
             $criteria->setMaxResults($limit);
         }
         if (null !== $offset) {
-            $criteria->setMaxResults($offset);
+            $criteria->setFirstResult($offset);
         }
 
         return $this->getObjectRepository($model)->matching($criteria);
@@ -124,20 +189,20 @@ class Driver implements DriverInterface
         $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
 
         $node     = $this->expressionLanguage->parse($expression, $names)->getNodes();
-        $criteria = $this->buildCriteria($model, Criteria::create(), $node);
+        $criteria = $this->buildCriteria($model, DoctrineCriteria::create(), $node);
 
         return $this->getObjectRepository($model)->matching($criteria)->count();
     }
 
     /**
-     * @param Model    $model
-     * @param Criteria $criteria
-     * @param          $node
-     * @param bool     $andWhere
+     * @param Model            $model
+     * @param DoctrineCriteria $criteria
+     * @param                  $node
+     * @param bool             $andWhere
      *
-     * @return Criteria
+     * @return DoctrineCriteria
      */
-    private function buildCriteria(Model $model, Criteria $criteria, $node, $andWhere = true)
+    private function buildCriteria(Model $model, DoctrineCriteria $criteria, $node, $andWhere = true)
     {
         if ($node instanceof BinaryNode) {
             $left     = $node->nodes['left'];
@@ -164,7 +229,7 @@ class Driver implements DriverInterface
 
                     $property = ModelHelper::getProperty($model, $name);
 
-                    $expr = Criteria::expr();
+                    $expr = DoctrineCriteria::expr();
 
                     if (\in_array($operator, ['==', '!='])) {
                         // Doctrine need "in" expression for relationships
@@ -181,7 +246,7 @@ class Driver implements DriverInterface
                         $expr = $expr->in($name, $value);
                     }
                 } else {
-                    throw new \RuntimeException(sprintf('Unsupported type of left or right node in expression "%s"', $expr));
+                    throw new RuntimeException(sprintf('Unsupported type of left or right node in expression "%s"', $expr));
                 }
 
                 if ($andWhere) {
@@ -196,10 +261,10 @@ class Driver implements DriverInterface
                 $this->buildCriteria($model, $criteria, $left, false);
                 $this->buildCriteria($model, $criteria, $right, false);
             } else {
-                throw new \RuntimeException(sprintf('Unsupported operator "%s"', $operator));
+                throw new RuntimeException(sprintf('Unsupported operator "%s"', $operator));
             }
         } else {
-            throw new \RuntimeException(sprintf('Unsupported note "%s" in expression "%s"', get_class($node), $expr));
+            throw new RuntimeException(sprintf('Unsupported note "%s" in expression "%s"', get_class($node), $expr));
         }
 
         return $criteria;

@@ -288,7 +288,7 @@ abstract class AbstractController extends Controller
 
                         $value = $this->storage->getRepository($propertyModel)->findByExpr($expr, $orderings);
                     } elseif ($orderings !== []) {
-                        $value = $this->storage->getRepository($propertyModel)->findBy([], $orderings);
+                        $value = $this->storage->getRepository($propertyModel)->findBy(null, $orderings);
                     } else {
                         $value = $this->storage->getRepository($propertyModel)->findAll();
                     }

@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\Storage;
 
+use AppGear\AppBundle\Entity\Storage\Criteria;
 use AppGear\CoreBundle\Model\ModelManager;
 
 class Repository
@@ -68,14 +69,14 @@ class Repository
      *
      * Optionally sorting and limiting details can be passed.
      *
-     * @param array      $criteria
+     * @param Criteria   $criteria
      * @param array|null $orderBy
      * @param int|null   $limit
      * @param int|null   $offset
      *
      * @return array The objects.
      */
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(Criteria $criteria = null, array $orderBy = null, $limit = null, $offset = null)
     {
         return $this->driver->findBy($this->model, $criteria, $orderBy, $limit, $offset);
     }
@@ -85,11 +86,11 @@ class Repository
      *
      * Optionally sorting and limiting details can be passed.
      *
-     * @param array $criteria
+     * @param Criteria $criteria
      *
      * @return int Count
      */
-    public function countBy(array $criteria)
+    public function countBy(Criteria $criteria = null)
     {
         return $this->driver->countBy($this->model, $criteria);
     }
@@ -99,14 +100,14 @@ class Repository
      *
      * Optionally sorting and limiting details can be passed.
      *
-     * @param array      $criteria
+     * @param Criteria   $criteria
      * @param array|null $orderBy
      * @param int|null   $limit
      * @param int|null   $offset
      *
      * @return array The objects.
      */
-    public function findOneBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findOneBy(Criteria $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $entities = $this->findBy($criteria, $orderBy, $limit, $offset);
 

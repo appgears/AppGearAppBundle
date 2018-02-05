@@ -46,13 +46,15 @@ class ListController extends AbstractController
             if ($offset !== null) {
                 $count = $this->storage->getRepository($model)->countByExpr($expression);
             }
-        } elseif (is_scalar($criteria)) {
-            $criteria = $this->storage->getRepository('app.storage.criteria.composite')->find($criteria);
         } else {
-            $data = $this->storage->getRepository($model)->findBy([], $orderings, $limit, $offset);
+            if (is_scalar($criteria)) {
+                $criteria = $this->storage->getRepository('app.storage.criteria.composite')->find($criteria);
+            }
+
+            $data = $this->storage->getRepository($model)->findBy($criteria, $orderings, $limit, $offset);
 
             if ($offset !== null) {
-                $count = $this->storage->getRepository($model)->countBy([]);
+                $count = $this->storage->getRepository($model)->countBy($criteria);
             }
         }
 

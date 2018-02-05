@@ -47,7 +47,7 @@ class ViewController extends AbstractController
                 $expression = $this->performExpression($request, $expression);
                 $data       = $this->storage->getRepository($model)->findByExpr($expression, $orderings);
             } else {
-                $data = $this->storage->getRepository($model)->findBy([], $orderings);
+                $data = $this->storage->getRepository($model)->findBy(null, $orderings);
             }
         }
 

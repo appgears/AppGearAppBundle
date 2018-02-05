@@ -2,7 +2,8 @@
 
 namespace AppGear\AppBundle\Entity\Storage\Criteria;
 
-class Composite
+use AppGear\AppBundle\Entity\Storage\Criteria;
+class Composite extends Criteria
 {
     
     /**

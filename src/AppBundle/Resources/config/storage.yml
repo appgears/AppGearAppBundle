@@ -20,6 +20,7 @@ services:
   appgear.storage.driver.yaml:
     class: AppGear\AppBundle\Storage\Driver\Yaml\Driver
     arguments:
+      - '@service_container'
       - '@appgear.storage.driver.yaml.loader'
       - '@appgear.storage.driver.hydrator.factory'
     tags:
