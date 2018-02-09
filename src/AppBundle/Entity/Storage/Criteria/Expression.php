@@ -14,7 +14,7 @@ class Expression extends Criteria
     /**
      * Comparison
      */
-    protected $comparison;
+    protected $comparison = 'eq';
     
     /**
      * Value

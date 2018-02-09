@@ -5,8 +5,35 @@
     
     {% if data | length %}
         
-        {% if (view.top | length) or (view.showCount) %}
+        {% if (view.filters | length) or (view.top | length) or (view.showCount) %}
             <div class="panel-heading">
+                
+                
+                {% if view.filters | length %}
+                    <form>
+                        <div class="btn-group" data-toggle="buttons">
+                            
+                            {#<label class="btn btn-default active">
+                                <input type="checkbox" name="123" data-toggle="button" checked>
+                                <span class="glyphicon glyphicon-star"></span>
+                                123
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="checkbox" name="456">
+                                <span class="glyphicon glyphicon-star-empty"></span>
+                                456
+                            </label>#}
+                            
+                            {% for filter in view.filters %}
+                                <label class="btn btn-default btn-xs"> <input type="checkbox" name="filters[0]" onchange="this.form.submit()">
+                                    {{ filter.name }}
+                                </label>
+                            {% endfor %}
+                        
+                        </div>
+                    </form>
+                {% endif %}
+                
                 {% for field in (view.top | view_fields(data[0], false)) %}
                     {{ block('widget_field') }}
                 {% endfor %}

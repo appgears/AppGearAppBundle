@@ -53,30 +53,6 @@ interface DriverInterface
     public function find($model, $id);
 
     /**
-     * Finds entities by criteria expression.
-     *
-     * @param string   $model      Model
-     * @param string   $expression Expression language criteria string
-     * @param array    $orderBy    The orderings
-     *                             Keys are field and values are the order, being either ASC or DESC.
-     * @param int|null $limit
-     * @param int|null $offset
-     *
-     * @return array The objects.
-     */
-    public function findByExpr($model, $expression, array $orderBy = null, $limit = null, $offset = null);
-
-    /**
-     * Counts entities by criteria expression.
-     *
-     * @param string $model      Model
-     * @param string $expression Expression language criteria string
-     *
-     * @return int Count
-     */
-    public function countByExpr($model, $expression);
-
-    /**
      * Save object to the storage.
      *
      * @param object $object Object

@@ -76,22 +76,6 @@ class Driver implements DriverInterface
     /**
      * {@inheritdoc}
      */
-    public function findByExpr($model, $expression, array $orderBy = null, $limit = null, $offset = null)
-    {
-        throw new \RuntimeException('Not implemented yet');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function countByExpr($model, $expression)
-    {
-        throw new \RuntimeException('Not implemented yet');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function save($object)
     {
         throw new \RuntimeException('Not implemented yet');

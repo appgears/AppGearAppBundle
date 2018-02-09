@@ -28,6 +28,8 @@ class ListController extends AbstractController
             $view = $this->initialize($request, $viewParameters);
         }
 
+        $activeFilters = $request->get('filters', []);
+
         $expression = $request->get('data[expression]', null, true);
         $criteria   = $request->get('data[criteria]', null, true);
         $orderings  = $request->get('data[orderings]', [], true);

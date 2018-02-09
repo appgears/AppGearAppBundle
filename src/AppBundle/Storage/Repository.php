@@ -3,7 +3,16 @@
 namespace AppGear\AppBundle\Storage;
 
 use AppGear\AppBundle\Entity\Storage\Criteria;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
+use Cosmologist\Gears\ArrayType;
+use RuntimeException;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
+use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\Node\Node;
 
 class Repository
 {
@@ -131,7 +140,7 @@ class Repository
      */
     public function findByExpr($expr, array $orderBy = null, $limit = null, $offset = null)
     {
-        return $this->driver->findByExpr($this->model, $expr, $orderBy, $limit, $offset);
+        return $this->findBy($this->convertCriteria($expr, $this->model), $orderBy, $limit, $offset);
     }
 
     /**
@@ -143,7 +152,7 @@ class Repository
      */
     public function countByExpr($expr)
     {
-        return $this->driver->countByExpr($this->model, $expr);
+        return $this->countBy($this->convertCriteria($expr, $this->model));
     }
 
     /**
@@ -181,5 +190,112 @@ class Repository
     public function remove($object)
     {
         $this->driver->remove($object);
+    }
+
+    /**
+     * Convert string expression to model to storage criteria
+     *
+     * @param string $expression
+     * @param string $model
+     *
+     * @return Criteria
+     */
+    private function convertCriteria(string $expression, string $model): Criteria
+    {
+        $model = $this->modelManager->get($model);
+        $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
+
+        $expressionLanguage = new ExpressionLanguage();
+
+        $node = $expressionLanguage->parse($expression, $names)->getNodes();
+
+        return $this->convertCriteriaNode($node);
+    }
+
+    /**
+     * Convert expression node to appgear storage criteria
+     *
+     * @param Node $node
+     *
+     * @return Criteria
+     */
+    private function convertCriteriaNode(Node $node): Criteria
+    {
+        if (!($node instanceof BinaryNode)) {
+            throw new RuntimeException(sprintf('Unsupported node "%s"', get_class($node)));
+        }
+
+        $left     = $node->nodes['left'];
+        $right    = $node->nodes['right'];
+        $operator = $node->attributes['operator'];
+
+        if (in_array($operator, ['==', '!=', '<', '>', 'in'])) {
+            if (!($left instanceof NameNode && ($right instanceof ConstantNode || $right instanceof ArrayNode))) {
+                throw new RuntimeException(sprintf('Unsupported type of left or right node in expression "%s" or "%s"', get_class($left), get_class($right)));
+            }
+
+            if ($right instanceof ConstantNode) {
+                $value = $right->attributes['value'];
+            } else {
+                $value = $this->convertArrayNodeToArray($right);
+            }
+
+            switch ($operator) {
+                case '==':
+                    $operator = 'eq';
+                    break;
+                case '!=':
+                    $operator = 'neq';
+                    break;
+                case '<':
+                    $operator = 'lt';
+                    break;
+                case '>':
+                    $operator = 'gt';
+                    break;
+                default:
+                    break;
+            }
+
+            $expression = new Criteria\Expression();
+            $expression
+                ->setField($left->attributes['name'])
+                ->setComparison($operator)
+                ->setValue($value);
+
+            /** @var Criteria\Composite $criteria */
+            return $expression;
+
+        } elseif (in_array($operator, ['and', '&&'])) {
+            $composite = new Criteria\Composite();
+            $composite
+                ->setOperator('and')
+                ->setExpressions([$this->convertCriteriaNode($left), $this->convertCriteriaNode($right)]);
+
+            return $composite;
+        } else {
+            throw new RuntimeException(sprintf('Unsupported operator "%s"', $operator));
+        }
+    }
+
+    /**
+     * Convert expression ArrayNode to associative array
+     *
+     * @param ArrayNode $node
+     *
+     * @return array
+     */
+    private function convertArrayNodeToArray(ArrayNode $node)
+    {
+        $keys = $values = [];
+        foreach ($node->nodes as $i => $node) {
+            if ($i & 1) {
+                $values[] = $node->attributes['value'];
+            } else {
+                $keys[] = $node->attributes['value'];
+            }
+        }
+
+        return array_combine($keys, $values);
     }
 }

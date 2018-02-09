@@ -118,7 +118,7 @@ class Driver implements DriverInterface
 
         if ($storageCriteria instanceof StorageCriteria\Composite) {
             foreach ($storageCriteria->getExpressions() as $expression) {
-                $this->convertCriteria($model, $doctrineCriteria, $expression, $storageCriteria->getOperator() === 'AND');
+                $this->convertCriteria($model, $doctrineCriteria, $expression, strtoupper($storageCriteria->getOperator()) === 'AND');
             }
         } elseif ($storageCriteria instanceof StorageCriteria\Expression) {
             $doctrineExpression = DoctrineCriteria::expr();
@@ -154,120 +154,6 @@ class Driver implements DriverInterface
         }
 
         return $doctrineCriteria;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findByExpr($model, $expression, array $orderBy = null, $limit = null, $offset = null)
-    {
-        $model = $this->modelManager->get($model);
-        $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
-
-        $node     = $this->expressionLanguage->parse($expression, $names)->getNodes();
-        $criteria = $this->buildCriteria($model, DoctrineCriteria::create(), $node);
-
-        if (null !== $orderBy) {
-            $criteria->orderBy($orderBy);
-        }
-        if (null !== $limit) {
-            $criteria->setMaxResults($limit);
-        }
-        if (null !== $offset) {
-            $criteria->setFirstResult($offset);
-        }
-
-        return $this->getObjectRepository($model)->matching($criteria);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function countByExpr($model, $expression)
-    {
-        $model = $this->modelManager->get($model);
-        $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
-
-        $node     = $this->expressionLanguage->parse($expression, $names)->getNodes();
-        $criteria = $this->buildCriteria($model, DoctrineCriteria::create(), $node);
-
-        return $this->getObjectRepository($model)->matching($criteria)->count();
-    }
-
-    /**
-     * @param Model            $model
-     * @param DoctrineCriteria $criteria
-     * @param                  $node
-     * @param bool             $andWhere
-     *
-     * @return DoctrineCriteria
-     */
-    private function buildCriteria(Model $model, DoctrineCriteria $criteria, $node, $andWhere = true)
-    {
-        if ($node instanceof BinaryNode) {
-            $left     = $node->nodes['left'];
-            $right    = $node->nodes['right'];
-            $operator = $node->attributes['operator'];
-
-            if (\in_array($operator, ['==', '!=', '<', '>', 'in'])) {
-                if ($left instanceof NameNode && ($right instanceof ConstantNode || $right instanceof ArrayNode)) {
-                    $name = $left->attributes['name'];
-                    if ($right instanceof ConstantNode) {
-                        $value = $right->attributes['value'];
-                    } else {
-                        // Extract array from ArrayNode
-                        $keys = $values = [];
-                        foreach ($right->nodes as $i => $node) {
-                            if ($i & 1) {
-                                $values[] = $node->attributes['value'];
-                            } else {
-                                $keys[] = $node->attributes['value'];
-                            }
-                        }
-                        $value = \array_combine($keys, $values);
-                    }
-
-                    $property = ModelHelper::getProperty($model, $name);
-
-                    $expr = DoctrineCriteria::expr();
-
-                    if (\in_array($operator, ['==', '!='])) {
-                        // Doctrine need "in" expression for relationships
-                        if (($property instanceof Property\Relationship) && ($value !== null)) {
-                            $expr = ($operator === '==') ? $expr->in($name, [$value]) : $expr->notIn($name, [$value]);
-                        } else {
-                            $expr = ($operator === '==') ? $expr->eq($name, $value) : $expr->neq($name, $value);
-                        }
-                    } elseif ($operator === '>') {
-                        $expr = $expr->lt($name, $value);
-                    } elseif ($operator === '<') {
-                        $expr = $expr->gt($name, $value);
-                    } elseif ($operator === 'in') {
-                        $expr = $expr->in($name, $value);
-                    }
-                } else {
-                    throw new RuntimeException(sprintf('Unsupported type of left or right node in expression "%s"', $expr));
-                }
-
-                if ($andWhere) {
-                    $criteria->andWhere($expr);
-                } else {
-                    $criteria->orWhere($expr);
-                }
-            } elseif (\in_array($operator, ['and', '&&'])) {
-                $this->buildCriteria($model, $criteria, $left);
-                $this->buildCriteria($model, $criteria, $right);
-            } elseif (\in_array($operator, ['or', '||'])) {
-                $this->buildCriteria($model, $criteria, $left, false);
-                $this->buildCriteria($model, $criteria, $right, false);
-            } else {
-                throw new RuntimeException(sprintf('Unsupported operator "%s"', $operator));
-            }
-        } else {
-            throw new RuntimeException(sprintf('Unsupported note "%s" in expression "%s"', get_class($node), $expr));
-        }
-
-        return $criteria;
     }
 
     /**

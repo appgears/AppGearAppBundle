@@ -27,6 +27,11 @@ class ListView extends View
     protected $fields = array();
     
     /**
+     * Filters
+     */
+    protected $filters = array();
+    
+    /**
      * ShowCount
      */
     protected $showCount = false;
@@ -97,6 +102,23 @@ class ListView extends View
     public function getFields()
     {
         return $this->fields;
+    }
+    
+    /**
+     * Set filters
+     */
+    public function setFilters($filters)
+    {
+        $this->filters = $filters;
+        return $this;
+    }
+    
+    /**
+     * Get filters
+     */
+    public function getFilters()
+    {
+        return $this->filters;
     }
     
     /**
