@@ -25,7 +25,9 @@
                             </label>#}
                             
                             {% for filter in view.filters %}
-                                <label class="btn btn-default btn-xs"> <input type="checkbox" name="filters[0]" onchange="this.form.submit()">
+                                {% set isActiveFilter = loop.index0 in filters %}
+                                {% set inputAttrs = {'data-toggle': 'button', 'checked': 'checked'} %}
+                                <label class="btn btn-default btn-xs{% if isActiveFilter %} active{% endif %}"> <input type="checkbox" name="filters[0]" value="0" onchange="this.form.submit()"{% if isActiveFilter %} checked{% endif %}>
                                     {{ filter.name }}
                                 </label>
                             {% endfor %}

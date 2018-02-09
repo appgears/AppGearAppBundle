@@ -44,7 +44,7 @@ class Repository
      * @param string          $model        Model
      * @param ModelManager    $modelManager Model manager
      */
-    public function __construct(DriverInterface $driver, $model, ModelManager $modelManager)
+    public function __construct(DriverInterface $driver, string $model, ModelManager $modelManager)
     {
         $this->model        = $model;
         $this->driver       = $driver;
@@ -140,7 +140,7 @@ class Repository
      */
     public function findByExpr($expr, array $orderBy = null, $limit = null, $offset = null)
     {
-        return $this->findBy($this->convertCriteria($expr, $this->model), $orderBy, $limit, $offset);
+        return $this->findBy($this->convertExpression2Criteria($expr, $this->model), $orderBy, $limit, $offset);
     }
 
     /**
@@ -152,7 +152,7 @@ class Repository
      */
     public function countByExpr($expr)
     {
-        return $this->countBy($this->convertCriteria($expr, $this->model));
+        return $this->countBy($this->convertExpression2Criteria($expr, $this->model));
     }
 
     /**
@@ -196,13 +196,12 @@ class Repository
      * Convert string expression to model to storage criteria
      *
      * @param string $expression
-     * @param string $model
      *
      * @return Criteria
      */
-    private function convertCriteria(string $expression, string $model): Criteria
+    public function convertExpression2Criteria(string $expression): Criteria
     {
-        $model = $this->modelManager->get($model);
+        $model = $this->modelManager->get($this->model);
         $names = ArrayType::collect(ModelHelper::getProperties($model), 'name');
 
         $expressionLanguage = new ExpressionLanguage();

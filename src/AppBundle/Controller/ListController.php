@@ -2,7 +2,9 @@
 
 namespace AppGear\AppBundle\Controller;
 
+use AppGear\AppBundle\Entity\Storage\Criteria;
 use AppGear\AppBundle\Entity\View;
+use AppGear\AppBundle\Entity\View\ListView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,8 +30,6 @@ class ListController extends AbstractController
             $view = $this->initialize($request, $viewParameters);
         }
 
-        $activeFilters = $request->get('filters', []);
-
         $expression = $request->get('data[expression]', null, true);
         $criteria   = $request->get('data[criteria]', null, true);
         $orderings  = $request->get('data[orderings]', [], true);
@@ -42,24 +42,54 @@ class ListController extends AbstractController
             $offset = ((int) $page - 1) * $limit;
         }
 
+        $repository = $this->storage->getRepository($model);
+
         if (is_scalar($expression)) {
-            $data = $this->storage->getRepository($model)->findByExpr($expression, $orderings, $limit, $offset);
+            $criteria = $repository->convertExpression2Criteria($expression);
+        } elseif (is_scalar($criteria)) {
+            $criteria = $this->storage->getRepository('app.storage.criteria.composite')->find($criteria);
+        }
 
-            if ($offset !== null) {
-                $count = $this->storage->getRepository($model)->countByExpr($expression);
+        $filters  = $request->get('filters', []);
+        $criteria = $this->applyFilters($criteria, $filters, $view);
+
+        $data = $repository->findBy($criteria, $orderings, $limit, $offset);
+
+        if ($offset !== null) {
+            $count = $repository->countBy($criteria);
+        }
+
+        return $this->viewResponse($view, compact('request', 'model', 'filters', 'data', 'count', 'page', 'limit', 'offset'));
+    }
+
+    /**
+     * Merge filters criteria with storage criteria
+     *
+     * @param Criteria $criteria
+     * @param array    $filters
+     * @param ListView $listView
+     *
+     * @return Criteria
+     */
+    private function applyFilters(Criteria $criteria, array $filters, ListView $listView): Criteria
+    {
+        /** @var ListView\Filter[] $viewFilters */
+        $viewFilters = $listView->getFilters();
+
+        foreach ($filters as $filterIndex) {
+            if (!isset($viewFilters[$filterIndex])) {
+                continue;
             }
-        } else {
-            if (is_scalar($criteria)) {
-                $criteria = $this->storage->getRepository('app.storage.criteria.composite')->find($criteria);
-            }
 
-            $data = $this->storage->getRepository($model)->findBy($criteria, $orderings, $limit, $offset);
+            $viewFilter = $viewFilters[$filterIndex];
 
-            if ($offset !== null) {
-                $count = $this->storage->getRepository($model)->countBy($criteria);
+            if (null !== $filterCriteria = $viewFilter->getCriteria()) {
+                $criteria = (new Criteria\Composite())
+                    ->setOperator('AND')
+                    ->setExpressions([$criteria, $filterCriteria]);
             }
         }
 
-        return $this->viewResponse($view, compact('request', 'model', 'data', 'count', 'page', 'limit', 'offset'));
+        return $criteria;
     }
 }
