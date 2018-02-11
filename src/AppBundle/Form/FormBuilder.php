@@ -139,13 +139,16 @@ class FormBuilder
                         );
                 }
             } else {
+                $prototypeClass = $this->modelManager->fullClassName($property->getTarget());
+
                 $formBuilder->add(
                     $propertyName,
                     CollectionType::class,
                     [
-                        'entry_type' => new RelatedDynamicType($this, $property, $this->modelManager),
-                        'allow_add'  => true,
-                        'options'    => ['label' => false] // Removing indexes (labels) for collection items
+                        'entry_type'     => new RelatedDynamicType($this, $property, $this->modelManager),
+                        'allow_add'      => true,
+                        'prototype_data' => new $prototypeClass,
+                        'options'        => ['label' => false] // Removing indexes (labels) for collection items
                     ]
                 );
             }
