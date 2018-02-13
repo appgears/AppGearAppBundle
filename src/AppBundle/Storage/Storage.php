@@ -2,7 +2,11 @@
 
 namespace AppGear\AppBundle\Storage;
 
+use AppGear\AppBundle\Entity\Storage\Column;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Entity\Property;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 
 class Storage
@@ -84,7 +88,7 @@ class Storage
      */
     public function save($entity)
     {
-        $model  = $this->modelManager->getByInstance($entity);
+        $model = $this->modelManager->getByInstance($entity);
         $this->getRepository($model)->save($entity);
     }
 
@@ -97,7 +101,33 @@ class Storage
      */
     public function remove($entity)
     {
-        $model  = $this->modelManager->getByInstance($entity);
+        $model = $this->modelManager->getByInstance($entity);
         $this->getRepository($model)->remove($entity);
+    }
+
+    /**
+     * Get entity identifier value
+     *
+     * @param object $entity Entity
+     *
+     * @return Property|null
+     */
+    public function getIdentifierProperty($entity): ?Property
+    {
+        $model = $this->modelManager->getByInstance($entity);
+
+        return StorageHelper::getIdentifierProperty($model);
+    }
+
+    /**
+     * Get entity identifier value
+     *
+     * @param object $entity Entity
+     *
+     * @return mixed
+     */
+    public function getIdentifierValue($entity)
+    {
+        return ModelHelper::readPropertyValue($entity, $this->getIdentifierProperty($entity));
     }
 }

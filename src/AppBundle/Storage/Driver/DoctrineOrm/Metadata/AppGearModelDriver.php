@@ -11,6 +11,7 @@ use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\EntityService\PropertyService;
 use AppGear\CoreBundle\Helper\ModelHelper;
+use AppGear\CoreBundle\Helper\PropertyHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
@@ -149,7 +150,7 @@ class AppGearModelDriver implements MappingDriver
         /** @var ClassMetadataInfo $classMetadata */
 
         foreach ($model->getProperties() as $property) {
-            $columnExtension = (new PropertyService($property))->getExtension(Column::class);
+            $columnExtension = PropertyHelper::getExtension($property, Column::class);
 
             if ($property instanceof Field) {
                 $mapping = [

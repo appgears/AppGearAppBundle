@@ -54,12 +54,14 @@ class FormController extends AbstractController
     /**
      * CrudController constructor.
      *
-     * @param Storage         $storage         Storage
-     * @param ModelManager    $modelManager    Model manager
-     * @param ViewManager     $viewManager     View manager
-     * @param SecurityManager $securityManager Security manager
-     * @param FormBuilder     $formBuilder     Form builder for model
-     * @param LoggerInterface $logger          Logger
+     * @param Storage         $storage          Storage
+     * @param ModelManager    $modelManager     Model manager
+     * @param ViewManager     $viewManager      View manager
+     * @param SecurityManager $securityManager  Security manager
+     * @param FormBuilder     $formBuilder      Form builder for model
+     * @param string          $uploadDirectory  Upload directory
+     * @param string          $uploadFilePrefix Prefix for uploaded files
+     * @param LoggerInterface $logger           Logger
      */
     public function __construct(
         Storage $storage,
@@ -105,7 +107,7 @@ class FormController extends AbstractController
 
         // Если форма была отправлена и успешно обработана
         if ($this->submitForm($request, $form)) {
-            $this->uploadFiles($formBuilder, $entity);
+            $this->uploadFiles($formBuilder);
             $this->updateMappedRelationshipForCollection($formBuilder, $model);
             $this->saveEntity($model, $entity);
 
@@ -196,6 +198,7 @@ class FormController extends AbstractController
      * upload path with the stored filename and create a new File class.
      *
      * @param FormBuilderInterface $formBuilder
+     * @param object               $entity
      */
     protected function initFiles(FormBuilderInterface $formBuilder, $entity)
     {
@@ -265,6 +268,7 @@ class FormController extends AbstractController
         $data     = $formBuilder->getData();
         $accessor = new PropertyAccessor();
 
+        /** @var FormBuilderInterface $field */
         foreach ($formBuilder as $field) {
             if ($field->getType()->getName() === 'collection') {
                 $property = ModelHelper::getRelationship($model, $field->getName());

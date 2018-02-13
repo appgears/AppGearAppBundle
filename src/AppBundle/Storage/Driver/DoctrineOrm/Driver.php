@@ -132,7 +132,7 @@ class Driver implements DriverInterface
 
                 // Doctrine need "in" expression for relationships
                 if (($property instanceof Property\Relationship) && ($value !== null)) {
-                    $doctrineExpression = ($comparison === '==') ? $doctrineExpression->in($field, [$value]) : $doctrineExpression->notIn($field, [$value]);
+                    $doctrineExpression = ($comparison === 'eq') ? $doctrineExpression->in($field, [$value]) : $doctrineExpression->notIn($field, [$value]);
                 } else {
                     $doctrineExpression = ($comparison === 'eq') ? $doctrineExpression->eq($field, $value) : $doctrineExpression->neq($field, $value);
                 }

@@ -9,7 +9,7 @@ class Composite extends Criteria
     /**
      * Operator
      */
-    protected $operator;
+    protected $operator = 'AND';
     
     /**
      * Expressions

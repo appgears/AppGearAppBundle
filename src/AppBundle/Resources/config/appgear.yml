@@ -37,6 +37,7 @@ models:
       operator:
         field:
           type: core.property.field.string_type
+          defaultValue: 'AND'
       expressions:
         relationship:
           type: core.property.relationship.toMany

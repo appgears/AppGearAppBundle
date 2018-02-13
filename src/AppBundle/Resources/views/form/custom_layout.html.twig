@@ -2,7 +2,7 @@
 
 {%- block form_widget -%}
     {% if compound %}
-        {% if form.parent.parent is empty %}
+        {% if form.parent.parent is defined and form.parent.parent is empty %}
             {{- block('form_widget_compound') -}}
             <button type="button" class="btn btn-default btn-compound-add-item"><i class="fa fa-plus"></i>Add Item</button>
         {% else %}
@@ -14,7 +14,7 @@
 {%- endblock form_widget -%}
 
 {%- block form_widget_compound -%}
-    {% if form.parent.parent is empty %}
+    {% if form.parent.parent is defined and form.parent.parent is empty %}
         {{ parent() }}
     {% else %}
         <div class="panel panel-default" style="border: 1px solid #ddd;">

@@ -23,6 +23,8 @@ services:
   appgear.controller.list:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\ListController
+    arguments:
+      - '@appgear.form.builder'
 
   appgear.controller.remove:
     parent: appgear.controller

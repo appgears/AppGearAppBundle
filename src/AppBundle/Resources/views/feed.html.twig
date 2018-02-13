@@ -1,19 +1,27 @@
+{% form_theme filtersFormView '@app/form/custom_layout.html.twig' %}
 {% use "@app/widgets.html.twig" %}
 {% use "@app/misc/widget_text_max_lines.html.twig" %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form method="post">
+            {{ form_widget(filtersFormView) }}
+        </form>
+    </div>
+</div>
 
 <div class="panel panel-default app-list-feed">
     
     {% if data | length %}
         
-        {% if (view.filters | length) or (view.top | length) or (view.showCount) %}
+        {% if (view.top | length) or (view.showCount) %}
             <div class="panel-heading">
                 
-                
-                {% if view.filters | length %}
+                {#{% if view.filters | length %}
                     <form>
                         <div class="btn-group" data-toggle="buttons">
                             
-                            {#<label class="btn btn-default active">
+                            #}{#<label class="btn btn-default active">
                                 <input type="checkbox" name="123" data-toggle="button" checked>
                                 <span class="glyphicon glyphicon-star"></span>
                                 123
@@ -22,7 +30,7 @@
                                 <input type="checkbox" name="456">
                                 <span class="glyphicon glyphicon-star-empty"></span>
                                 456
-                            </label>#}
+                            </label>#}{#
                             
                             {% for filter in view.filters %}
                                 {% set isActiveFilter = loop.index0 in filters %}
@@ -34,7 +42,7 @@
                         
                         </div>
                     </form>
-                {% endif %}
+                {% endif %}#}
                 
                 {% for field in (view.top | view_fields(data[0], false)) %}
                     {{ block('widget_field') }}

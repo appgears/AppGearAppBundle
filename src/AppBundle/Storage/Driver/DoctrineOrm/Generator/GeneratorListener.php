@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator;
 
 use AppGear\AppBundle\Entity\Storage\Column;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\EntityService\PropertyService;
@@ -22,7 +23,7 @@ class GeneratorListener
 
         /** @var Model $parent */
         if (null !== $parent = $model->getParent()) {
-            if (!$parent->getAbstract() && (null !== $property = $this->findIdentifierProperty($parent))) {
+            if (!$parent->getAbstract() && (null !== $property = StorageHelper::getIdentifierProperty($parent))) {
 
                 $class   = $generatorEvent->getClass();
                 $factory = new BuilderFactory();
@@ -32,24 +33,5 @@ class GeneratorListener
                 $class->addStmt($node);
             }
         }
-    }
-
-    /**
-     * Find model identifier property
-     *
-     * @param Model $model Model
-     *
-     * @return null|Property
-     */
-    private function findIdentifierProperty(Model $model)
-    {
-        foreach ($model->getProperties() as $property) {
-            $columnExtension = (new PropertyService($property))->getExtension(Column::class);
-            if ($columnExtension !== null && $extension->getIdentifier()) {
-                return $property;
-            }
-        }
-
-        return null;
     }
 }
