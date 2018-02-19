@@ -174,10 +174,6 @@ class FormController extends AbstractController
      */
     protected function submitForm(Request $request, FormInterface $form)
     {
-        if (!$request->isMethod('POST')) {
-            return false;
-        }
-
         $form->handleRequest($request);
 
         if (!$form->isSubmitted()) {

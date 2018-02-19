@@ -22,8 +22,6 @@ class AppGearAppBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        CoreExtension::$moduleConfigurators[] = Configuration::$moduleConfigurators[] = new RoutingsConfigurator();
-
         $container->addCompilerPass(new AppGearModelDriverCompilerPass());
 
         parent::build($container);
