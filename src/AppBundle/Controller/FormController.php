@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Controller;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Form\FormBuilder;
+use AppGear\AppBundle\Form\FormManager;
 use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
@@ -30,6 +31,11 @@ class FormController extends AbstractController
      * @var FormBuilder
      */
     protected $formBuilder;
+
+    /**
+     * @var FormManager
+     */
+    protected $formManager;
 
     /**
      * @var string
@@ -69,10 +75,12 @@ class FormController extends AbstractController
         ViewManager $viewManager,
         SecurityManager $securityManager,
         FormBuilder $formBuilder,
+        FormManager $formManager,
         string $uploadDirectory,
         string $uploadFilePrefix,
         LoggerInterface $logger
-    ) {
+    )
+    {
         parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
         $this->formBuilder      = $formBuilder;
@@ -95,29 +103,24 @@ class FormController extends AbstractController
         $model = $this->modelManager->get($model);
 
         // Загружаем существующую сущность или создаем новую
+        // TODO: проверить работу с data_class и entity=null
         $entity = $this->loadEntity($model, $id);
 
         // Проверяем доступ
-        $this->checkAccess((string) $model, $entity);
+        $this->checkAccess((string)$model, $entity);
 
         // Собираем форму
-        $formBuilder = $this->getFormBuilder($model, $entity);
-        $this->initFiles($formBuilder, $entity);
-        $form = $formBuilder->getForm();
+        $formBuilder = $this->formManager->getBuilder($model, $entity);
+        $form        = $formBuilder->getForm();
 
-        // Если форма была отправлена и успешно обработана
-        if ($this->submitForm($request, $form)) {
-            $this->uploadFiles($formBuilder);
-            $this->updateMappedRelationshipForCollection($formBuilder, $model);
+        if ($this->formManager->submit($formBuilder, $form, $request)) {
             $this->saveEntity($model, $entity);
 
             return $this->buildResponse($request, $model, $entity);
         }
 
-        // Инициализируем отображение
-        $viewParameters = $this->requireAttribute($request, 'view');
         /** @var View $view */
-        $view = $this->initialize($request, $viewParameters);
+        $view = $this->initialize($request, $this->requireAttribute($request, 'view'));
 
         return $this->viewResponse($view, ['form' => $form->createView()]);
     }
@@ -135,19 +138,6 @@ class FormController extends AbstractController
         } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $model)) {
             throw new AccessDeniedHttpException();
         }
-    }
-
-    /**
-     * Get form for model entity
-     *
-     * @param Model  $model  Model
-     * @param object $entity Entity
-     *
-     * @return FormBuilderInterface
-     */
-    protected function getFormBuilder(Model $model, $entity)
-    {
-        return $this->formBuilder->build($this->formBuilder->create($entity), $model);
     }
 
     /**
@@ -180,44 +170,12 @@ class FormController extends AbstractController
             return false;
         }
         if (!$form->isValid()) {
-            $this->logger->error((string) $form->getErrors(true));
+            $this->logger->error((string)$form->getErrors(true));
 
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * When creating a form to edit an already persisted item, the file form type still expects a  File instance.
-     * As the persisted entity now contains only the relative file path, you first have to concatenate the configured
-     * upload path with the stored filename and create a new File class.
-     *
-     * @param FormBuilderInterface $formBuilder
-     * @param object               $entity
-     */
-    protected function initFiles(FormBuilderInterface $formBuilder, $entity)
-    {
-        $accessor = new PropertyAccessor();
-
-        /** @var FormBuilderInterface $field */
-        foreach ($formBuilder as $field) {
-            if ($field->getType()->getName() === 'file') {
-                $fieldName = $field->getName();
-
-                $file = $accessor->getValue($entity, $fieldName);
-                if (!is_string($file)) {
-                    continue;
-                }
-
-                // Avoid erasing field value when form will saved without new file
-                $this->existingFileFields[$fieldName] = $file;
-
-                $file = new File($this->uploadDirectory . str_replace($this->uploadFilePrefix, '', $file));
-
-                $accessor->setValue($entity, $fieldName, $file);
-            }
-        }
     }
 
     /**
