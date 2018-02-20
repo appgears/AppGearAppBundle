@@ -49,24 +49,10 @@ class FormManager
      * @param Request              $request
      *
      * @return bool
-     */
-    public function submitRequest(FormBuilderInterface $builder, FormInterface $form, Request $request)
+     */ 
+    public function submit(FormBuilderInterface $builder, FormInterface $form, Request $request)
     {
-        $data = $this->getFormDataFromRequest();
-
-        return $this->submit($builder, $form, $data);
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     * @param FormInterface        $form
-     * @param array                $data
-     *
-     * @return bool
-     */
-    public function submit(FormBuilderInterface $builder, FormInterface $form, array $data)
-    {
-        $form->submit($data);
+        $form->handleRequest($request);
 
         if (!$form->isSubmitted()) {
             return false;
