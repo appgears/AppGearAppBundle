@@ -38,24 +38,9 @@ class FormController extends AbstractController
     protected $formManager;
 
     /**
-     * @var string
-     */
-    protected $uploadDirectory;
-
-    /**
-     * @var string
-     */
-    protected $uploadFilePrefix;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
-
-    /**
-     * @var array
-     */
-    private $existingFileFields = [];
 
     /**
      * CrudController constructor.
@@ -65,8 +50,6 @@ class FormController extends AbstractController
      * @param ViewManager     $viewManager      View manager
      * @param SecurityManager $securityManager  Security manager
      * @param FormBuilder     $formBuilder      Form builder for model
-     * @param string          $uploadDirectory  Upload directory
-     * @param string          $uploadFilePrefix Prefix for uploaded files
      * @param LoggerInterface $logger           Logger
      */
     public function __construct(
@@ -76,16 +59,11 @@ class FormController extends AbstractController
         SecurityManager $securityManager,
         FormBuilder $formBuilder,
         FormManager $formManager,
-        string $uploadDirectory,
-        string $uploadFilePrefix,
         LoggerInterface $logger
-    )
-    {
+    ) {
         parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
         $this->formBuilder      = $formBuilder;
-        $this->uploadDirectory  = $uploadDirectory;
-        $this->uploadFilePrefix = $uploadFilePrefix;
         $this->logger           = $logger;
     }
 
@@ -100,23 +78,22 @@ class FormController extends AbstractController
      */
     public function formAction(Request $request, $model, $id = null)
     {
-        $model = $this->modelManager->get($model);
+        $model  = $this->modelManager->get($model);
+        $entity = $this->storage->getRepository($model)->find($id);
 
-        // Загружаем существующую сущность или создаем новую
-        // TODO: проверить работу с data_class и entity=null
-        $entity = $this->loadEntity($model, $id);
+        $this->checkAccess((string) $model, $entity);
 
-        // Проверяем доступ
-        $this->checkAccess((string)$model, $entity);
-
-        // Собираем форму
         $formBuilder = $this->formManager->getBuilder($model, $entity);
         $form        = $formBuilder->getForm();
 
-        if ($this->formManager->submit($formBuilder, $form, $request)) {
-            $this->saveEntity($model, $entity);
+        if ($this->formManager->submitRequest($formBuilder, $form, $request)) {
+            $this->storage->getRepository($model)->save($entity);
 
             return $this->buildResponse($request, $model, $entity);
+        }
+
+        if (!$form->isValid()) {
+            $this->logger->error((string) $form->getErrors(true));
         }
 
         /** @var View $view */
@@ -138,113 +115,6 @@ class FormController extends AbstractController
         } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $model)) {
             throw new AccessDeniedHttpException();
         }
-    }
-
-    /**
-     * Load entity from the model storage by ID or create new entity instance
-     *
-     * @param Model $model Entity model
-     * @param null  $id    Entity ID
-     *
-     * @return object
-     */
-    protected function loadEntity(Model $model, $id = null)
-    {
-        return ($id === null) ? $this->modelManager->instance($model->getName()) :
-            $this->storage->getRepository($model)->find($id);
-    }
-
-    /**
-     * Handle request with form
-     *
-     * @param Request       $request Request
-     * @param FormInterface $form    Form
-     *
-     * @return bool True if form passed and successfully submitted
-     */
-    protected function submitForm(Request $request, FormInterface $form)
-    {
-        $form->handleRequest($request);
-
-        if (!$form->isSubmitted()) {
-            return false;
-        }
-        if (!$form->isValid()) {
-            $this->logger->error((string)$form->getErrors(true));
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param FormBuilderInterface $formBuilder
-     */
-    protected function uploadFiles(FormBuilderInterface $formBuilder)
-    {
-        $data     = $formBuilder->getData();
-        $accessor = new PropertyAccessor();
-
-        /** @var FormBuilderInterface $field */
-        foreach ($formBuilder as $field) {
-            if ($field->getType()->getName() === 'file') {
-                $fieldName = $field->getName();
-
-                /** @var UploadedFile $file */
-                $file = $accessor->getValue($data, $fieldName);
-                if (!($file instanceof UploadedFile)) {
-
-                    // Avoid erasing field value when form will saved without new file
-                    if (isset($this->existingFileFields[$fieldName])) {
-                        $accessor->setValue($data, $fieldName, $this->existingFileFields[$fieldName]);
-                    }
-
-                    continue;
-                }
-
-                $fileName = $this->uploadFilePrefix . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $file->guessExtension();
-                $file->move($this->uploadDirectory, $fileName);
-
-                $accessor->setValue($data, $fieldName, $fileName);
-            }
-        }
-    }
-
-    /**
-     * Set relationship from related backside
-     *
-     * @param FormBuilderInterface $formBuilder Form builder
-     * @param Model                $model       Model
-     */
-    protected function updateMappedRelationshipForCollection(FormBuilderInterface $formBuilder, Model $model)
-    {
-        $data     = $formBuilder->getData();
-        $accessor = new PropertyAccessor();
-
-        /** @var FormBuilderInterface $field */
-        foreach ($formBuilder as $field) {
-            if ($field->getType()->getName() === 'collection') {
-                $property = ModelHelper::getRelationship($model, $field->getName());
-                if (null !== $backsideProperty = StorageHelper::getBacksideProperty($property)) {
-                    $relatedData = $accessor->getValue($data, $property->getName());
-                    foreach ($relatedData as $relatedItem) {
-                        $accessor->setValue($relatedItem, $backsideProperty->getName(), $data);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Save entity to storage
-     *
-     * @param Model  $model  Model
-     * @param object $entity Entity
-     */
-    protected function saveEntity(Model $model, $entity)
-    {
-        $this->storage->getRepository($model)->save($entity);
     }
 
     /**

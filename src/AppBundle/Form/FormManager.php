@@ -2,58 +2,92 @@
 
 namespace AppGear\AppBundle\Form;
 
+use AppGear\AppBundle\Form\FormBuilder as AppFormBuilder;
+use AppGear\CoreBundle\Entity\Model;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormManager
 {
     /**
-     * Form factory
-     *
-     * @var FormFactoryInterface
+     * @var FormBuilder
      */
-    private $formFactory;
+    private $appFormBuilder;
 
     /**
      * FormManager constructor.
      *
-     * @param FormFactoryInterface $formFactory Form factory
+     * @param FormBuilder $appFormBuilder
      */
-    public function __construct(FormFactoryInterface $formFactory)
+    public function __construct(AppFormBuilder $appFormBuilder)
     {
-        $this->formFactory = $formFactory;
-    }
-
-    public function getBuilder(Model $model = null, $entity = null)
-    {
-        $builder = $this->formFactory->createBuilder('form', $data);
-
-        $this->initFields($builder, $model);
-        $this->initFiles($builder);
-
-
-        // TODO: fix
-        $formBuilder->add('save', SubmitType::class, array('label' => 'Save'));
-    }
-
-    private function initFields(FormBuilderInterface $builder, Model $model)
-    {
-        foreach (ModelHelper::getProperties($model) as $property) {
-            $this->addProperty($formBuilder, $property);
-        }
+        $this->appFormBuilder = $appFormBuilder;
     }
 
     /**
-     * When creating a form to edit an already persisted item, the file form type still expects a  File instance.
-     * As the persisted entity now contains only the relative file path, you first have to concatenate the configured
-     * upload path with the stored filename and create a new File class.
+     * @param Model $model
+     * @param null  $entity
+     * @param array $properties
+     * @param array $formOptions
      *
-     * @param FormBuilderInterface $formBuilder
-     * @param object               $entity
+     * @return FormBuilderInterface
      */
-    private function initFiles(FormBuilderInterface $formBuilder, $entity)
+    public function getBuilder(Model $model, $entity = null, array $properties = [], array $formOptions = [])
     {
+        $builder = $this->appFormBuilder->create($entity, $formOptions);
+        $builder = $this->appFormBuilder->build($builder, $model, $properties);
+
+        return $builder;
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param FormInterface        $form
+     * @param Request              $request
+     *
+     * @return bool
+     */
+    public function submitRequest(FormBuilderInterface $builder, FormInterface $form, Request $request)
+    {
+        $data = $this->getFormDataFromRequest();
+
+        return $this->submit($builder, $form, $data);
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param FormInterface        $form
+     * @param array                $data
+     *
+     * @return bool
+     */
+    public function submit(FormBuilderInterface $builder, FormInterface $form, array $data)
+    {
+        $form->submit($data);
+
+        if (!$form->isSubmitted()) {
+            return false;
+        }
+
+        if (!$form->isValid()) {
+            return false;
+        }
+
+        $this->uploadFiles($builder);
+        $this->updateMappedRelationshipForCollection($builder, $model);
+
+        return true;
+    }
+
+    /**
+     * @param FormBuilderInterface $formBuilder
+     */
+    private function uploadFiles(FormBuilderInterface $formBuilder)
+    {
+        $data     = $formBuilder->getData();
         $accessor = new PropertyAccessor();
 
         /** @var FormBuilderInterface $field */
@@ -61,34 +95,48 @@ class FormManager
             if ($field->getType()->getName() === 'file') {
                 $fieldName = $field->getName();
 
-                $file = $accessor->getValue($entity, $fieldName);
-                if (!is_string($file)) {
+                /** @var UploadedFile $file */
+                $file = $accessor->getValue($data, $fieldName);
+                if (!($file instanceof UploadedFile)) {
+
+                    // Avoid erasing field value when form will saved without new file
+                    if (isset($this->existingFileFields[$fieldName])) {
+                        $accessor->setValue($data, $fieldName, $this->existingFileFields[$fieldName]);
+                    }
+
                     continue;
                 }
 
-                // Avoid erasing field value when form will saved without new file
-                $this->existingFileFields[$fieldName] = $file;
+                $fileName = $this->uploadFilePrefix . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.' . $file->guessExtension();
+                $file->move($this->uploadDirectory, $fileName);
 
-                $file = new File($this->uploadDirectory . str_replace($this->uploadFilePrefix, '', $file));
-
-                $accessor->setValue($entity, $fieldName, $file);
+                $accessor->setValue($data, $fieldName, $fileName);
             }
         }
     }
 
-    public function submit(FormBuilderInterface $builder, FormInterface $form, Request $request)
+    /**
+     * Set relationship from related backside
+     *
+     * @param FormBuilderInterface $formBuilder Form builder
+     * @param Model                $model       Model
+     */
+    private function updateMappedRelationshipForCollection(FormBuilderInterface $formBuilder, Model $model)
     {
-        $data = $request->getData();
+        $data     = $formBuilder->getData();
+        $accessor = new PropertyAccessor();
 
-        $form->submit($data);
-
-        if (!$form->isValid()) {
-            return false;
+        /** @var FormBuilderInterface $field */
+        foreach ($formBuilder as $field) {
+            if ($field->getType()->getName() === 'collection') {
+                $property = ModelHelper::getRelationship($model, $field->getName());
+                if (null !== $backsideProperty = StorageHelper::getBacksideProperty($property)) {
+                    $relatedData = $accessor->getValue($data, $property->getName());
+                    foreach ($relatedData as $relatedItem) {
+                        $accessor->setValue($relatedItem, $backsideProperty->getName(), $data);
+                    }
+                }
+            }
         }
-
-        $this->uploadFiles($formBuilder);
-        $this->updateMappedRelationshipForCollection($formBuilder, $model);
-
-        return true;
     }
 }

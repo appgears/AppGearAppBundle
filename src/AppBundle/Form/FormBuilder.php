@@ -14,10 +14,11 @@ use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormBuilder
 {
@@ -50,22 +51,42 @@ class FormBuilder
     private $modelManager;
 
     /**
+     * Upload directory
+     *
+     * @var string
+     */
+    private $uploadDirectory;
+
+    /**
+     * Prefix for uploaded files
+     *
+     * @var string
+     */
+    private $uploadFilePrefix;
+
+    /**
      * FormBuilder constructor.
      *
-     * @param FormFactoryInterface $formFactory   Form factory
-     * @param ModelManager         $modelManager  Model manager
-     * @param TaggedManager        $taggedManager Tagged services manager
-     * @param Storage              $storage       Storage
+     * @param FormFactoryInterface $formFactory      Form factory
+     * @param ModelManager         $modelManager     Model manager
+     * @param TaggedManager        $taggedManager    Tagged services manager
+     * @param Storage              $storage          Storage
+     * @param string               $uploadDirectory  Upload directory
+     * @param string               $uploadFilePrefix Prefix for uploaded files
      */
     public function __construct(FormFactoryInterface $formFactory,
                                 ModelManager $modelManager,
                                 TaggedManager $taggedManager,
-                                Storage $storage)
+                                Storage $storage,
+                                string $uploadDirectory,
+                                string $uploadFilePrefix)
     {
-        $this->formFactory   = $formFactory;
-        $this->modelManager  = $modelManager;
-        $this->taggedManager = $taggedManager;
-        $this->storage       = $storage;
+        $this->formFactory      = $formFactory;
+        $this->modelManager     = $modelManager;
+        $this->taggedManager    = $taggedManager;
+        $this->storage          = $storage;
+        $this->uploadDirectory  = $uploadDirectory;
+        $this->uploadFilePrefix = $uploadFilePrefix;
     }
 
     /**
@@ -84,18 +105,23 @@ class FormBuilder
     /**
      * Build form
      *
-     * @param FormBuilderInterface $formBuilder Form builder
-     * @param Model                $model       Model
+     * @param FormBuilderInterface $formBuilder       Form builder
+     * @param Model                $model             Model
+     * @param array                $allowedProperties [Optional] Add form fields only for passed properties
      *
      * @return FormBuilderInterface
      */
-    public function build(FormBuilderInterface $formBuilder, Model $model)
+    public function build(FormBuilderInterface $formBuilder, Model $model, array $allowedProperties = [])
     {
         foreach (ModelHelper::getProperties($model) as $property) {
-            $this->addProperty($formBuilder, $property);
-        }
+            if ($allowedProperties !== [] && !isset($allowedProperties[$property->getName()])) {
+                continue;
+            }
 
-        $formBuilder->add('save', SubmitType::class, array('label' => 'Save'));
+            $allowedSubProperties = $allowedProperties[$property->getName()] ?? [];
+
+            $this->addProperty($formBuilder, $property, $allowedSubProperties);
+        }
 
         return $formBuilder;
     }
@@ -103,21 +129,28 @@ class FormBuilder
     /**
      * Add model property as field to form builder
      *
-     * @param FormBuilderInterface $formBuilder Form builder
-     * @param Property             $property    Property
+     * @param FormBuilderInterface $formBuilder       Form builder
+     * @param Property             $property          Property
+     * @param array                $allowedProperties Allowed properties (for composition form)
      */
-    public function addProperty(FormBuilderInterface $formBuilder, Property $property)
+    public function addProperty(FormBuilderInterface $formBuilder, Property $property, array $allowedProperties = [])
     {
         $propertyName = $property->getName();
 
         if ($property instanceof Field) {
             list($type, $options) = $this->resolveFieldType($property);
             $options['required'] = false;
+
             $formBuilder->add($propertyName, $type, $options);
 
         } elseif ($property instanceof Relationship) {
+            /** @var Model $target */
+            $target = $property->getTarget();
+
             if (!$property->getComposition()) {
-                $choiceLoader = new ModelChoiceLoader($this->storage, $property->getTarget());
+
+                // TODO: переделать на choices
+                $choiceLoader = new ModelChoiceLoader($this->storage, $target);
                 $options      = [
                     'choice_loader' => $choiceLoader,
                     'required'      => false
@@ -139,18 +172,59 @@ class FormBuilder
                         );
                 }
             } else {
-                $prototypeClass = $this->modelManager->fullClassName($property->getTarget());
+                if ($property instanceof Relationship\ToMany) {
+                    $prototypeClass = $this->modelManager->fullClassName($target);
 
-                $formBuilder->add(
-                    $propertyName,
-                    CollectionType::class,
-                    [
-                        'entry_type'     => new RelatedDynamicType($this, $property, $this->modelManager),
-                        'allow_add'      => true,
-                        'prototype_data' => new $prototypeClass,
-                        'options'        => ['label' => false] // Removing indexes (labels) for collection items
-                    ]
-                );
+                    // TODO: использовать FormBuilder вместо RelatedDynamicType
+                    $formBuilder->add(
+                        $propertyName,
+                        CollectionType::class,
+                        [
+                            'entry_type'     => new RelatedDynamicType($this, $property, $this->modelManager),
+                            'allow_add'      => true,
+                            'prototype_data' => new $prototypeClass,
+                            'options'        => ['label' => false] // Removing indexes (labels) for collection items
+                        ]
+                    );
+                } elseif ($property instanceof Relationship\ToOne) {
+
+                    $subFormBuilder = $this->formFactory->createNamedBuilder($propertyName);
+                    $subFormBuilder = $this->build($subFormBuilder, $target, $allowedProperties);
+
+                    $formBuilder->add($subFormBuilder);
+                }
+            }
+        }
+    }
+
+    /**
+     * When creating a form to edit an already persisted item, the file form type still expects a  File instance.
+     * As the persisted entity now contains only the relative file path, you first have to concatenate the configured
+     * upload path with the stored filename and create a new File class.
+     *
+     * @param FormBuilderInterface $formBuilder
+     * @param object               $entity
+     */
+    private function initFileField(FormBuilderInterface $formBuilder, $entity)
+    {
+        $accessor = new PropertyAccessor();
+
+        /** @var FormBuilderInterface $field */
+        foreach ($formBuilder as $field) {
+            if ($field->getType()->getName() === 'file') {
+                $fieldName = $field->getName();
+
+                $file = $accessor->getValue($entity, $fieldName);
+                if (!is_string($file)) {
+                    continue;
+                }
+
+                // Avoid erasing field value when form will saved without new file
+                $this->existingFileFields[$fieldName] = $file;
+
+                $file = new File($this->uploadDirectory . str_replace($this->uploadFilePrefix, '', $file));
+
+                $accessor->setValue($entity, $fieldName, $file);
             }
         }
     }
