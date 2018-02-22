@@ -8,16 +8,13 @@ use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
-use Cosmologist\Gears\ArrayType;
+use Cosmologist\Gears\StringType;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria as DoctrineCriteria;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use RuntimeException;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
-use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
-use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
-use Symfony\Component\ExpressionLanguage\Node\NameNode;
 
 class Driver implements DriverInterface
 {
@@ -76,8 +73,10 @@ class Driver implements DriverInterface
      */
     public function findBy($model, StorageCriteria $criteria = null, array $orderBy = null, $limit = null, $offset = null)
     {
+        $queryBuilder = $this->getObjectRepository($model)->createQueryBuilder('root');
+
         $doctrineCriteria = DoctrineCriteria::create();
-        $this->convertCriteria($this->modelManager->get($model), $doctrineCriteria, $criteria);
+        $this->convertCriteria($this->modelManager->get($model), $queryBuilder, $doctrineCriteria, $criteria);
 
         if (null !== $orderBy) {
             $doctrineCriteria->orderBy($orderBy);
@@ -89,7 +88,9 @@ class Driver implements DriverInterface
             $doctrineCriteria->setFirstResult($offset);
         }
 
-        return $this->getObjectRepository($model)->matching($doctrineCriteria);
+        $queryBuilder->addCriteria($doctrineCriteria);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -97,10 +98,14 @@ class Driver implements DriverInterface
      */
     public function countBy($model, StorageCriteria $criteria = null)
     {
-        $doctrineCriteria = DoctrineCriteria::create();
-        $this->convertCriteria($this->modelManager->get($model), $doctrineCriteria, $criteria);
+        $queryBuilder = $this->getObjectRepository($model)->createQueryBuilder('root');
 
-        return $this->getObjectRepository($model)->matching($doctrineCriteria)->count();
+        $doctrineCriteria = DoctrineCriteria::create();
+        $this->convertCriteria($this->modelManager->get($model), $queryBuilder, $doctrineCriteria, $criteria);
+
+        $queryBuilder->select('COUNT(root.id)');
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -110,7 +115,7 @@ class Driver implements DriverInterface
      *
      * @return DoctrineCriteria
      */
-    private function convertCriteria(Model $model, DoctrineCriteria $doctrineCriteria, StorageCriteria $storageCriteria = null, $andWhere = true)
+    private function convertCriteria(Model $model, QueryBuilder $queryBuilder, DoctrineCriteria $doctrineCriteria, StorageCriteria $storageCriteria = null, $andWhere = true)
     {
         if ($storageCriteria === null) {
             return $doctrineCriteria;
@@ -118,7 +123,7 @@ class Driver implements DriverInterface
 
         if ($storageCriteria instanceof StorageCriteria\Composite) {
             foreach ($storageCriteria->getExpressions() as $expression) {
-                $this->convertCriteria($model, $doctrineCriteria, $expression, strtoupper($storageCriteria->getOperator()) === 'AND');
+                $this->convertCriteria($model, $queryBuilder, $doctrineCriteria, $expression, strtoupper($storageCriteria->getOperator()) === 'AND');
             }
         } elseif ($storageCriteria instanceof StorageCriteria\Expression) {
             $doctrineExpression = DoctrineCriteria::expr();
@@ -126,6 +131,12 @@ class Driver implements DriverInterface
             $field      = $storageCriteria->getField();
             $comparison = $storageCriteria->getComparison();
             $value      = $storageCriteria->getValue();
+
+            if (StringType::contains($field, '.')) {
+                $association = StringType::strBefore($field, '.');
+
+                $queryBuilder->join('root.' . $association, $association);
+            }
 
             if (\in_array($comparison, ['eq', 'neq'])) {
                 $property = ModelHelper::getProperty($model, $field);

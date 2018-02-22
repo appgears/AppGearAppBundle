@@ -14,7 +14,7 @@
         {% elseif (field.property|class) == 'ToMany' %}
             {{ block('widget_field_to_many')|raw }}
         {% elseif (field.property|class) == 'ToOne' %}
-            {% set _value  = attribute(entity, field.property.name) %}
+            {% set _value  = entity|property_accessor(field.mapping) %}
             {{ block('widget_field_to_one')|raw }}
         {% else %}
             {% set _block = block('widget_field_' ~ (field.property|class|replace({'Type': ''})|lower)) %}

@@ -15,14 +15,14 @@ services:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\FormController
     arguments:
-      - '@appgear.form.builder'
+      - '@appgear.form.manager'
       - '@logger'
 
   appgear.controller.list:
     parent: appgear.controller
     class: AppGear\AppBundle\Controller\ListController
     arguments:
-      - '@appgear.form.builder'
+      - '@appgear.form.manager'
 
   appgear.controller.remove:
     parent: appgear.controller

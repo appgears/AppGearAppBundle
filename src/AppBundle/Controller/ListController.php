@@ -6,6 +6,7 @@ use AppGear\AppBundle\Entity\Storage\Criteria;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Entity\View\ListView;
 use AppGear\AppBundle\Form\FormBuilder;
+use AppGear\AppBundle\Form\FormManager;
 use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
@@ -22,15 +23,15 @@ use Symfony\Component\HttpFoundation\Response;
 class ListController extends AbstractController
 {
     /**
-     * @var FormBuilder
+     * @var FormManager
      */
-    private $formBuilder;
+    private $formManager;
 
-    public function __construct(Storage $storage, ModelManager $modelManager, ViewManager $viewManager, SecurityManager $securityManager, FormBuilder $formBuilder)
+    public function __construct(Storage $storage, ModelManager $modelManager, ViewManager $viewManager, SecurityManager $securityManager, FormManager $formManager)
     {
         parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
-        $this->formBuilder = $formBuilder;
+        $this->formManager = $formManager;
     }
 
     /**
@@ -102,13 +103,14 @@ class ListController extends AbstractController
      */
     private function buildFiltersForm(Model $model, ListView $listView)
     {
-        $formBuilder = $this->formBuilder->create([]);
+        $fields = [];
 
         /** @var ListView\Filter $filter */
         foreach ($listView->getFilters() as $filter) {
-            $property = ModelHelper::getProperty($model, $filter->getName());
-            $this->formBuilder->addProperty($formBuilder, $property);
+            $fields[] = $filter->getName();
         }
+
+        $formBuilder = $this->formManager->getBuilder($model, null, $fields);
 
         $formBuilder->add('apply', SubmitType::class, array('label' => 'Apply'));
 
