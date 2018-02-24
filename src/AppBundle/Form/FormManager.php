@@ -3,7 +3,9 @@
 namespace AppGear\AppBundle\Form;
 
 use AppGear\AppBundle\Form\FormBuilder as AppFormBuilder;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Helper\ModelHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -50,7 +52,7 @@ class FormManager
      *
      * @return bool
      */ 
-    public function submit(FormBuilderInterface $builder, FormInterface $form, Request $request)
+    public function submit(FormBuilderInterface $builder, FormInterface $form, Request $request, Model $model)
     {
         $form->handleRequest($request);
 

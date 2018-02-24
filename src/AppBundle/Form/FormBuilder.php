@@ -172,8 +172,9 @@ class FormBuilder
                         );
                 }
             } else {
+                $targetFqcn = $this->modelManager->fullClassName($target);
+
                 if ($property instanceof Relationship\ToMany) {
-                    $prototypeClass = $this->modelManager->fullClassName($target);
 
                     // TODO: использовать FormBuilder вместо RelatedDynamicType
                     $formBuilder->add(
@@ -182,13 +183,13 @@ class FormBuilder
                         [
                             'entry_type'     => new RelatedDynamicType($this, $property, $this->modelManager),
                             'allow_add'      => true,
-                            'prototype_data' => new $prototypeClass,
+                            'prototype_data' => new $targetFqcn,
                             'options'        => ['label' => false] // Removing indexes (labels) for collection items
                         ]
                     );
                 } elseif ($property instanceof Relationship\ToOne) {
 
-                    $subFormBuilder = $this->formFactory->createNamedBuilder($propertyName);
+                    $subFormBuilder = $this->formFactory->createNamedBuilder($propertyName, 'form', null, ['data_class' => $targetFqcn ]);
                     $subFormBuilder = $this->build($subFormBuilder, $target, $allowedProperties);
 
                     $formBuilder->add($subFormBuilder);
