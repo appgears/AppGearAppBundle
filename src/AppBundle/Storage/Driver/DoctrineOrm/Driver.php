@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
 use AppGear\AppBundle\Entity\Storage\Criteria as StorageCriteria;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\AppBundle\Storage\DriverInterface;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
@@ -98,12 +99,16 @@ class Driver implements DriverInterface
      */
     public function countBy($model, StorageCriteria $criteria = null)
     {
+        $model = $this->modelManager->get($model);
+
         $queryBuilder = $this->getObjectRepository($model)->createQueryBuilder('root');
 
         $doctrineCriteria = DoctrineCriteria::create();
-        $this->convertCriteria($this->modelManager->get($model), $queryBuilder, $doctrineCriteria, $criteria);
+        $this->convertCriteria($model, $queryBuilder, $doctrineCriteria, $criteria);
 
-        $queryBuilder->select('COUNT(root.id)');
+        $identifierProperty = StorageHelper::getIdentifierProperty($model);
+
+        $queryBuilder->select('COUNT(root.' . $identifierProperty->getName() . ')');
 
         return $queryBuilder->getQuery()->getSingleScalarResult();
     }
