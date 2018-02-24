@@ -78,7 +78,7 @@ class FormController extends AbstractController
         $formBuilder = $this->formManager->getBuilder($model, $entity);
         $form        = $formBuilder->getForm();
 
-        if ($this->formManager->submitRequest($formBuilder, $form, $request)) {
+        if ($this->formManager->submit($formBuilder, $form, $request, $model)) {
             $this->storage->getRepository($model)->save($entity);
 
             return $this->buildResponse($request, $model, $entity);
