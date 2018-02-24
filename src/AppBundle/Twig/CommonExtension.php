@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Twig;
 
 use AppGear\PlatformBundle\Entity\Model\Property\Relationship;
+use Cosmologist\Bundle\SymfonyCommonBundle\PropertyAccessor\NullTolerancePropertyAccessor;
 use Exception;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
@@ -87,7 +88,7 @@ class CommonExtension extends Twig_Extension
      */
     public function propertyAccessor($object, $propertyPath)
     {
-        $accessor = new PropertyAccessor();
+        $accessor = new NullTolerancePropertyAccessor();
 
         return $accessor->getValue($object, $propertyPath);
     }
