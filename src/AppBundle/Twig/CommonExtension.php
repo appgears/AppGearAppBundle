@@ -75,7 +75,12 @@ class CommonExtension extends Twig_Extension
     {
         $language = new ExpressionLanguage();
 
-        return $language->evaluate($expression, ['entity' => $entity, 'value' => $value]);
+        try {
+            return $language->evaluate($expression, ['entity' => $entity, 'value' => $value]);
+        } catch (Exception $e) {
+        }
+
+        return null;
     }
 
     /**
