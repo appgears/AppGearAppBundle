@@ -204,7 +204,7 @@ class AppGearModelDriver implements MappingDriver
 
                     if ($property->getComposition() || ($targetProperty !== null && $targetProperty->getComposition())) {
                         $joinColumn['onDelete'] = 'CASCADE';
-                        $mapping['cascade']     = ['persist', 'remove'];
+                        $mapping['cascade']     = ['persist'];
                     }
 
                     $mapping['joinColumns'][] = $joinColumn;
