@@ -107,7 +107,7 @@ class ListController extends AbstractController
 
         /** @var ListView\Filter $filter */
         foreach ($listView->getFilters() as $filter) {
-            $fields[] = $filter->getName();
+            $fields[$filter->getName()] = [];
         }
 
         $formBuilder = $this->formManager->getBuilder($model, null, $fields);
