@@ -30,6 +30,16 @@ class FormManager
     }
 
     /**
+     * Return AppGear form builder
+     *
+     * @return FormBuilder
+     */
+    public function getFormBuilder()
+    {
+        return $this->appFormBuilder;
+    }
+
+    /**
      * @param Model $model
      * @param null  $entity
      * @param array $properties

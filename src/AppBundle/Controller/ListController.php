@@ -11,8 +11,10 @@ use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
+use AppGear\CoreBundle\Entity\Property\Field\StringType;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
+use Cosmologist\Gears\StringType as GearsStringType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -81,7 +83,7 @@ class ListController extends AbstractController
         $criteria = $this->applyCriteriaFilters($criteria, $filters, $view);*/
 
         $filtersForm     = $this->buildFiltersForm($model, $view)->getForm();
-        $criteria        = $this->applyFilterForm($request, $filtersForm, $criteria);
+        $criteria        = $this->applyFilterForm($request, $view, $filtersForm, $criteria);
         $filtersFormView = $filtersForm->createView();
 
         $data = $repository->findBy($criteria, $orderings, $limit, $offset);
@@ -103,18 +105,20 @@ class ListController extends AbstractController
      */
     private function buildFiltersForm(Model $model, ListView $listView)
     {
-        $fields = [];
+        $appFormBuilder     = $this->formManager->getFormBuilder();
+        $symfonyFormBuilder = $appFormBuilder->create();
 
         /** @var ListView\Filter $filter */
         foreach ($listView->getFilters() as $filter) {
-            $fields[$filter->getName()] = [];
+            $mapping  = $filter->getMapping() ?? $filter->getName();
+            $property = ModelHelper::getProperty($model, $mapping);
+
+            $appFormBuilder->addProperty($symfonyFormBuilder, $property, [], $filter->getName());
         }
 
-        $formBuilder = $this->formManager->getBuilder($model, null, $fields);
+        $symfonyFormBuilder->add('apply', SubmitType::class, array('label' => 'Apply'));
 
-        $formBuilder->add('apply', SubmitType::class, array('label' => 'Apply'));
-
-        return $formBuilder;
+        return $symfonyFormBuilder;
     }
 
     /**
@@ -126,7 +130,7 @@ class ListController extends AbstractController
      *
      * @return Criteria|Criteria\Composite
      */
-    private function applyFilterForm(Request $request, FormInterface $form, Criteria $criteria)
+    private function applyFilterForm(Request $request, ListView $view, FormInterface $form, Criteria $criteria)
     {
         if (!$request->isMethod('POST')) {
             return $criteria;
@@ -145,18 +149,22 @@ class ListController extends AbstractController
         }
 
         $expressions = [];
-        foreach ($data as $name => $value) {
-            if (empty($value)) {
+        foreach ($view->getFilters() as $filter) {
+            $name    = $filter->getName();
+            $mapping = $filter->getMapping() ?? $name;
+
+            if (!isset($data[$name])) {
                 continue;
             }
 
+            $value = $data[$name];
             if (is_object($value)) {
                 $value = $this->storage->getIdentifierValue($value);
             }
 
             $expression = new Criteria\Expression();
             $expression
-                ->setField($name)
+                ->setField($mapping)
                 ->setValue($value);
 
             $expressions[] = $expression;

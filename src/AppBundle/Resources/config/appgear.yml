@@ -120,6 +120,9 @@ models:
       name:
         field:
           type: core.property.field.string_type
+      mapping:
+        field:
+          type: core.property.field.string_type
       criteria:
         relationship:
           type: core.property.relationship.toOne

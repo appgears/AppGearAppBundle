@@ -129,19 +129,21 @@ class FormBuilder
     /**
      * Add model property as field to form builder
      *
-     * @param FormBuilderInterface $formBuilder       Form builder
-     * @param Property             $property          Property
-     * @param array                $allowedProperties Allowed properties (for composition form)
+     * @param FormBuilderInterface $formBuilder            Form builder
+     * @param Property             $property               Property
+     * @param array                $allowedChildProperties Allowed properties (for composition form)
+     * @param string               $name                   [Optional] Form field name, if empty then use property name
      */
-    public function addProperty(FormBuilderInterface $formBuilder, Property $property, array $allowedProperties = [])
+    public function addProperty(FormBuilderInterface $formBuilder, Property $property, array $allowedChildProperties = [], string $name = null)
     {
         $propertyName = $property->getName();
+        $name         = $name ?? $propertyName;
 
         if ($property instanceof Field) {
             list($type, $options) = $this->resolveFieldType($property);
             $options['required'] = false;
 
-            $formBuilder->add($propertyName, $type, $options);
+            $formBuilder->add($name, $type, $options);
 
         } elseif ($property instanceof Relationship) {
             /** @var Model $target */
@@ -160,13 +162,13 @@ class FormBuilder
                     $options['multiple'] = true;
                 }
 
-                $formBuilder->add($propertyName, ChoiceType::class, $options);
+                $formBuilder->add($name, ChoiceType::class, $options);
 
                 // Add special transformer to toMany associations
                 // because, toMany properties contains PersistentCollection, but ChoiceType supports only array
                 if (isset($options['multiple'])) {
                     $formBuilder
-                        ->get($propertyName)
+                        ->get($name)
                         ->addModelTransformer(
                             new ChoicesCollectionToValuesTransformer(new LazyChoiceList($choiceLoader))
                         );
@@ -178,7 +180,7 @@ class FormBuilder
 
                     // TODO: использовать FormBuilder вместо RelatedDynamicType
                     $formBuilder->add(
-                        $propertyName,
+                        $name,
                         CollectionType::class,
                         [
                             'entry_type'     => new RelatedDynamicType($this, $property, $this->modelManager),
@@ -189,8 +191,8 @@ class FormBuilder
                     );
                 } elseif ($property instanceof Relationship\ToOne) {
 
-                    $subFormBuilder = $this->formFactory->createNamedBuilder($propertyName, 'form', null, ['data_class' => $targetFqcn ]);
-                    $subFormBuilder = $this->build($subFormBuilder, $target, $allowedProperties);
+                    $subFormBuilder = $this->formFactory->createNamedBuilder($propertyName, 'form', null, ['data_class' => $targetFqcn]);
+                    $subFormBuilder = $this->build($subFormBuilder, $target, $allowedChildProperties);
 
                     $formBuilder->add($subFormBuilder);
                 }

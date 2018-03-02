@@ -11,6 +11,11 @@ class Filter
     protected $name;
     
     /**
+     * Mapping
+     */
+    protected $mapping;
+    
+    /**
      * Criteria
      */
     protected $criteria;
@@ -30,6 +35,23 @@ class Filter
     public function getName()
     {
         return $this->name;
+    }
+    
+    /**
+     * Set mapping
+     */
+    public function setMapping($mapping)
+    {
+        $this->mapping = $mapping;
+        return $this;
+    }
+    
+    /**
+     * Get mapping
+     */
+    public function getMapping()
+    {
+        return $this->mapping;
     }
     
     /**
