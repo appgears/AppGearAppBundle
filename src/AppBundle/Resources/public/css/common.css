@@ -16,3 +16,8 @@ td ul {
 .odd {
     background-color: #f9f9f9 !important;
 }
+
+.live-edit {
+    border-bottom: 1px dashed;
+    display: inline;
+}

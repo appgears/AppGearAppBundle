@@ -147,6 +147,10 @@ models:
       group:
         field:
           type: core.property.field.string_type
+      liveEdit:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
 
   app.view.field.transformer: ~
 

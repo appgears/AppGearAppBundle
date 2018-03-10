@@ -31,6 +31,11 @@ class Field
     protected $group;
     
     /**
+     * LiveEdit
+     */
+    protected $liveEdit = false;
+    
+    /**
      * Set name
      */
     public function setName($name)
@@ -113,5 +118,22 @@ class Field
     public function getGroup()
     {
         return $this->group;
+    }
+    
+    /**
+     * Set liveEdit
+     */
+    public function setLiveEdit($liveEdit)
+    {
+        $this->liveEdit = $liveEdit;
+        return $this;
+    }
+    
+    /**
+     * Get liveEdit
+     */
+    public function getLiveEdit()
+    {
+        return $this->liveEdit;
     }
 }

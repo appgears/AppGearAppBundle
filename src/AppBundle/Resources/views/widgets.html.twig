@@ -2,6 +2,7 @@
 
 {% block widget_field %}
     {% spaceless %}
+        <span{% if field.field.liveEdit %} class="live-edit"{% endif %}>
         {% if (field.widget is defined and field.widget is not null) or field.property is null %}
             {% set _widget = field.widget %}
             {% set _value  = null %}
@@ -24,6 +25,7 @@
                 {{ block('widget_field_default') }}
             {% endif %}
         {% endif %}
+        </span>
     {% endspaceless %}
 {% endblock %}
 

@@ -176,6 +176,7 @@ class ViewExtension extends Twig_Extension
                 }
 
                 return [
+                    'field'    => $field,
                     'name'     => $field->getName(),
                     'mapping'  => $mapping,
                     'property' => $property,
@@ -204,7 +205,6 @@ class ViewExtension extends Twig_Extension
             iterator_to_array(ModelHelper::getProperties($model))
         );
     }
-
 
     /**
      * {@inheritdoc};
