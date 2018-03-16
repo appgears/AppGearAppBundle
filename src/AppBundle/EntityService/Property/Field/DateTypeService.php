@@ -4,7 +4,7 @@ namespace AppGear\AppBundle\EntityService\Property\Field;
 
 use AppGear\AppBundle\Form\FormFieldTypeServiceInterface;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class DateTypeService implements FormFieldTypeServiceInterface, MysqlFieldTypeServiceInterface
 {
@@ -13,7 +13,7 @@ class DateTypeService implements FormFieldTypeServiceInterface, MysqlFieldTypeSe
      */
     public function getFormType()
     {
-        return DateTimeType::class;
+        return DateType::class;
     }
 
     /**
