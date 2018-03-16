@@ -106,7 +106,7 @@ class ListController extends AbstractController
     private function buildFiltersForm(Model $model, ListView $listView)
     {
         $appFormBuilder     = $this->formManager->getFormBuilder();
-        $symfonyFormBuilder = $appFormBuilder->create();
+        $symfonyFormBuilder = $appFormBuilder->create(null, ['csrf_protection' => false]);
 
         /** @var ListView\Filter $filter */
         foreach ($listView->getFilters() as $filter) {
@@ -114,9 +114,8 @@ class ListController extends AbstractController
             $property = ModelHelper::getProperty($model, $mapping);
 
             $appFormBuilder->addProperty($symfonyFormBuilder, $property, [], $filter->getName());
+            $symfonyFormBuilder->add($filter->getName() . '_' . 'negative', 'checkbox');
         }
-
-        $symfonyFormBuilder->add('apply', SubmitType::class, array('label' => 'Apply'));
 
         return $symfonyFormBuilder;
     }
@@ -162,9 +161,13 @@ class ListController extends AbstractController
                 $value = $this->storage->getIdentifierValue($value);
             }
 
+            $isNegative = $data[$name . '_negative'];
+            $comparison = $isNegative ? 'neq' : 'eq';
+
             $expression = new Criteria\Expression();
             $expression
                 ->setField($mapping)
+                ->setComparison($comparison)
                 ->setValue($value);
 
             $expressions[] = $expression;
