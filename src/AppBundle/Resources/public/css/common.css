@@ -21,3 +21,13 @@ td ul {
     border-bottom: 1px dashed;
     display: inline;
 }
+
+.fast-button {
+    float: left;
+    color: #fff;
+    height: 50px;
+    font-size: 21px;
+    font-weight: bold;
+    border-right: rgba(255, 255, 255, 0.1) 1px solid;
+    padding: 10px 15px 0;
+}
