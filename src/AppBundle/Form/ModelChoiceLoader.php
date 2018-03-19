@@ -50,7 +50,7 @@ class ModelChoiceLoader implements ChoiceLoaderInterface
             $choices[(string)$item] = $item;
         }
 
-        ksort($choices);
+        ksort($choices, SORT_NATURAL);
 
         $list = new ArrayChoiceList($choices, function ($el) {
             return $el->getId();

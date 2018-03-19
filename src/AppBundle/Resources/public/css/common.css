@@ -31,3 +31,7 @@ td ul {
     border-right: rgba(255, 255, 255, 0.1) 1px solid;
     padding: 10px 15px 0;
 }
+
+.fast-button:hover {
+    color: #fff;
+}
