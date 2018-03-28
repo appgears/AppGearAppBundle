@@ -1,0 +1,51 @@
+{% extends '@commerce/admin/container.html.twig' %}
+
+{% use "@app/widgets.html.twig" %}
+{% use "@app/misc/widget_text_max_lines.html.twig" %}
+
+{% block content %}
+    <div class="panel panel-default">
+        
+        {% set entity = data %}
+        {% set last_group = null %}
+        
+        {% if view.top | length %}
+            <div class="panel-heading">
+                {% for field in (view.top | view_fields(entity)) %}
+                    {% if last_group != field.group and loop.index0 != 0 %}
+                        |
+                    {% endif %}
+                    
+                    {{ block('widget_field') }}
+                    
+                    {% set last_group = field.group %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    
+        {% set last_group = null %}
+        
+        <div class="panel-body padding-30">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-striped" data-toggle="table">
+                    {% for field in (view.fields) %}
+                        <tr>
+                            <td>
+                                <div class="th-inner">
+                                    {{ field.name|humanize }}
+                                </div>
+                            </td>
+                            <td>
+                                {{ block('widget_field') }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    {#{% for field in (view.embedded | view_fields(entity)) %}#}
+        {#{{ block('widget_field') }}#}
+    {#{% endfor %}#}
+{% endblock %}
