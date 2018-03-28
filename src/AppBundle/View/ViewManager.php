@@ -27,7 +27,7 @@ class ViewManager
      *
      * @param View $view View
      *
-     * @return ViewService
+     * @return string
      */
     public function render(View $view, array $data = []): string
     {
