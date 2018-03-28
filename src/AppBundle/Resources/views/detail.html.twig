@@ -12,13 +12,13 @@
         {% if view.top | length %}
             <div class="panel-heading">
                 {% for field in (view.top | view_fields(entity)) %}
-                    {% if last_group != field.group and loop.index0 != 0 %}
+                    {% if last_group != field.field.group and loop.index0 != 0 %}
                         |
                     {% endif %}
                     
                     {{ block('widget_field') }}
                     
-                    {% set last_group = field.group %}
+                    {% set last_group = field.field.group %}
                 {% endfor %}
             </div>
         {% endif %}
@@ -32,7 +32,7 @@
                         <tr>
                             <td>
                                 <div class="th-inner">
-                                    {{ field.name|humanize }}
+                                    {{ field.field.name|humanize }}
                                 </div>
                             </td>
                             <td>

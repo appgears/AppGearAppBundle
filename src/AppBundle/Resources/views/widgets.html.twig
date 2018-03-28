@@ -2,21 +2,16 @@
 
 {% block widget_field %}
     {% spaceless %}
+        {% set _value  = entity|property_accessor(field.mapping) %}
+        
         <span{% if field.field.liveEdit %} class="live-edit"{% endif %}>
-        {% if (field.widget is defined and field.widget is not null) or field.property is null %}
-            {% set _widget = field.widget %}
-            {% set _value  = null %}
-            {% if field.property is not null %}
-                {% set _value  = entity|property_accessor(field.mapping) %}
-            {% else %}
-                {% set _value  = field.name %}
-            {% endif %}
+        {% if (field.field.widget is defined and field.field.widget is not null) or field.property is null %}
+            {% set _widget = field.field.widget %}
             {{ block('widget') }}
         {% elseif (field.property|class) == 'ToMany' %}
             {{ block('widget_field_to_many')|raw }}
         {% elseif (field.property|class) == 'ToOne' %}
-            {% set _value  = entity|property_accessor(field.mapping) %}
-            {{ block('widget_field_to_one')|raw }}
+            {{ block('widget_field_default') }}
         {% else %}
             {% set _block = block('widget_field_' ~ (field.property|class|replace({'Type': ''})|lower)) %}
             {% if _block is not empty %}
@@ -40,24 +35,20 @@
     </ul>
 {% endblock %}
 
-{% block widget_field_to_one %}
+{% block widget_field_default %}
     {{ _value }}
 {% endblock %}
 
-{% block widget_field_default %}
-    {{ entity|property_accessor(field.mapping) }}
-{% endblock %}
-
 {% block widget_field_text %}
-    {{ attribute(entity, field.property.name)|nl2br|raw }}
+    {{ _value|nl2br|raw }}
 {% endblock %}
 
 {% block widget_field_date %}
-    {{ entity|property_accessor(field.mapping)|date('Y-m-d') }}
+    {{ _value|date('Y-m-d') }}
 {% endblock %}
 
 {% block widget_field_datetime %}
-    {{ entity|property_accessor(field.mapping)|date('Y-m-d H:i:s') }}
+    {{ _value|date('Y-m-d H:i:s') }}
 {% endblock %}
 
 
@@ -145,14 +136,14 @@
     {% set postParametersString = '{' ~ (postParametersStrings|join(',')) ~ '}' %}
     
     {% if _widget.method == 'ajax' %}
-        <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}" data-appgear-widget-action-post-parameters='{{ postParametersString }}'>{{ _value }}</button>
+        <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}" data-appgear-widget-action-post-parameters='{{ postParametersString }}'>{{ _value | default(field.field.name) }}</button>
     {% else %}
         {% if _widget.post %}
             <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">
                 {% for parameterName, parameterValue in postParameters %}
                     <input type="hidden" name="{{ parameterName }}" value="{{ parameterValue }}"/>
                 {% endfor %}
-                <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value }}</button>
+                <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value | default(field.field.name) }}</button>
             </form>
         {% else %}
             {% if _widget.route | length %}
@@ -170,7 +161,7 @@
                 {% set attrs = attrs|merge({'target': '_blank'}) %}
             {% endif %}
             
-            <a{{ attrs|htmlAttributes }}>{{ _value }}</a>
+            <a{{ attrs|htmlAttributes }}>{{ _value | default(field.field.name) }}</a>
         {% endif %}
     {% endif %}
 {% endblock %}
@@ -180,7 +171,7 @@
 {% endblock %}
 
 {% block widget_view %}
-    {{ _widget.view | render( entity|property_accessor(field.mapping)) | raw }}
+    {{ _widget.view | render( _value) | raw }}
 {% endblock %}
 
 {% block widget_phone %}

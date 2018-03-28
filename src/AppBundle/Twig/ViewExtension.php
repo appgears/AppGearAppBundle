@@ -148,9 +148,10 @@ class ViewExtension extends Twig_Extension
      */
     public function viewFields(array $fields, $entity, $getFromModelIfNoFields = true)
     {
-        $model = is_object($entity) ? $this->modelManager->getByInstance($entity) : null;
+        $isModel = $this->modelManager->isModel($entity);
+        $model   = $isModel ? $this->modelManager->getByInstance($entity) : null;
 
-        if (count($fields) === 0 && $getFromModelIfNoFields) {
+        if (count($fields) === 0 && $getFromModelIfNoFields && $isModel) {
             $fields = $this->getFieldsFromModel($model);
         }
 
@@ -159,15 +160,12 @@ class ViewExtension extends Twig_Extension
                 /** @var View\Field $field */
 
                 $mapping  = $field->getMapping() ?? $field->getName();
-                $property = ModelHelper::getProperty($model, $mapping);
+                $property = ($model !== null) ? ModelHelper::getProperty($model, $mapping) : null;
 
                 return [
                     'field'    => $field,
-                    'name'     => $field->getName(),
                     'mapping'  => $mapping,
-                    'property' => $property,
-                    'widget'   => $field->getWidget(),
-                    'group'    => $field->getGroup()
+                    'property' => $property
                 ];
             },
             $fields
