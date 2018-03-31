@@ -175,14 +175,14 @@
 {% endblock %}
 
 {% block widget_phone %}
-    {% if _value|length and _value|phone_valid %}
-        {% set _value = _value|phone_format %}
-        
-        <a href="tel:{{ _value }}">{{ _value }}</a>
+    {% set phone = _value|phone_format %}
+
+    {% if phone|length %}
+        <a href="tel:{{ phone }}">{{ phone }}</a>
         &nbsp;
-        <a href="viber://chat?number={{ _value|replace({'+': ''}) }}" class="fab fa-lg fa-viber" style="color:#665cac" title="Viber"></a>
+        <a href="viber://chat?number={{ phone|replace({'+': ''}) }}" class="fab fa-lg fa-viber" style="color:#665cac" title="Viber"></a>
         &nbsp;
-        <a href="https://api.whatsapp.com/send?phone={{ _value|replace({'+': ''}) }}" class="fab fa-lg fa-whatsapp" style="color:#09d261" title="WhatsApp"></a>
+        <a href="https://api.whatsapp.com/send?phone={{ phone|replace({'+': ''}) }}" class="fab fa-lg fa-whatsapp" style="color:#09d261" title="WhatsApp"></a>
     {% else %}
         {{ _value }}
     {% endif %}
