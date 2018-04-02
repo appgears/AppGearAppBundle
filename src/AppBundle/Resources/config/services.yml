@@ -4,21 +4,6 @@ parameters:
 
 services:
 
-  appgear.cache.cache_manager:
-      class: AppGear\AppBundle\Cache\CacheManager
-      arguments:
-        - @doctrine.cache.memcache
-
-  doctrine.cache.memcache:
-    class: Doctrine\Common\Cache\MemcacheCache
-    calls:
-      - [setMemcache, [@memcache]]
-
-  memcache:
-    class: Memcache
-    calls:
-      - [addserver, [%memcache.host%, %memcache.port%]]
-
   appgear.view.manager:
     class: AppGear\AppBundle\View\ViewManager
     arguments:
