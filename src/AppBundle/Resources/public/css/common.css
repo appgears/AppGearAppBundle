@@ -35,3 +35,13 @@ td ul {
 .fast-button:hover {
     color: #fff;
 }
+
+/** Detail top links like buttons (emulate btn btn-primary btn-xs) **/
+.panel-heading a {
+    color: #fff;
+    background-color: #4b5354 !important;
+    border-color: #4b5354;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 13px;
+}

@@ -29,31 +29,37 @@ $(document).ready(function () {
         var data = this.dataset;
 
         if (data.appgearWidgetActionConfirm && !confirm('Are you sure?')) {
-            return;
+            return false;
         }
 
-        var method = data.appgearWidgetActionPost ? 'POST' : 'GET';
+        if (this.form !== null && this.form !== undefined) {
+            this.form.submit();
+        }
 
-        $.ajax({
-            url: data.appgearWidgetActionUrl,
-            method: method,
-            data: JSON.parse(data.appgearWidgetActionPostParameters),
-            statusCode: {
-                200: function (data) {
-                    if (data.length > 0) {
-                        smartyAlert(data);
-                    } else {
-                        location.reload();
+        if (data.appgearWidgetActionAjax) {
+            var method = data.appgearWidgetActionPost ? 'POST' : 'GET';
+
+            $.ajax({
+                url: data.appgearWidgetActionUrl,
+                method: method,
+                data: JSON.parse(data.appgearWidgetActionPostParameters),
+                statusCode: {
+                    200: function (data) {
+                        if (data.length > 0) {
+                            smartyAlert(data);
+                        } else {
+                            location.reload();
+                        }
+                    },
+                    403: function () {
+                        smartyAlert('Access Denied!', 'warning');
+                    },
+                    404: function () {
+                        smartyAlert('Not Found!', 'warning');
                     }
-                },
-                403: function () {
-                    smartyAlert('Access Denied!', 'warning');
-                },
-                404: function () {
-                    smartyAlert('Not Found!', 'warning');
                 }
-            }
-        });
+            });
+        }
     });
 
     /**
