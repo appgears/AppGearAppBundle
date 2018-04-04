@@ -138,31 +138,22 @@
     {% if _widget.method == 'ajax' %}
         <button type="submit" class="btn btn-primary btn-xs appgear-widget-action" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ path(_widget.route, parameters) }}" data-appgear-widget-action-post="{{ _widget.post }}" data-appgear-widget-action-post-parameters='{{ postParametersString }}'>{{ _value | default(field.field.name) }}</button>
     {% else %}
-        {% if _widget.post %}
-            <form method="post" action="{{ path(_widget.route, parameters) }}" style="margin: 0">
-                {% for parameterName, parameterValue in postParameters %}
-                    <input type="hidden" name="{{ parameterName }}" value="{{ parameterValue }}"/>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary btn-xs"{% if _widget.confirm %} onclick="return confirm('Are you sure?')"{% endif %}>{{ _value | default(field.field.name) }}</button>
-            </form>
+        {% if _widget.route | length %}
+            {% set href = path(_widget.route, parameters) %}
         {% else %}
-            {% if _widget.route | length %}
-                {% set href = path(_widget.route, parameters) %}
-            {% else %}
-                {% set href = _widget.link | string_named_sprintf(parameters) %}
-            {% endif %}
-            
-            {% set attrs = {'href':  href} %}
-            
-            {% if _widget.confirm %}
-                {% set attrs = attrs|merge({'onClick': 'return confirm("Are you sure?")'}) %}
-            {% endif %}
-            {% if _widget.newWindow %}
-                {% set attrs = attrs|merge({'target': '_blank'}) %}
-            {% endif %}
-            
-            <a{{ attrs|htmlAttributes }}>{{ _value | default(field.field.name) }}</a>
+            {% set href = _widget.link | string_named_sprintf(parameters) %}
         {% endif %}
+        
+        {% set attrs = {'href':  href} %}
+        
+        {% if _widget.confirm %}
+            {% set attrs = attrs|merge({'onClick': 'return confirm("Are you sure?")'}) %}
+        {% endif %}
+        {% if _widget.newWindow %}
+            {% set attrs = attrs|merge({'target': '_blank'}) %}
+        {% endif %}
+        
+        <a{{ attrs|htmlAttributes }}>{{ _value | default(field.field.name) }}</a>
     {% endif %}
 {% endblock %}
 
