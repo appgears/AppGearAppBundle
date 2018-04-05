@@ -32,7 +32,7 @@ td ul {
     padding: 10px 15px 0;
 }
 
-.fast-button:hover {
+.fast-button:hover, .fast-button:focus {
     color: #fff;
 }
 
@@ -44,4 +44,9 @@ td ul {
     border-radius: 3px;
     padding: 1px 5px;
     font-size: 13px;
+}
+
+/* Отключил green.css из SmartyAdmin - шапка поменяла цвет - восстанавливаем */
+header#header {
+    background-color: #5a6667;
 }

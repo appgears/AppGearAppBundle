@@ -158,6 +158,8 @@ class Driver implements DriverInterface
                 $doctrineExpression = $doctrineExpression->gt($field, $value);
             } elseif ($comparison === 'in') {
                 $doctrineExpression = $doctrineExpression->in($field, $value);
+            } elseif ($comparison === 'nin') {
+                $doctrineExpression = $doctrineExpression->notIn($field, $value);
             } else {
                 throw new RuntimeException("Unknown criteria comparison: $comparison");
             }

@@ -141,39 +141,27 @@ class FormBuilder
 
         if ($property instanceof Field) {
             list($type, $options) = $this->resolveFieldType($property);
-            $options['required'] = false;
 
             $formBuilder->add($name, $type, $options);
-
         } elseif ($property instanceof Relationship) {
-            /** @var Model $target */
-            $target = $property->getTarget();
-
             if (!$property->getComposition()) {
 
-                // TODO: переделать на choices
-                $choiceLoader = new ModelChoiceLoader($this->storage, $target);
-                $options      = [
-                    'choice_loader' => $choiceLoader,
-                    'required'      => false
-                ];
-
-                if ($property instanceof Relationship\ToMany) {
-                    $options['multiple'] = true;
-                }
-
-                $formBuilder->add($name, ChoiceType::class, $options);
+                list($type, $options) = $this->resolveRelationType($property);
+                $formBuilder->add($name, $type, $options);
 
                 // Add special transformer to toMany associations
                 // because, toMany properties contains PersistentCollection, but ChoiceType supports only array
+                // https://github.com/symfony/symfony/issues/23192#issuecomment-308692855
                 if (isset($options['multiple'])) {
                     $formBuilder
                         ->get($name)
                         ->addModelTransformer(
-                            new ChoicesCollectionToValuesTransformer(new LazyChoiceList($choiceLoader))
+                            new ChoicesCollectionToValuesTransformer(new LazyChoiceList($options['choice_loader']))
                         );
                 }
             } else {
+                /** @var Model $target */
+                $target     = $property->getTarget();
                 $targetFqcn = $this->modelManager->fullClassName($target);
 
                 if ($property instanceof Relationship\ToMany) {
@@ -233,21 +221,52 @@ class FormBuilder
     }
 
     /**
-     * Resolve form field type for model field
+     * Resolve form field type and options for model field
      *
      * @param Field $field Model field
      *
-     * @return mixed
+     * @return array
      */
-    private function resolveFieldType(Field $field)
+    public function resolveFieldType(Field $field)
     {
         $fieldModel = $this->modelManager->getByInstance($field);
 
+        $type    = TextType::class;
+        $options = [];
+
         /** @var FormFieldTypeServiceInterface $service */
         if ($service = $this->taggedManager->get('form.property.field.service', ['field' => $fieldModel->getName()])) {
-            return [$service->getFormType(), $service->getFormOptions()];
+            $type    = $service->getFormType();
+            $options = $service->getFormOptions();
         }
 
-        return [TextType::class, []];
+        // Define required options if does not set
+        $options += ['required' => false];
+
+        return [$type, $options];
+    }
+
+    /**
+     * Resolve form field type and options for model relationship
+     *
+     * @param Relationship $relationship Model relationship
+     *
+     * @return array
+     */
+    public function resolveRelationType(Relationship $relationship)
+    {
+        $target = $relationship->getTarget();
+
+        $choiceLoader = new ModelChoiceLoader($this->storage, $target);
+        $options      = [
+            'choice_loader' => $choiceLoader,
+            'required'      => false
+        ];
+
+        if ($relationship instanceof Relationship\ToMany) {
+            $options['multiple'] = true;
+        }
+
+        return [ChoiceType::class, $options];
     }
 }

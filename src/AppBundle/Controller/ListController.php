@@ -5,18 +5,14 @@ namespace AppGear\AppBundle\Controller;
 use AppGear\AppBundle\Entity\Storage\Criteria;
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Entity\View\ListView;
-use AppGear\AppBundle\Form\FormBuilder;
 use AppGear\AppBundle\Form\FormManager;
 use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
 use AppGear\CoreBundle\Entity\Model;
-use AppGear\CoreBundle\Entity\Property\Field\StringType;
 use AppGear\CoreBundle\Helper\ModelHelper;
+use AppGear\CoreBundle\Helper\PropertyHelper;
 use AppGear\CoreBundle\Model\ModelManager;
-use Cosmologist\Gears\StringType as GearsStringType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -113,7 +109,18 @@ class ListController extends AbstractController
             $mapping  = $filter->getMapping() ?? $filter->getName();
             $property = ModelHelper::getProperty($model, $mapping);
 
-            $appFormBuilder->addProperty($symfonyFormBuilder, $property, [], $filter->getName());
+            // Input
+            if (PropertyHelper::isField($property)) {
+                list($type, $options) = $appFormBuilder->resolveFieldType($property);
+            } else {
+                list($type, $options) = $appFormBuilder->resolveRelationType($property);
+
+                $options['multiple'] = true;
+            }
+
+            $symfonyFormBuilder->add($filter->getName(), $type, $options);
+
+            // Negative checkbox
             $symfonyFormBuilder->add($filter->getName() . '_' . 'negative', 'checkbox');
         }
 
@@ -156,13 +163,13 @@ class ListController extends AbstractController
                 continue;
             }
 
-            $value = $data[$name];
-            if (is_object($value)) {
-                $value = $this->storage->getIdentifierValue($value);
-            }
-
+            $value      = $data[$name];
             $isNegative = $data[$name . '_negative'];
-            $comparison = $isNegative ? 'neq' : 'eq';
+            if (is_array($value)) {
+                $comparison = $isNegative ? 'nin' : 'in';
+            } else {
+                $comparison = $isNegative ? 'neq' : 'eq';
+            }
 
             $expression = new Criteria\Expression();
             $expression

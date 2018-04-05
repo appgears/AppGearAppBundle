@@ -261,7 +261,7 @@ img.img-responsive {
 }
 
 
-.form-control {
+/*.form-control {
 	border:#ddd 2px solid;
 	box-shadow:none;
 
@@ -271,13 +271,13 @@ img.img-responsive {
 }
 .form-control:focus {
 	border-color:#c6c6c6;
-}
+}*/ /* AppGear comment - делаем стандартный стиль для bootstrap-контролов */
 
 /* BOOTSTRAP REWRITE */
-.btn,
+/*.btn,
 .form-control {
 	height:40px;
-}
+}*/ /* AppGear comment - делаем стандартный стиль для bootstrap-контролов */
 .btn-sm,
 .btn-xs,
 .btn-lg,
@@ -6353,10 +6353,10 @@ body:not(.device-touch) .btn.btn-reveal span {
 
 
 /* BOOTSTRAP REWRITE */
-.btn,
+/* .btn,
 .form-control {
 	height:40px;
-}
+}*/ /* AppGear comment - делаем стандартный стиль для bootstrap-контролов */
 .btn-sm,
 .btn-xs,
 .btn-lg,

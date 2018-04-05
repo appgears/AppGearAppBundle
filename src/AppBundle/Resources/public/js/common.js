@@ -73,4 +73,13 @@ $(document).ready(function () {
 
         group.append(prototype);
     });
+
+    /**
+     * Selectize dropdown's who contains more that 20 items
+     */
+    $('.panel-default select').each(function (index, item) {
+        if (item.options.length > 20) {
+            $(item).selectize();
+        }
+    });
 });
