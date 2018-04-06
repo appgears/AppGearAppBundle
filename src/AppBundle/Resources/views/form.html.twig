@@ -2,7 +2,7 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" class="appgear-form">
             {% for fieldName in form|keys %}
                 {{ form_row(attribute(form, fieldName)) }}
             {% endfor %}

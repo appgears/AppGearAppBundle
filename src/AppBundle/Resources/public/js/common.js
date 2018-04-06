@@ -75,11 +75,16 @@ $(document).ready(function () {
     });
 
     /**
-     * Selectize dropdown's who contains more that 20 items
+     * Selectize forms dropdown's who contains more that 20 items
      */
-    $('.panel-default select').each(function (index, item) {
+    $('form.appgear-form select').each(function (index, item) {
         if (item.options.length > 20) {
             $(item).selectize();
         }
     });
+
+    /**
+     * Selectize list filters dropdown's
+     */
+    $('form.appgear-list-filters select').selectize();
 });
