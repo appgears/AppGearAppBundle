@@ -32,8 +32,9 @@ $(document).ready(function () {
             return false;
         }
 
-        if (this.form !== null && this.form !== undefined) {
-            this.form.submit();
+        var parentForm = this.closest('form');
+        if (parentForm !== null && parentForm !== undefined) {
+            parentForm.submit();
         }
 
         if (data.appgearWidgetActionAjax) {
