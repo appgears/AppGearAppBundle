@@ -57,6 +57,9 @@ $(document).ready(function () {
                     },
                     404: function () {
                         smartyAlert('Not Found!', 'warning');
+                    },
+                    422: function (data) {
+                        smartyAlert(data.responseText, 'warning');
                     }
                 }
             });
