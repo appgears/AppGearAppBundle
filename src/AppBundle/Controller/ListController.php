@@ -163,7 +163,12 @@ class ListController extends AbstractController
                 continue;
             }
 
-            $value      = $data[$name];
+            $value = $data[$name];
+
+            if (is_array($value) && count($value) === 0) {
+                continue;
+            }
+
             $isNegative = $data[$name . '_negative'];
             if (is_array($value)) {
                 $comparison = $isNegative ? 'nin' : 'in';
