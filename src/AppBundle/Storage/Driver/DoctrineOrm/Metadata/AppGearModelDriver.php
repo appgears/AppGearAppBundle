@@ -157,12 +157,13 @@ class AppGearModelDriver implements MappingDriver
                     'fieldName' => $property->getName(),
                     'type'      => $this->resolveFieldType($property),
                     'nullable'  => true,
-                    'options'   => []
+                    'options'   => [],
+                    'default'   => $property->getDefaultValue()
                 ];
 
                 if ($columnExtension !== null && $columnExtension->getIdentifier()) {
                     $mapping['id'] = true;
-                    if ($property instanceof Field\Integer) {
+                    if ($property instanceof Field\IntegerType) {
                         $mapping['options']['unsigned'] = true;
                     }
                     $classMetadata->setIdGenerator(new IdentityGenerator());
