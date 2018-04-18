@@ -90,5 +90,10 @@ $(document).ready(function () {
     /**
      * Selectize list filters dropdown's
      */
-    $('form.appgear-list-filters select').selectize();
+     $('form.appgear-list-filters select').selectize({
+
+         /* https://github.com/selectize/selectize.js/issues/600#issuecomment-85737816 */
+         inputClass: 'form-control selectize-input',
+         dropdownParent: "body"
+     });
 });

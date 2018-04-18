@@ -17,11 +17,11 @@
                             {{ form_label(formField) }}
             
                             <div class="input-group">
+                                {{ form_widget(formField) }}
                                 <span class="input-group-addon">
                                     {#{{ form_widget(formFieldNegativeField) }}#}
                                     <input type="checkbox" name="{{ formFieldNegativeField.vars.full_name }}" value="{{ formFieldNegativeField.vars.value }}"{% if formFieldNegativeField.vars.data %} checked{% endif %}>
                                 </span>
-                                {{ form_widget(formField) }}
                             </div>
                         </div>
                     {% endif %}

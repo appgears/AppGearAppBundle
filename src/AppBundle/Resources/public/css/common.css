@@ -50,10 +50,3 @@ td ul {
 header#header {
     background-color: #5a6667;
 }
-
-/* Selectize делает height: auto и переопределяем значение height:34px из bootstrap.min.css.
-   Это приодит к тому, что в админке "едут" фильтр с выпадающим списком и чекбокс-отрицания
- */
-.form-control.selectize-control {
-    height: 34px !important;
-}
