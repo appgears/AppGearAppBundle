@@ -140,7 +140,9 @@ class Driver implements DriverInterface
             if (StringType::contains($field, '.')) {
                 $association = StringType::strBefore($field, '.');
 
-                $queryBuilder->join('root.' . $association, $association);
+                if (!in_array($association, $queryBuilder->getAllAliases())) {
+                    $queryBuilder->join('root.' . $association, $association);
+                }
             }
 
             if (\in_array($comparison, ['eq', 'neq'])) {
