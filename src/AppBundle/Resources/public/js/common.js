@@ -1,16 +1,3 @@
-function smartyAlert(message, type = 'success') {
-    var alertHtml =
-        `<div class="alert alert-` + type + ` margin-bottom-30">
-            <button type="button" class="close" data-dismiss="alert">
-            <span aria-hidden="true">×</span>
-        <span class="sr-only">Close</span>
-            </button>
-            ${message}
-        </div>`;
-
-    $('#content').prepend(alertHtml);
-}
-
 $(document).ready(function () {
 
     /**
@@ -47,19 +34,19 @@ $(document).ready(function () {
                 statusCode: {
                     200: function (data) {
                         if (data.length > 0) {
-                            smartyAlert(data);
+                            toastr.success(data, null, {timeOut: 0})
                         } else {
                             location.reload();
                         }
                     },
                     403: function () {
-                        smartyAlert('Access Denied!', 'warning');
+                        toastr.warning('Access Denied!', null, {timeOut: 0})
                     },
                     404: function () {
-                        smartyAlert('Not Found!', 'warning');
+                        toastr.warning('Not Found!', null, {timeOut: 0})
                     },
                     422: function (data) {
-                        smartyAlert(data.responseText, 'warning');
+                        toastr.warning(data.responseText, null, {timeOut: 0})
                     }
                 }
             });
