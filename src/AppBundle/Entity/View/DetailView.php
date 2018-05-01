@@ -12,6 +12,11 @@ class DetailView extends View
     protected $top = array();
     
     /**
+     * Groups
+     */
+    protected $groups = array();
+    
+    /**
      * Fields
      */
     protected $fields = array();
@@ -36,6 +41,23 @@ class DetailView extends View
     public function getTop()
     {
         return $this->top;
+    }
+    
+    /**
+     * Set groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+        return $this;
+    }
+    
+    /**
+     * Get groups
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
     
     /**

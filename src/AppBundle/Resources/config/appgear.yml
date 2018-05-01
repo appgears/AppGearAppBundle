@@ -79,6 +79,10 @@ models:
         relationship:
           type: core.property.relationship.toMany
           target: app.view.field
+      groups:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field.group
       fields:
         relationship:
           type: core.property.relationship.toMany
@@ -151,6 +155,16 @@ models:
         field:
           type: core.property.field.boolean_type
           defaultValue: false
+
+  app.view.field.group:
+    properties:
+      name:
+        field:
+          type: core.property.field.string_type
+      fields:
+        relationship:
+          type: core.property.relationship.toMany
+          target: app.view.field
 
   app.view.field.transformer: ~
 
