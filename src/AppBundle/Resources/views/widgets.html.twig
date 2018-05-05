@@ -2,7 +2,12 @@
 
 {% block widget_field %}
     {% spaceless %}
-        {% set _value  = entity|property_accessor(field.mapping) %}
+        {% set _value = null %}
+
+        {# сущность может не определена, к примеру, при рендере top у listview #}
+        {% if entity is defined %}
+            {% set _value  = entity|property_accessor(field.mapping) %}
+        {% endif %}
         
         <span{% if field.field.liveEdit %} class="live-edit"{% endif %}>
         {% if (field.field.widget is defined and field.field.widget is not null) or field.property is null %}
