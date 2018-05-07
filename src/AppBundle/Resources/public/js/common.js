@@ -34,19 +34,19 @@ $(document).ready(function () {
                 statusCode: {
                     200: function (data) {
                         if (data.length > 0) {
-                            toastr.success(data, null, {timeOut: 3000})
+                            toastr.success(data, null, {timeOut: 5000, closeButton: true})
                         } else {
                             location.reload();
                         }
                     },
                     403: function () {
-                        toastr.warning('Access Denied!', null, {timeOut: 3000})
+                        toastr.warning('Access Denied!', null, {timeOut: 2000, closeButton: true})
                     },
                     404: function () {
-                        toastr.warning('Not Found!', null, {timeOut: 3000})
+                        toastr.warning('Not Found!', null, {timeOut: 2000, closeButton: true})
                     },
                     422: function (data) {
-                        toastr.warning(data.responseText, null, {timeOut: 3000})
+                        toastr.warning(data.responseText, null, {timeOut: 3000, closeButton: true})
                     }
                 }
             });

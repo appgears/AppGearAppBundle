@@ -50,3 +50,8 @@ td ul {
 header#header {
     background-color: #5a6667;
 }
+
+
+.toast-message a {
+    text-decoration: underline;
+}
