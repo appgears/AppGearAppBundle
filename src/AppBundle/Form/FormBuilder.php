@@ -117,6 +117,9 @@ class FormBuilder
             if ($allowedProperties !== [] && !isset($allowedProperties[$property->getName()])) {
                 continue;
             }
+            if ($property->getCalculated() !== null) {
+                continue;
+            }
 
             $allowedSubProperties = $allowedProperties[$property->getName()] ?? [];
 
