@@ -91,10 +91,13 @@
                     <table class="table table-hover table-bordered{% if loop.index is odd %} odd{% endif %}"
                            data-toggle="table">
                         {% for field in fields %}
-                            <tr>
-                                <td width="15%"><strong>{{ field.field.name|humanize }}</strong></td>
-                                <td>{{ block('widget_field') }}</td>
-                            </tr>
+                            {# skip empty fields - may be configured as view option #}
+                            {% if entity is defined and entity|property_accessor(field.mapping) is not empty %}
+                                <tr>
+                                    <td width="15%"><strong>{{ field.field.name|humanize }}</strong></td>
+                                    <td>{{ block('widget_field') }}</td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </table>
                 </div>
