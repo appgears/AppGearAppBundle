@@ -58,7 +58,7 @@ class AclSetClassFieldScopeCommand extends ContainerAwareCommand
 
         $aclProvider = $this->getContainer()->get('security.acl.provider');
 
-        $oid = new ObjectIdentity('class', $fqcn . 'l');
+        $oid = new ObjectIdentity('class', $fqcn);
         
         try {
             $acl = $aclProvider->findAcl($oid);
