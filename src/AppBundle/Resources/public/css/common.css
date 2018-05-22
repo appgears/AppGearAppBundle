@@ -51,7 +51,10 @@ header#header {
     background-color: #5a6667;
 }
 
-
 .toast-message a {
     text-decoration: underline;
+}
+
+.appgear-widget-action {
+    user-select: none;
 }
