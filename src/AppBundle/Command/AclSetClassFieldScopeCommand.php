@@ -66,9 +66,6 @@ class AclSetClassFieldScopeCommand extends ContainerAwareCommand
             $acl = $aclProvider->createAcl($oid);
         }
 
-        // Role based securityIdentity
-        //$securityIdentity = new RoleSecurityIdentity("ROLE_POST_OWNER");
-
         /** @var UserProviderInterface $securityUserProvider */
         $securityUserProvider = $this->getContainer()->get('security.user.provider.concrete.' . $userProvider);
         $user                 = $securityUserProvider->loadUserByUsername($userName);
