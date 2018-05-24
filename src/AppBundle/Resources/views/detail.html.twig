@@ -40,25 +40,26 @@
                             </td>
                         </tr>
                     {% endfor %}
-                </table>
-    
-                
-                {% for group in view.groups %}
-                    <table class="table table-hover table-bordered table-striped" data-toggle="table">
-                    {% for field in (group.fields | view_fields(entity)) %}
+                    
+                    
+                    {% for group in view.groups %}
                         <tr>
-                            <td width="15%">
-                                <div class="th-inner">
-                                    {{ field.field.name|humanize }}
-                                </div>
-                            </td>
-                            <td>
-                                {{ block('widget_field') }}
-                            </td>
+                            <td colspan="2">&nbsp;</td>
                         </tr>
+                        {% for field in (group.fields | view_fields(entity)) %}
+                            <tr>
+                                <td width="15%">
+                                    <div class="th-inner">
+                                        {{ field.field.name|humanize }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ block('widget_field') }}
+                                </td>
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
-                    </table>
-                {% endfor %}
+                </table>
             </div>
         </div>
     </div>
