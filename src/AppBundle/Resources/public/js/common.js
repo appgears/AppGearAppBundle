@@ -27,6 +27,8 @@ $(document).ready(function () {
         if (data.appgearWidgetActionAjax) {
             var method = data.appgearWidgetActionPost ? 'POST' : 'GET';
 
+            var loadingToast = toastr.info('Loading...', null, {timeOut: 0});
+
             $.ajax({
                 url: data.appgearWidgetActionUrl,
                 method: method,
@@ -34,19 +36,23 @@ $(document).ready(function () {
                 statusCode: {
                     200: function (data) {
                         if (data.length > 0) {
-                            toastr.success(data, null, {timeOut: 5000, closeButton: true})
+                            $(loadingToast).closest('.toast').remove();
+                            toastr.success(data, null, {timeOut: 5000, closeButton: true, progressBar: true})
                         } else {
                             location.reload();
                         }
                     },
                     403: function () {
-                        toastr.warning('Access Denied!', null, {timeOut: 2000, closeButton: true})
+                        $(loadingToast).closest('.toast').remove();
+                        toastr.warning('Access Denied!', null, {timeOut: 2000, closeButton: true, progressBar: true})
                     },
                     404: function () {
-                        toastr.warning('Not Found!', null, {timeOut: 2000, closeButton: true})
+                        $(loadingToast).closest('.toast').remove();
+                        toastr.warning('Not Found!', null, {timeOut: 2000, closeButton: true, progressBar: true})
                     },
                     422: function (data) {
-                        toastr.warning(data.responseText, null, {timeOut: 3000, closeButton: true})
+                        $(loadingToast).closest('.toast').remove();
+                        toastr.warning(data.responseText, null, {timeOut: 3000, closeButton: true, progressBar: true})
                     }
                 }
             });
