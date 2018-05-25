@@ -37,22 +37,22 @@ $(document).ready(function () {
                     200: function (data) {
                         if (data.length > 0) {
                             $(loadingToast).closest('.toast').remove();
-                            toastr.success(data, null, {timeOut: 5000, closeButton: true, progressBar: true})
+                            toastr.success(data, null, {timeOut: 5000, closeButton: true})
                         } else {
                             location.reload();
                         }
                     },
                     403: function () {
                         $(loadingToast).closest('.toast').remove();
-                        toastr.warning('Access Denied!', null, {timeOut: 2000, closeButton: true, progressBar: true})
+                        toastr.warning('Access Denied!', null, {timeOut: 2000, closeButton: true})
                     },
                     404: function () {
                         $(loadingToast).closest('.toast').remove();
-                        toastr.warning('Not Found!', null, {timeOut: 2000, closeButton: true, progressBar: true})
+                        toastr.warning('Not Found!', null, {timeOut: 2000, closeButton: true})
                     },
                     422: function (data) {
                         $(loadingToast).closest('.toast').remove();
-                        toastr.warning(data.responseText, null, {timeOut: 3000, closeButton: true, progressBar: true})
+                        toastr.warning(data.responseText, null, {timeOut: 3000, closeButton: true})
                     }
                 }
             });
