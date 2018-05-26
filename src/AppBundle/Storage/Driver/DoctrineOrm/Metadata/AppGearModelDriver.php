@@ -150,11 +150,15 @@ class AppGearModelDriver implements MappingDriver
         /** @var ClassMetadataInfo $classMetadata */
 
         foreach ($model->getProperties() as $property) {
-            if ($property->getCalculated() !== null) {
+            /** @var Column $columnExtension */
+            $columnExtension = PropertyHelper::getExtension($property, Column::class);
+
+            $calculatedProperty = $property->getCalculated() !== null;
+            $managedProperty    = ($columnExtension !== null && $columnExtension->getManaged());
+
+            if ($calculatedProperty && !$managedProperty) {
                 continue;
             }
-
-            $columnExtension = PropertyHelper::getExtension($property, Column::class);
 
             if ($property instanceof Field) {
                 $mapping = [

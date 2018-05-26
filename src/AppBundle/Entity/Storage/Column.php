@@ -7,6 +7,11 @@ class Column extends Property
 {
     
     /**
+     * Managed
+     */
+    protected $managed;
+    
+    /**
      * Identifier
      */
     protected $identifier;
@@ -25,6 +30,23 @@ class Column extends Property
      * OrderBy
      */
     protected $orderBy;
+    
+    /**
+     * Set managed
+     */
+    public function setManaged($managed)
+    {
+        $this->managed = $managed;
+        return $this;
+    }
+    
+    /**
+     * Get managed
+     */
+    public function getManaged()
+    {
+        return $this->managed;
+    }
     
     /**
      * Set identifier

@@ -16,6 +16,9 @@ models:
   app.storage.column:
     parent: core.extension.property
     properties:
+      managed:
+        field:
+          type: core.property.field.boolean_type
       identifier:
         field:
           type: core.property.field.boolean_type
