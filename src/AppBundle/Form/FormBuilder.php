@@ -2,6 +2,7 @@
 
 namespace AppGear\AppBundle\Form;
 
+use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\AppBundle\Form\Transformer\ChoicesCollectionToValuesTransformer;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
@@ -10,6 +11,7 @@ use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\Helper\ModelHelper;
+use AppGear\CoreBundle\Helper\PropertyHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -118,6 +120,12 @@ class FormBuilder
                 continue;
             }
             if ($property->getCalculated() !== null) {
+                continue;
+            }
+
+            /** @var Column $columnExtension */
+            $columnExtension = PropertyHelper::getExtension($property, Column::class);
+            if ($columnExtension !== null && $columnExtension->getIdentifier()) {
                 continue;
             }
 

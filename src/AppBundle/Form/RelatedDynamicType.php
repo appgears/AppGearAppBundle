@@ -2,9 +2,11 @@
 
 namespace AppGear\AppBundle\Form;
 
+use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\Helper\ModelHelper;
+use AppGear\CoreBundle\Helper\PropertyHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -62,6 +64,12 @@ class RelatedDynamicType extends AbstractType
             }
 
             if ($backSideProperty !== null && $backSideProperty === $this->relationship) {
+                continue;
+            }
+
+            /** @var Column $columnExtension */
+            $columnExtension = PropertyHelper::getExtension($property, Column::class);
+            if ($columnExtension !== null && $columnExtension->getIdentifier()) {
                 continue;
             }
 
