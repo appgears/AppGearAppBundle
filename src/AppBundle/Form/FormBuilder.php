@@ -145,19 +145,22 @@ class FormBuilder
      * @param array                $allowedChildProperties Allowed properties (for composition form)
      * @param string               $name                   [Optional] Form field name, if empty then use property name
      */
-    public function addProperty(FormBuilderInterface $formBuilder, Property $property, array $allowedChildProperties = [], string $name = null)
+    public function addProperty(FormBuilderInterface $formBuilder, Property $property, array $allowedChildProperties = [], string $name = null, string $type = null)
     {
         $propertyName = $property->getName();
         $name         = $name ?? $propertyName;
 
         if ($property instanceof Field) {
-            list($type, $options) = $this->resolveFieldType($property);
+            list($fieldType, $options) = $this->resolveFieldType($property);
+            $type = $type ?? $fieldType;
 
             $formBuilder->add($name, $type, $options);
         } elseif ($property instanceof Relationship) {
             if (!$property->getComposition()) {
 
-                list($type, $options) = $this->resolveRelationType($property);
+                list($relationType, $options) = $this->resolveRelationType($property);
+                $type = $type ?? $relationType;
+
                 $formBuilder->add($name, $type, $options);
 
                 // Add special transformer to toMany associations

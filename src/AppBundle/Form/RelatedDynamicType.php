@@ -67,13 +67,16 @@ class RelatedDynamicType extends AbstractType
                 continue;
             }
 
+            // Force hidden type for collection items identifier
             /** @var Column $columnExtension */
             $columnExtension = PropertyHelper::getExtension($property, Column::class);
             if ($columnExtension !== null && $columnExtension->getIdentifier()) {
-                continue;
+                $type = 'hidden';
+            } else {
+                $type = null;
             }
 
-            $this->formBuilder->addProperty($builder, $property);
+            $this->formBuilder->addProperty($builder, $property, [], null, $type);
         }
     }
 
