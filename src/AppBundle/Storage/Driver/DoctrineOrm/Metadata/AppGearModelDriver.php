@@ -9,7 +9,6 @@ use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
-use AppGear\CoreBundle\EntityService\PropertyService;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Helper\PropertyHelper;
 use AppGear\CoreBundle\Model\ModelManager;
