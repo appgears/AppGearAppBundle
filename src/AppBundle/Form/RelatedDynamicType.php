@@ -76,6 +76,10 @@ class RelatedDynamicType extends AbstractType
                 $type = null;
             }
 
+            if ($property->getCalculated() !== null) {
+                continue;
+            }
+
             $this->formBuilder->addProperty($builder, $property, [], null, $type);
         }
     }

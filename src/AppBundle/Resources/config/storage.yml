@@ -42,6 +42,14 @@ services:
     arguments:
       - '@appgear.storage.driver.hydrator.simple'
 
+  appgear.storage.driver.doctrine_orm.calculated.field_subscriber:
+    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Calculated\CalculatedFieldSubscriber
+    arguments:
+      - '@app_gear.core.model.manager'
+    tags:
+        - { name: doctrine.event_listener, event: prePersist }
+        - { name: doctrine.event_listener, event: preUpdate }
+
   appgear.storage.driver.doctrine_orm.generator.listener:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener
     tags:
