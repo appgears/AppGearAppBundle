@@ -7,31 +7,9 @@ class FormView extends View
 {
     
     /**
-     * Form
-     */
-    protected $form;
-    
-    /**
      * Fields
      */
     protected $fields = array();
-    
-    /**
-     * Set form
-     */
-    public function setForm($form)
-    {
-        $this->form = $form;
-        return $this;
-    }
-    
-    /**
-     * Get form
-     */
-    public function getForm()
-    {
-        return $this->form;
-    }
     
     /**
      * Set fields
