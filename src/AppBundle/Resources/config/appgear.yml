@@ -285,9 +285,6 @@ models:
   app.view.form_view:
     parent: app.view
     properties:
-      form:
-        classType:
-          className: Symfony\Component\Form\Form
       fields:
         relationship:
           type: core.property.relationship.toMany
