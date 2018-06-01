@@ -122,6 +122,9 @@ class FormBuilder
             if ($property->getCalculated() !== null) {
                 continue;
             }
+            if ($property->getReadOnly()) {
+                continue;
+            }
 
             /** @var Column $columnExtension */
             $columnExtension = PropertyHelper::getExtension($property, Column::class);
