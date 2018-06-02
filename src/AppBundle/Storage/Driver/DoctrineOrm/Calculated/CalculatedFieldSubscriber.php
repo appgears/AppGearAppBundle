@@ -67,6 +67,10 @@ class CalculatedFieldSubscriber implements EventSubscriber
      */
     private function updateCalculateFields($object)
     {
+        if (!$this->modelManager->isModel($object)) {
+            return;
+        }
+
         $model = $this->modelManager->getByInstance($object);
 
         /** @var Property $property */
