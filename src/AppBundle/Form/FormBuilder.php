@@ -2,16 +2,16 @@
 
 namespace AppGear\AppBundle\Form;
 
-use AppGear\AppBundle\Entity\Storage\Column;
 use AppGear\AppBundle\Form\Transformer\ChoicesCollectionToValuesTransformer;
+use AppGear\AppBundle\Helper\StorageHelper;
 use AppGear\AppBundle\Storage\Storage;
+use AppGear\CoreBundle\Collection\Collection;
 use AppGear\CoreBundle\DependencyInjection\TaggedManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Entity\Property\Field;
 use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\Helper\ModelHelper;
-use AppGear\CoreBundle\Helper\PropertyHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -113,31 +113,51 @@ class FormBuilder
      *
      * @return FormBuilderInterface
      */
-    public function build(FormBuilderInterface $formBuilder, Model $model, array $allowedProperties = [])
+    public function buildByModel(FormBuilderInterface $formBuilder, Model $model, array $allowedProperties = [])
     {
-        foreach (ModelHelper::getProperties($model) as $property) {
-            if ($allowedProperties !== [] && !isset($allowedProperties[$property->getName()])) {
-                continue;
-            }
-            if ($property->getCalculated() !== null) {
-                continue;
-            }
-            if ($property->getReadOnly()) {
-                continue;
-            }
+        $properties = Collection::create(ModelHelper::getProperties($model))
+            ->filter([StorageHelper::class, 'isIdentifierProperty']);
 
-            /** @var Column $columnExtension */
-            $columnExtension = PropertyHelper::getExtension($property, Column::class);
-            if ($columnExtension !== null && $columnExtension->getIdentifier()) {
-                continue;
-            }
+        return $this->buildByProperties($formBuilder, $properties, $allowedProperties);
+    }
 
+    /**
+     * Build form by properties collection
+     *
+     * @param FormBuilderInterface $formBuilder
+     * @param Collection           $propertiesCollection
+     * @param array                $allowedProperties
+     *
+     * @return FormBuilderInterface
+     */
+    public function buildByProperties(FormBuilderInterface $formBuilder, Collection $propertiesCollection, array $allowedProperties = [])
+    {
+        $propertiesCollection->filter([$this, 'isPropertyAllowed']);
+
+        /** @var Property $property */
+        foreach ($propertiesCollection->toArray() as $property) {
             $allowedSubProperties = $allowedProperties[$property->getName()] ?? [];
-
             $this->addProperty($formBuilder, $property, $allowedSubProperties);
         }
 
         return $formBuilder;
+    }
+
+    /**
+     * Is property allowed (if allowed all properties (allowed is empty) or in allowed list)
+     *
+     * @param Property $property
+     * @param array    $allowed
+     *
+     * @return bool
+     */
+    public function isPropertyAllowed(Property $property, array $allowed = [])
+    {
+        if ($allowed === [] || isset($allowedProperties[$property->getName()])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -147,9 +167,18 @@ class FormBuilder
      * @param Property             $property               Property
      * @param array                $allowedChildProperties Allowed properties (for composition form)
      * @param string               $name                   [Optional] Form field name, if empty then use property name
+     *
+     * @return FormBuilderInterface
      */
     public function addProperty(FormBuilderInterface $formBuilder, Property $property, array $allowedChildProperties = [], string $name = null, string $type = null)
     {
+        if ($property->getCalculated() !== null) {
+            return $formBuilder;
+        }
+        if ($property->getReadOnly()) {
+            return $formBuilder;
+        }
+
         $propertyName = $property->getName();
         $name         = $name ?? $propertyName;
 
@@ -196,12 +225,18 @@ class FormBuilder
                     );
                 } elseif ($property instanceof Relationship\ToOne) {
 
+                    $subProperties = Collection::create(ModelHelper::getProperties($target))
+                        ->filter([StorageHelper::class, 'isIdentifierProperty'])
+                        ->filter([StorageHelper::class, 'isRelatedProperty'], [$property]);
+
                     $subFormBuilder = $this->formFactory->createNamedBuilder($propertyName, 'form', null, ['data_class' => $targetFqcn]);
-                    $subFormBuilder = $this->build($subFormBuilder, $target, $allowedChildProperties);
+                    $subFormBuilder = $this->buildByProperties($subFormBuilder, $subProperties, $allowedChildProperties);
 
                     $formBuilder->add($subFormBuilder);
                 }
             }
+
+            return $formBuilder;
         }
     }
 

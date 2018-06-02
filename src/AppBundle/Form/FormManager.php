@@ -50,7 +50,7 @@ class FormManager
     public function getBuilder(Model $model, $entity = null, array $properties = [], array $formOptions = [])
     {
         $builder = $this->appFormBuilder->create($entity, $formOptions);
-        $builder = $this->appFormBuilder->build($builder, $model, $properties);
+        $builder = $this->appFormBuilder->buildByModel($builder, $model, $properties);
 
         return $builder;
     }
