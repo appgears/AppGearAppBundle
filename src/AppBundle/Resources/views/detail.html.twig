@@ -11,7 +11,7 @@
         
         {% if view.top | length %}
             <div class="panel-heading">
-                {% for field in (view.top | view_fields(entity)) %}
+                {% for field in (view.top | view_fields(entity, false)) %}
                     {% if last_group != field.field.group and loop.index0 != 0 %}
                         |
                     {% endif %}
@@ -64,7 +64,7 @@
         </div>
     </div>
     
-    {% for field in (view.embedded | view_fields(entity)) %}
+    {% for field in (view.embedded | view_fields(entity, false)) %}
         {{ block('widget_field') }}
     {% endfor %}
 {% endblock %}
