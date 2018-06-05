@@ -39,6 +39,8 @@ services:
   appgear.entity_service.property.field.integer_type_service:
     class: AppGear\AppBundle\EntityService\Property\Field\IntegerTypeService
     tags:
+      - name: form.property.field.service
+        field: core.property.field.integer_type
       - name: storage.platform.mysql.property.field.service
         field: core.property.field.integer_type
 
