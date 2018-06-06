@@ -154,6 +154,7 @@ class AppGearModelDriver implements MappingDriver
 
             $calculatedProperty = $property->getCalculated() !== null;
             $managedProperty    = ($columnExtension !== null && $columnExtension->getManaged());
+            $columnName         = ($columnExtension !== null) ? $columnExtension->getName() : null;
 
             if ($calculatedProperty && !$managedProperty) {
                 continue;
@@ -161,11 +162,12 @@ class AppGearModelDriver implements MappingDriver
 
             if ($property instanceof Field) {
                 $mapping = [
-                    'fieldName' => $property->getName(),
-                    'type'      => $this->resolveFieldType($property),
-                    'nullable'  => true,
-                    'options'   => [],
-                    'default'   => $property->getDefaultValue()
+                    'fieldName'  => $property->getName(),
+                    'columnName' => $columnName,
+                    'type'       => $this->resolveFieldType($property),
+                    'nullable'   => true,
+                    'options'    => [],
+                    'default'    => $property->getDefaultValue()
                 ];
 
                 if ($columnExtension !== null && $columnExtension->getIdentifier()) {

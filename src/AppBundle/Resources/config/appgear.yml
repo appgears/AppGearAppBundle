@@ -19,6 +19,9 @@ models:
       managed:
         field:
           type: core.property.field.boolean_type
+      name:
+        field:
+          type: core.property.field.string_type
       identifier:
         field:
           type: core.property.field.boolean_type

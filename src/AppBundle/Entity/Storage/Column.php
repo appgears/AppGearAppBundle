@@ -12,6 +12,11 @@ class Column extends Property
     protected $managed;
     
     /**
+     * Name
+     */
+    protected $name;
+    
+    /**
      * Identifier
      */
     protected $identifier;
@@ -46,6 +51,23 @@ class Column extends Property
     public function getManaged()
     {
         return $this->managed;
+    }
+    
+    /**
+     * Set name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+    
+    /**
+     * Get name
+     */
+    public function getName()
+    {
+        return $this->name;
     }
     
     /**
