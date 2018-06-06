@@ -33,7 +33,7 @@
                         {% for field in fields %}
                             <th>
                                 <div class="th-inner">
-                                    {{ field.field.name|humanize }}
+                                    {{ field.field.name|humanize|ucwords }}
                                 </div>
                             </th>
                         {% endfor %}
