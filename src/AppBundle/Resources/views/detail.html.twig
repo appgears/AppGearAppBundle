@@ -44,7 +44,7 @@
                     
                     {% for group in view.groups %}
                         <tr>
-                            <td colspan="2">&nbsp;</td>
+                            <td colspan="2">{{ group.name|default(' ')|upper }}</td>
                         </tr>
                         {% for field in (group.fields | view_fields(entity)) %}
                             <tr>
