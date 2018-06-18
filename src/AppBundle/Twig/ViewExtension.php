@@ -4,12 +4,12 @@ namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\CoreBundle\Entity\Model;
-use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Embera\Embera;
 use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Twig_Extension;
 use Twig_SimpleFilter;
 
@@ -154,6 +154,19 @@ class ViewExtension extends Twig_Extension
         if (count($fields) === 0 && $getFromModelIfNoFields && $isModel) {
             $fields = $this->getFieldsFromModel($model);
         }
+
+        $el = new ExpressionLanguage();
+
+        $fields = array_filter(
+            $fields,
+            function ($field) use ($el, $entity) {
+                if ($field->getExclude() === null) {
+                    return true;
+                }
+
+                return !$el->evaluate($field->getExclude(), compact('entity'));
+            }
+        );
 
         return array_map(
             function ($field) use ($model) {

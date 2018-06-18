@@ -36,6 +36,11 @@ class Field
     protected $liveEdit = false;
     
     /**
+     * Exclude
+     */
+    protected $exclude;
+    
+    /**
      * Set name
      */
     public function setName($name)
@@ -135,5 +140,22 @@ class Field
     public function getLiveEdit()
     {
         return $this->liveEdit;
+    }
+    
+    /**
+     * Set exclude
+     */
+    public function setExclude($exclude)
+    {
+        $this->exclude = $exclude;
+        return $this;
+    }
+    
+    /**
+     * Get exclude
+     */
+    public function getExclude()
+    {
+        return $this->exclude;
     }
 }

@@ -161,6 +161,9 @@ models:
         field:
           type: core.property.field.boolean_type
           defaultValue: false
+      exclude:
+        field:
+          type: core.property.field.string_type
 
   app.view.field.group:
     properties:
