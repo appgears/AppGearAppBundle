@@ -87,4 +87,19 @@ class StorageHelper
     {
         return self::getBacksideProperty($property) === $backside;
     }
+
+    /**
+     * Check if property managed (has column extension with enabled "managed" flag)
+     *
+     * @param Property $property
+     *
+     * @return bool
+     */
+    public static function isManagedProperty(Property $property)
+    {
+        /** @var Column $columnExtension */
+        $columnExtension = PropertyHelper::getExtension($property, Column::class);
+
+        return $columnExtension !== null && $columnExtension->getManaged();
+    }
 }
