@@ -4,11 +4,13 @@ namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm;
 
 use AppGear\AppBundle\Entity\Storage\Criteria as StorageCriteria;
 use AppGear\AppBundle\Helper\StorageHelper;
+use AppGear\AppBundle\Storage\Driver\DoctrineOrm\Calculated\CalculatedFieldManager;
 use AppGear\AppBundle\Storage\DriverInterface;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
+use Commerce\PlatformBundle\Entity\Shop\Order;
 use Cosmologist\Gears\StringType;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria as DoctrineCriteria;
@@ -34,23 +36,24 @@ class Driver implements DriverInterface
     private $modelManager;
 
     /**
-     * Expression language component
+     * Calculated fields manager
      *
-     * @var ExpressionLanguage
+     * @var CalculatedFieldManager
      */
-    private $expressionLanguage;
+    private $calculatedFieldManager;
 
     /**
      * Constructor
      *
-     * @param Registry     $registry     Doctrine registry
-     * @param ModelManager $modelManager Model manager
+     * @param Registry               $registry               Doctrine registry
+     * @param ModelManager           $modelManager           Model manager
+     * @param CalculatedFieldManager $calculatedFieldManager Calculated fields manager
      */
-    public function __construct(Registry $registry, ModelManager $modelManager)
+    public function __construct(Registry $registry, ModelManager $modelManager, CalculatedFieldManager $calculatedFieldManager)
     {
-        $this->registry           = $registry;
-        $this->modelManager       = $modelManager;
-        $this->expressionLanguage = new ExpressionLanguage();
+        $this->registry               = $registry;
+        $this->modelManager           = $modelManager;
+        $this->calculatedFieldManager = $calculatedFieldManager;
     }
 
     /**
@@ -181,10 +184,12 @@ class Driver implements DriverInterface
      */
     public function save($object)
     {
+        $this->calculatedFieldManager->update($object);
+
         $manager = $this->registry->getManagerForClass(get_class($object));
 
         $manager->persist($object);
-        $manager->flush();
+        $manager->flush($object);
     }
 
     /**

@@ -14,6 +14,7 @@ services:
     arguments:
       - '@doctrine'
       - '@app_gear.core.model.manager'
+      - '@appgear.storage.driver.doctrine_orm.calculated.manager'
     tags:
         - { name: appgear.storage.driver, alias: doctrine_orm }
 
@@ -42,18 +43,23 @@ services:
     arguments:
       - '@appgear.storage.driver.hydrator.simple'
 
+  appgear.storage.driver.doctrine_orm.calculated.manager:
+    class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Calculated\CalculatedFieldManager
+    arguments:
+      - '@app_gear.core.model.manager'
+
   appgear.storage.driver.doctrine_orm.calculated.field_subscriber:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Calculated\CalculatedFieldSubscriber
     arguments:
-      - '@app_gear.core.model.manager'
+      - '@appgear.storage.driver.doctrine_orm.calculated.manager'
     tags:
         - { name: doctrine.event_listener, event: prePersist }
-        - { name: doctrine.event_listener, event: preUpdate }
 
   appgear.storage.driver.doctrine_orm.generator.listener:
     class: AppGear\AppBundle\Storage\Driver\DoctrineOrm\Generator\GeneratorListener
     tags:
-        - { name: kernel.event_listener, event: 'appgear.core.model.generator.generate.after', method: addIdentifierProperty }
+        - { name: kernel.event_listener, event: 'appgear.core.model.generator.generate.model', method: addIdentifierProperty }
+        - { name: kernel.event_listener, event: 'appgear.core.model.generator.generate.property', method: processCalculatedProperty }
 
 
   appgear.storage.driver.doctrine_orm.metadata_driver:

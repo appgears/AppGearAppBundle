@@ -2,12 +2,6 @@
 
 namespace AppGear\AppBundle\Storage\Driver\DoctrineOrm\Calculated;
 
-use AppGear\AppBundle\Entity\Storage\Column;
-use AppGear\CoreBundle\Entity\Property;
-use AppGear\CoreBundle\Helper\ModelHelper;
-use AppGear\CoreBundle\Helper\PropertyHelper;
-use AppGear\CoreBundle\Model\ModelManager;
-use Cosmologist\Gears\ObjectType;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 
@@ -19,18 +13,18 @@ use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 class CalculatedFieldSubscriber implements EventSubscriber
 {
     /**
-     * @var ModelManager
+     * @var CalculatedFieldManager
      */
-    private $modelManager;
+    private $manager;
 
     /**
      * CalculatedFieldSubscriber constructor.
      *
-     * @param ModelManager $modelManager
+     * @param CalculatedFieldManager $manager
      */
-    public function __construct(ModelManager $modelManager)
+    public function __construct(CalculatedFieldManager $manager)
     {
-        $this->modelManager = $modelManager;
+        $this->manager = $manager;
     }
 
     /**
@@ -40,7 +34,6 @@ class CalculatedFieldSubscriber implements EventSubscriber
     {
         return [
             'prePersist',
-            'preUpdate',
         ];
     }
 
@@ -49,45 +42,6 @@ class CalculatedFieldSubscriber implements EventSubscriber
      */
     public function prePersist(LifecycleEventArgs $args)
     {
-        $this->updateCalculateFields($args->getObject());
-    }
-
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function preUpdate(LifecycleEventArgs $args)
-    {
-        $this->updateCalculateFields($args->getObject());
-    }
-
-    /**
-     * update entity fields in model for suitable model calculated properties
-     *
-     * @param object $object
-     */
-    private function updateCalculateFields($object)
-    {
-        if (!$this->modelManager->isModel($object)) {
-            return;
-        }
-
-        $model = $this->modelManager->getByInstance($object);
-
-        /** @var Property $property */
-        foreach ($model->getProperties() as $property) {
-            if ($property->getCalculated() === null) {
-                continue;
-            }
-            /** @var Column $columnExtension */
-            if (null === $columnExtension = PropertyHelper::getExtension($property, Column::class)) {
-                continue;
-            }
-            if (!$columnExtension->getManaged()) {
-                continue;
-            }
-
-            $value = ModelHelper::readPropertyValue($object, $property);
-            ObjectType::writeInternalProperty($object, $property->getName(),  $value);
-        }
+        $this->manager->update($args->getObject());
     }
 }
