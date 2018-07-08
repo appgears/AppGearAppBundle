@@ -189,7 +189,7 @@ class Driver implements DriverInterface
         $manager = $this->registry->getManagerForClass(get_class($object));
 
         $manager->persist($object);
-        $manager->flush($object);
+        $manager->flush();
     }
 
     /**
