@@ -103,6 +103,7 @@ class ListController extends AbstractController
     {
         $appFormBuilder     = $this->formManager->getFormBuilder();
         $symfonyFormBuilder = $appFormBuilder->create(null, ['csrf_protection' => false]);
+        $symfonyFormBuilder->setMethod('GET');
 
         /** @var ListView\Filter $filter */
         foreach ($listView->getFilters() as $filter) {
@@ -138,10 +139,6 @@ class ListController extends AbstractController
      */
     private function applyFilterForm(Request $request, ListView $view, FormInterface $form, Criteria $criteria)
     {
-        if (!$request->isMethod('POST')) {
-            return $criteria;
-        }
-
         $form->handleRequest($request);
 
         if (!$form->isSubmitted()) {
