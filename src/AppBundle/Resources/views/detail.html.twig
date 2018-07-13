@@ -3,6 +3,8 @@
 {% use "@app/widgets.html.twig" %}
 {% use "@app/misc/widget_text_max_lines.html.twig" %}
 
+{% block title %}{{ data | object_string }}{% endblock %}
+
 {% block content %}
     <div class="panel panel-default">
         
