@@ -51,10 +51,20 @@ header#header {
     background-color: #5a6667;
 }
 
+/* Подчеркиваем ссылки в всплывающих уведомлениях */
 .toast-message a {
     text-decoration: underline;
 }
 
 .appgear-widget-action {
     user-select: none;
+}
+
+/* Задаем цвет для иконок мессенджеров */
+.fa-viber {
+    color: #665cac;
+}
+
+.fa-whatsapp {
+    color: #09d261
 }

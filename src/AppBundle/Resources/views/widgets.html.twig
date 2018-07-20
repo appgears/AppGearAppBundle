@@ -3,28 +3,28 @@
 {% block widget_field %}
     {% spaceless %}
         {% set _value = null %}
-
+        
         {# сущность может не определена, к примеру, при рендере top у listview #}
         {% if entity is defined %}
             {% set _value  = entity|property_accessor(field.mapping) %}
         {% endif %}
         
         <span{% if field.field.liveEdit %} class="live-edit"{% endif %}>
-        {% if (field.field.widget is defined and field.field.widget is not null) or field.property is null %}
-            {% set _widget = field.field.widget %}
-            {{ block('widget') }}
-        {% elseif (field.property|class) == 'ToMany' %}
-            {{ block('widget_field_to_many')|raw }}
-        {% elseif (field.property|class) == 'ToOne' %}
-            {{ block('widget_field_default') }}
-        {% else %}
-            {% set _block = block('widget_field_' ~ (field.property|class|replace({'Type': ''})|lower)) %}
-            {% if _block is not empty %}
-                {{ _block|raw }}
-            {% else %}
+            {% if (field.field.widget is defined and field.field.widget is not null) or field.property is null %}
+                {% set _widget = field.field.widget %}
+                {{ block('widget') }}
+            {% elseif (field.property|class) == 'ToMany' %}
+                {{ block('widget_field_to_many')|raw }}
+            {% elseif (field.property|class) == 'ToOne' %}
                 {{ block('widget_field_default') }}
+            {% else %}
+                {% set _block = block('widget_field_' ~ (field.property|class|replace({'Type': ''})|lower)) %}
+                {% if _block is not empty %}
+                    {{ _block|raw }}
+                {% else %}
+                    {{ block('widget_field_default') }}
+                {% endif %}
             {% endif %}
-        {% endif %}
         </span>
     {% endspaceless %}
 {% endblock %}
@@ -148,9 +148,9 @@
     
     {% set widget_class = '' %}
     {% if widget_class | length %}
-        {% set widget_class = ' ' ~ widget_class  %}
+        {% set widget_class = ' ' ~ widget_class %}
     {% endif %}
-   
+    
     {% if _widget.method == 'ajax' %}
         <a class="appgear-widget-action{{ widget_class }}" data-appgear-widget-action-ajax="1" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ href }}" data-appgear-widget-action-post="{{ _widget.post }}" data-appgear-widget-action-post-parameters='{{ postParametersString }}'>{{ _value | default(field.field.name) }}</a>
     {% else %}
@@ -182,13 +182,13 @@
 
 {% block widget_phone %}
     {% set phone = _value|phone_format %}
-
+    
     {% if phone|length %}
         <a href="tel:{{ phone }}">{{ phone }}</a>
         &nbsp;
-        <a href="viber://chat?number={{ phone|replace({'+': ''}) }}" class="fab fa-lg fa-viber" style="color:#665cac" title="Viber"></a>
+        <a href="viber://chat?number={{ phone|replace({'+': ''}) }}" class="fab fa-lg fa-viber" title="Viber"></a>
         &nbsp;
-        <a href="https://api.whatsapp.com/send?phone={{ phone|replace({'+': ''}) }}" class="fab fa-lg fa-whatsapp" style="color:#09d261" title="WhatsApp"></a>
+        <a href="https://api.whatsapp.com/send?phone={{ phone|replace({'+': ''}) }}" class="fab fa-lg fa-whatsapp" title="WhatsApp"></a>
     {% else %}
         {{ _value }}
     {% endif %}
