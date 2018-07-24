@@ -131,7 +131,10 @@ class ViewExtension extends Twig_Extension
     public function renderWidgetService($entity, View\Field\Widget $widget)
     {
         if ($widget instanceof View\Field\Widget\Service) {
-            return $this->container->get($widget->getId())->render($entity, $widget);
+            list($id, $method) = explode('::', $widget->getId());
+            $service = $this->container->get($id);
+
+            return $service->$method($entity);
         }
 
         return null;
