@@ -14,6 +14,7 @@
             {% if view.top|length %}
                 <div style="float: right">
                     {% for field in (view.top | view_fields(data[0], false)) %}
+                        {{ field.field.name|humanize }}:
                         {{ block('widget_field') }}
                     {% endfor %}
                 </div>
