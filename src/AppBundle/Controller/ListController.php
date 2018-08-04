@@ -88,7 +88,7 @@ class ListController extends AbstractController
             $count = $repository->countBy($criteria);
         }
 
-        return $this->viewResponse($view, compact('request', 'model', 'filtersFormView', 'data', 'count', 'page', 'limit', 'offset'));
+        return $this->viewResponse($view, compact('model', 'filtersFormView', 'data', 'count', 'page', 'limit', 'offset'));
     }
 
     /**

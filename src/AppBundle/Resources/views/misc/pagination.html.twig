@@ -11,7 +11,7 @@
 
 {% if limit is defined and limit != null and page is defined and page != null %}
     {% set currentFilters = [] %}
-    {% set paginationPath = request.get('_route') %}
+    {% set paginationPath = app.request.get('_route') %}
     {% set showAlwaysFirstAndLast = true %}
     {% set lastPage = (count / limit) | round %}
     
