@@ -89,7 +89,7 @@
                 {% if loop.index0 != 0 %}
                     {% set attrs = {'class': 'collapse-' ~ _uniqid ~ ' collapse'} %}
                 {% else %}
-                    {% set attrs = {'class': 'collapsor', 'data-toggle': 'collapse', 'data-target': '.collapse-' ~ _uniqid, 'aria-expanded': 'false'} %}
+                    {% set attrs = {'class': 'collapsor', 'data-toggle': 'collapse', 'data-target': '.collapse-' ~ _uniqid} %}
                 {% endif %}
             {% endif %}
             
