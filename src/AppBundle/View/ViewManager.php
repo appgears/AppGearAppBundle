@@ -35,4 +35,9 @@ class ViewManager
 
         return $this->twig->render($view->getTemplate(), $data);
     }
+
+    public function serialize(View $view, $data = null): array
+    {
+        return [];
+    }
 }

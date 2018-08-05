@@ -57,8 +57,8 @@ class ListController extends AbstractController
         $criteria   = $request->get('data[criteria]', null, true);
         $orderings  = $request->get('data[orderings]', [], true);
 
-        $page   = $request->get('page', null);
-        $limit  = $request->get('limit', null);
+        $page   = $request->get('page');
+        $limit  = $request->get('limit');
         $offset = $count = null;
 
         if (null !== $limit && null !== $page) {
@@ -88,7 +88,11 @@ class ListController extends AbstractController
             $count = $repository->countBy($criteria);
         }
 
-        return $this->viewResponse($view, compact('model', 'filtersFormView', 'data', 'count', 'page', 'limit', 'offset'));
+        $viewData = compact('model', 'filtersFormView', 'data', 'count', 'page', 'limit', 'offset');
+        $format   = $request->attributes->get('format');
+        $format   = ltrim($format, '.');
+
+        return $this->viewResponse($view, $viewData, $format);
     }
 
     /**

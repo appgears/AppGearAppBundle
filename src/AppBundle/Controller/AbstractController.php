@@ -13,6 +13,7 @@ use AppGear\CoreBundle\Entity\Property\Relationship;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -308,10 +309,15 @@ abstract class AbstractController extends Controller
      *
      * @return Response
      */
-    protected function viewResponse(View $view, array $data = [])
+    protected function viewResponse(View $view, array $data = [], string $format = null)
     {
-        $content  = $this->viewManager->render($view, $data);
-        $response = new Response($content);
+        if ('json' === $format) {
+            $content  = $this->viewManager->serialize($view, $data);
+            $response = new JsonResponse($content);
+        } else {
+            $content  = $this->viewManager->render($view, $data);
+            $response = new Response($content);
+        }
 
         if ($view->getUserSpecifiedContent() === false) {
             $response->setPublic();
