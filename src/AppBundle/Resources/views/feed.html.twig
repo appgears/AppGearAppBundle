@@ -2,37 +2,39 @@
 {% use "@app/widgets.html.twig" %}
 {% use "@app/misc/widget_text_max_lines.html.twig" %}
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <form method="GET" class="appgear-list-filters">
-            {{ form_start(filtersFormView, {'method': 'GET'}) }}
-            
-            {% for child in filtersFormView.children|keys %}
-                {% if '_negative' not in child %}
-                    {% set formField = attribute(filtersFormView.children, child) %}
-                    {% set childNegative = child ~ '_negative' %}
-                    {% set formFieldNegativeField = attribute(filtersFormView.children, childNegative) %}
-                    
-                    <div class="form-group">
-                        {{ form_label(formField) }}
-                        
-                        <div class="input-group">
-                            {{ form_widget(formField) }}
-                            <span class="input-group-addon">
-                                    {#{{ form_widget(formFieldNegativeField) }}#}
-                                <input type="checkbox" name="{{ formFieldNegativeField.vars.full_name }}" value="{{ formFieldNegativeField.vars.value }}"{% if formFieldNegativeField.vars.data %} checked{% endif %}>
-                            </span>
+{% if filtersFormView.children | length %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form method="GET" class="appgear-list-filters">
+                {{ form_start(filtersFormView, {'method': 'GET'}) }}
+
+                {% for child in filtersFormView.children|keys %}
+                    {% if '_negative' not in child %}
+                        {% set formField = attribute(filtersFormView.children, child) %}
+                        {% set childNegative = child ~ '_negative' %}
+                        {% set formFieldNegativeField = attribute(filtersFormView.children, childNegative) %}
+
+                        <div class="form-group">
+                            {{ form_label(formField) }}
+
+                            <div class="input-group">
+                                {{ form_widget(formField) }}
+                                <span class="input-group-addon">
+                                        {#{{ form_widget(formFieldNegativeField) }}#}
+                                    <input type="checkbox" name="{{ formFieldNegativeField.vars.full_name }}" value="{{ formFieldNegativeField.vars.value }}"{% if formFieldNegativeField.vars.data %} checked{% endif %}>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-            
-            <input type="submit" value="Apply" class="btn-default btn">
-            <input type="reset" value="Reset" class="btn-default btn">
-            {{ form_end(filtersFormView, {'render_rest': false}) }}
-        </form>
+                    {% endif %}
+                {% endfor %}
+
+                <input type="submit" value="Apply" class="btn-default btn">
+                <input type="reset" value="Reset" class="btn-default btn">
+                {{ form_end(filtersFormView, {'render_rest': false}) }}
+            </form>
+        </div>
     </div>
-</div>
+{% endif %}
 
 <div class="panel panel-default app-list-feed">
     
