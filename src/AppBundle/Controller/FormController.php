@@ -71,9 +71,9 @@ class FormController extends AbstractController
     public function formAction(Request $request, $model, $id = null)
     {
         $model  = $this->modelManager->get($model);
-        $entity = $this->storage->getRepository($model)->find($id);
+        $entity = ($id !== null) ? $this->storage->getRepository($model)->find($id) : null;
 
-        $this->checkAccess((string) $model, $entity);
+        $this->checkAccess((string) $model, $id);
 
         $formBuilder = $this->formManager->getBuilder($model, $entity);
         $form        = $formBuilder->getForm();
@@ -98,13 +98,13 @@ class FormController extends AbstractController
      * Check access
      *
      * @param string $model
-     * @param object $entity Entity
+     * @param mixed  $id ID
      */
-    public function checkAccess($model, $entity)
+    public function checkAccess($model, $id)
     {
-        if ($entity->getId() === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $model)) {
-            throw new AccessDeniedHttpException();
-        } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $model)) {
+        $permission = ($id === null) ? BasicPermissionMap::PERMISSION_CREATE : BasicPermissionMap::PERMISSION_EDIT;
+
+        if (!$this->securityManager->check($permission, $model)) {
             throw new AccessDeniedHttpException();
         }
     }
