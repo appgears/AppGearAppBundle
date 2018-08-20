@@ -70,8 +70,10 @@ class FormController extends AbstractController
      */
     public function formAction(Request $request, $model, $id = null)
     {
+        $repository = $this->storage->getRepository($model);
+
         $model  = $this->modelManager->get($model);
-        $entity = ($id !== null) ? $this->storage->getRepository($model)->find($id) : null;
+        $entity = ($id === null) ? $repository->create() : $repository->find($id);
 
         $this->checkAccess((string) $model, $id);
 
