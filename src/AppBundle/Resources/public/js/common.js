@@ -13,33 +13,32 @@ $(document).ready(function () {
      * Action widget handler
      */
     $('.appgear-widget-action').click(function () {
-        var data = this.dataset;
+        var dataset = this.dataset;
 
-        if (data.appgearWidgetActionConfirm && !confirm('Are you sure?')) {
+        if (dataset.appgearWidgetActionConfirm && !confirm('Are you sure?')) {
             return false;
         }
 
-        var parentForm = this.closest('form');
-        if (parentForm !== null && parentForm !== undefined) {
-            parentForm.submit();
-        }
-
-        if (data.appgearWidgetActionAjax) {
+        if (dataset.appgearWidgetActionAjax) {
             var method = data.appgearWidgetActionPost ? 'POST' : 'GET';
 
             var loadingToast = toastr.info('Loading...', null, {timeOut: 0});
 
             $.ajax({
-                url: data.appgearWidgetActionUrl,
+                url: this.href,
                 method: method,
-                data: JSON.parse(data.appgearWidgetActionPostParameters),
+                data: JSON.parse(dataset.appgearWidgetActionPostParameters),
                 statusCode: {
                     200: function (data) {
-                        if (data.length > 0) {
-                            $(loadingToast).closest('.toast').remove();
-                            toastr.success(data, null, {timeOut: 5000, closeButton: true})
-                        } else {
-                            location.reload();
+                        var message = data || 'Successfully';
+                        $(loadingToast).closest('.toast').remove();
+
+                        switch (dataset.appgearWidgetActionPayload) {
+                            case 'reload':
+                                location.reload();
+                                break;
+                            default:
+                                toastr.success(message, null, {timeOut: 5000, closeButton: true})
                         }
                     },
                     403: function () {
@@ -56,6 +55,8 @@ $(document).ready(function () {
                     }
                 }
             });
+
+            return false;
         }
     });
 
@@ -83,10 +84,10 @@ $(document).ready(function () {
     /**
      * Selectize list filters dropdown's
      */
-     $('form.appgear-list-filters select').selectize({
+    $('form.appgear-list-filters select').selectize({
 
-         /* https://github.com/selectize/selectize.js/issues/600#issuecomment-85737816 */
-         inputClass: 'form-control selectize-input',
-         dropdownParent: "body"
-     });
+        /* https://github.com/selectize/selectize.js/issues/600#issuecomment-85737816 */
+        inputClass: 'form-control selectize-input',
+        dropdownParent: "body"
+    });
 });

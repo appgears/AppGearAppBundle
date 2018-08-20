@@ -47,6 +47,11 @@ class Action extends Widget
     protected $newWindow = false;
     
     /**
+     * Payload
+     */
+    protected $payload;
+    
+    /**
      * Set post
      */
     public function setPost($post)
@@ -180,5 +185,22 @@ class Action extends Widget
     public function getNewWindow()
     {
         return $this->newWindow;
+    }
+    
+    /**
+     * Set payload
+     */
+    public function setPayload($payload)
+    {
+        $this->payload = $payload;
+        return $this;
+    }
+    
+    /**
+     * Get payload
+     */
+    public function getPayload()
+    {
+        return $this->payload;
     }
 }

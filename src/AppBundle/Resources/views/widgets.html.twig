@@ -113,6 +113,7 @@
 {% endblock %}
 
 {% block widget_action %}
+    
     {# GET parameters dictionary #}
     {% set parameters = {} %}
     {% for parameter in _widget.parameters %}
@@ -146,30 +147,28 @@
         {% set href = _widget.link | string_named_sprintf(parameters) %}
     {% endif %}
     
-    {% set widget_class = '' %}
-    {% if widget_class | length %}
-        {% set widget_class = ' ' ~ widget_class %}
+    {% set title = _value | default(field.field.name) %}
+    
+    {% set widgetAttrs = {'class': 'appgear-widget-action', 'href': href} %}
+    {% if _widget.confirm %}
+        {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-confirm': '1'}) %}
+    {% endif %}
+    {% if _widget.post %}
+        {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-post': '1'}) %}
+        {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-post-parameters': postParametersString}) %}
+    {% endif %}
+    {% if _widget.method == 'ajax' %}
+        {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-ajax': '1'}) %}
+        
+        {% if _widget.payload %}
+            {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-payload': _widget.payload}) %}
+        {% endif %}
+    {% elseif _widget.newWindow %}
+        {% set widgetAttrs = widgetAttrs|merge({'target': '_blank'}) %}
     {% endif %}
     
-    {% if _widget.method == 'ajax' %}
-        <a class="appgear-widget-action{{ widget_class }}" data-appgear-widget-action-ajax="1" data-appgear-widget-action-confirm="{{ _widget.confirm }}" data-appgear-widget-action-url="{{ href }}" data-appgear-widget-action-post="{{ _widget.post }}" data-appgear-widget-action-post-parameters='{{ postParametersString }}'>{{ _value | default(field.field.name) }}</a>
-    {% else %}
-        {% set attrs = {} %}
-        {% if _widget.newWindow %}
-            {% set attrs = attrs|merge({'target': '_blank'}) %}
-        {% endif %}
-        
-        {% if _widget.post %}
-            <form method="post" action="{{ href }}"{{ attrs|htmlAttributes }} style="margin: 0">
-                {% for parameterName, parameterValue in postParameters %}
-                    <input type="hidden" name="{{ parameterName }}" value="{{ parameterValue }}"/>
-                {% endfor %}
-                <a class="appgear-widget-action{{ widget_class }}" data-appgear-widget-action-confirm="{{ _widget.confirm }}">{{ _value | default(field.field.name) }}</a>
-            </form>
-        {% else %}
-            <a class="appgear-widget-action{{ widget_class }}" data-appgear-widget-action-confirm="{{ _widget.confirm }}" href="{{ href }}"{{ attrs|htmlAttributes }}>{{ _value | default(field.field.name) }}</a>
-        {% endif %}
-    {% endif %}
+    <a{{ widgetAttrs|htmlAttributes }}>{{ title }}</a>
+    
 {% endblock %}
 
 {% block widget_service %}
