@@ -52,6 +52,16 @@ class Repository
     }
 
     /**
+     * Create new model object
+     *
+     * @return object
+     */
+    public function create()
+    {
+        return $this->modelManager->instance($this->model);
+    }
+
+    /**
      * Finds an object by its primary key/identifier.
      *
      * @param mixed $id The identifier.
