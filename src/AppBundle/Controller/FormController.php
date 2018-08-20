@@ -81,7 +81,8 @@ class FormController extends AbstractController
         if ($this->formManager->submit($formBuilder, $form, $request, $model)) {
             $this->storage->getRepository($model)->save($entity);
 
-            return $this->buildResponse($request, $model, $entity);
+
+            return $this->response($request, $model, $entity);
         }
 
         if (!$form->isValid()) {
@@ -107,26 +108,5 @@ class FormController extends AbstractController
         if (!$this->securityManager->check($permission, $model)) {
             throw new AccessDeniedHttpException();
         }
-    }
-
-    /**
-     * Build response
-     *
-     * @param Request $request Request
-     * @param Model   $model   Entity model
-     * @param object  $entity  Entity
-     *
-     * @return Response
-     */
-    protected function buildResponse(Request $request, Model $model, $entity)
-    {
-        if ($response = $this->buildRedirectResponse($request, $model, $entity)) {
-            return $response;
-        }
-        if ($response = $this->buildSuccessResponse($request, $model, $entity)) {
-            return $response;
-        }
-
-        return new Response();
     }
 }

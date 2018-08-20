@@ -64,8 +64,7 @@ abstract class AbstractController extends Controller
         ModelManager $modelManager,
         ViewManager $viewManager,
         SecurityManager $securityManager
-    )
-    {
+    ) {
         $this->storage         = $storage;
         $this->modelManager    = $modelManager;
         $this->viewManager     = $viewManager;
@@ -96,16 +95,34 @@ abstract class AbstractController extends Controller
      * @param Model   $model   Model
      * @param object  $entity  Entity
      *
-     * @return null|RedirectResponse
+     * @return Response|RedirectResponse
      */
-    protected function buildRedirectResponse(Request $request, Model $model, $entity)
+    protected function response(Request $request, Model $model, $entity)
     {
-        if (!$redirect = $request->attributes->get('success[redirect]', null, true)) {
-            return null;
+        if (null === $redirect = $request->attributes->get('redirect')) {
+            return new Response();
         }
 
         if (is_string($redirect)) {
-            return $this->redirectToRoute($redirect);
+            if (null === $route = $this->container->get('router')->getRouteCollection()->get($redirect)) {
+                return new Response();
+            }
+
+            // Параметры для любого роута по-умолчанию
+            $parameters = ['model' => $model->getName(), 'id' => $entity->getId()];
+            // Параметры ожидаемые роутом
+            $routeVariables = $route->compile()->getVariables();
+
+            // Отбрасываем те параметры по-умолчанию, которые не нужны роуту (иначе они добавятся в query)
+            $filteredParameters = array_filter(
+                $parameters,
+                function ($key) use ($routeVariables) {
+                    return in_array($key, $routeVariables);
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+
+            return $this->redirectToRoute($redirect, $filteredParameters);
         } elseif (is_array($redirect) && array_key_exists('name', $redirect)) {
             $route      = $redirect['name'];
             $parameters = $redirect['parameters'] ?? [];
@@ -122,27 +139,6 @@ abstract class AbstractController extends Controller
 
             return $this->redirectToRoute($route, $parameters);
         }
-    }
-
-    /**
-     * Build view response for successfully action
-     *
-     * @param Request $request Request
-     * @param Model   $model   Entity model
-     * @param object  $entity  Entity
-     *
-     * @return null|Response
-     */
-    protected function buildSuccessResponse(Request $request, Model $model, $entity)
-    {
-        if (!$viewParameters = $request->attributes->get('success[view]', null, true)) {
-            return null;
-        }
-
-        $view = $this->initialize($request, $viewParameters);
-        $view->setEntity($entity);
-
-        return new Response($this->viewManager->getViewService($view)->render());
     }
 
     /**
