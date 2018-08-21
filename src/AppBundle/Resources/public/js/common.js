@@ -19,8 +19,8 @@ $(document).ready(function () {
             return false;
         }
 
-        if (dataset.appgearWidgetActionAjax) {
-            var method = data.appgearWidgetActionPost ? 'POST' : 'GET';
+        if (dataset.appgearWidgetActionAjax || dataset.appgearWidgetActionPost) {
+            var method = dataset.appgearWidgetActionPost ? 'POST' : 'GET';
 
             var loadingToast = toastr.info('Loading...', null, {timeOut: 0});
 
