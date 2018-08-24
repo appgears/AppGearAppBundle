@@ -53,42 +53,22 @@ class FormBuilder
     private $modelManager;
 
     /**
-     * Upload directory
-     *
-     * @var string
-     */
-    private $uploadDirectory;
-
-    /**
-     * Prefix for uploaded files
-     *
-     * @var string
-     */
-    private $uploadFilePrefix;
-
-    /**
      * FormBuilder constructor.
      *
      * @param FormFactoryInterface $formFactory      Form factory
      * @param ModelManager         $modelManager     Model manager
      * @param TaggedManager        $taggedManager    Tagged services manager
      * @param Storage              $storage          Storage
-     * @param string               $uploadDirectory  Upload directory
-     * @param string               $uploadFilePrefix Prefix for uploaded files
      */
     public function __construct(FormFactoryInterface $formFactory,
                                 ModelManager $modelManager,
                                 TaggedManager $taggedManager,
-                                Storage $storage,
-                                string $uploadDirectory,
-                                string $uploadFilePrefix)
+                                Storage $storage)
     {
         $this->formFactory      = $formFactory;
         $this->modelManager     = $modelManager;
         $this->taggedManager    = $taggedManager;
         $this->storage          = $storage;
-        $this->uploadDirectory  = $uploadDirectory;
-        $this->uploadFilePrefix = $uploadFilePrefix;
     }
 
     /**
@@ -237,38 +217,6 @@ class FormBuilder
             }
 
             return $formBuilder;
-        }
-    }
-
-    /**
-     * When creating a form to edit an already persisted item, the file form type still expects a  File instance.
-     * As the persisted entity now contains only the relative file path, you first have to concatenate the configured
-     * upload path with the stored filename and create a new File class.
-     *
-     * @param FormBuilderInterface $formBuilder
-     * @param object               $entity
-     */
-    private function initFileField(FormBuilderInterface $formBuilder, $entity)
-    {
-        $accessor = new PropertyAccessor();
-
-        /** @var FormBuilderInterface $field */
-        foreach ($formBuilder as $field) {
-            if ($field->getType()->getName() === 'file') {
-                $fieldName = $field->getName();
-
-                $file = $accessor->getValue($entity, $fieldName);
-                if (!is_string($file)) {
-                    continue;
-                }
-
-                // Avoid erasing field value when form will saved without new file
-                $this->existingFileFields[$fieldName] = $file;
-
-                $file = new File($this->uploadDirectory . str_replace($this->uploadFilePrefix, '', $file));
-
-                $accessor->setValue($entity, $fieldName, $file);
-            }
         }
     }
 

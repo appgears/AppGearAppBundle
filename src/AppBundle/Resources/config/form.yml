@@ -7,13 +7,13 @@ services:
       - '@app_gear.core.model.manager'
       - '@app_gear.core.tagged_manager'
       - '@appgear.storage'
-      - '%appgear.application.upload.directory%'
-      - '%appgear.application.upload.file_prefix%'
 
   appgear.form.manager:
     class: AppGear\AppBundle\Form\FormManager
     arguments:
       - '@appgear.form.builder'
+      - '%appgear.application.upload.directory%'
+      - '%appgear.application.upload.file_prefix%'
 
   appgear.form.type.markdown:
     class: AppGear\AppBundle\Form\Type\MarkdownType

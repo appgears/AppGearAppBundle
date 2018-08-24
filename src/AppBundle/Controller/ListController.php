@@ -105,7 +105,7 @@ class ListController extends AbstractController
      */
     private function buildFiltersForm(Model $model, ListView $listView)
     {
-        $appFormBuilder     = $this->formManager->getFormBuilder();
+        $appFormBuilder     = $this->formManager->getAppFormBuilder();
         $symfonyFormBuilder = $appFormBuilder->create(null, ['csrf_protection' => false]);
         $symfonyFormBuilder->setMethod('GET');
 

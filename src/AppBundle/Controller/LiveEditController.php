@@ -37,10 +37,6 @@ class LiveEditController
      * @var FormManager
      */
     private $formManager;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * CrudController constructor.
@@ -50,22 +46,19 @@ class LiveEditController
      * @param ModelManager     $modelManager    Model manager
      * @param SecurityManager  $securityManager Security manager
      * @param FormManager      $formManager     Form builder for model
-     * @param LoggerInterface  $logger          Logger
      */
     public function __construct(
         Twig_Environment $twig,
         Storage $storage,
         ModelManager $modelManager,
         SecurityManager $securityManager,
-        FormManager $formManager,
-        LoggerInterface $logger
+        FormManager $formManager
     ) {
         $this->twig            = $twig;
         $this->storage         = $storage;
         $this->modelManager    = $modelManager;
         $this->securityManager = $securityManager;
         $this->formManager     = $formManager;
-        $this->logger          = $logger;
     }
 
     /**
@@ -82,22 +75,18 @@ class LiveEditController
         $model  = $this->modelManager->get($model);
         $entity = $this->storage->getRepository($model)->find($id);
 
-        $this->checkAccess((string) $model, $entity);
+        $this->checkAccess((string)$model, $entity);
 
-        $formBuilder = $this->formManager->getBuilder($model, $entity, $properties);
-        $form        = $formBuilder->getForm();
+        $this->formManager->build($model, $entity, $properties)->getSymfonyFormBuilder();
+        $submitResult = $this->formManager->submit($request, $model);
 
-        if ($this->formManager->submit($formBuilder, $form, $request, $model)) {
+        if ($submitResult->isSubmitted && $submitResult->isValid) {
             $this->storage->getRepository($model)->save($entity);
 
-            return $this->buildResponse($request, $model, $entity);
+            return $this->response($request, $model, $entity);
         }
 
-        if (!$form->isValid()) {
-            $this->logger->error((string) $form->getErrors(true));
-        }
-
-        return $this->twig->render('{{ form(form) }}', ['form' => $form->createView()]);
+        return $this->twig->render('{{ form(form) }}', ['form' => $this->formManager->createView()]);
     }
 
     /**
@@ -111,9 +100,11 @@ class LiveEditController
         // TODO: temp
         return;
 
-        if ($entity->getId() === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE, $model)) {
+        if ($entity->getId() === null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_CREATE,
+                $model)) {
             throw new AccessDeniedHttpException();
-        } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT, $model)) {
+        } elseif ($entity->getId() !== null && !$this->securityManager->check(BasicPermissionMap::PERMISSION_EDIT,
+                $model)) {
             throw new AccessDeniedHttpException();
         }
     }

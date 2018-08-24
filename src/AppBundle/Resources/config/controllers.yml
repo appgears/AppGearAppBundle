@@ -16,7 +16,6 @@ services:
     class: AppGear\AppBundle\Controller\FormController
     arguments:
       - '@appgear.form.manager'
-      - '@logger'
 
   appgear.controller.list:
     parent: appgear.controller

@@ -8,9 +8,7 @@ use AppGear\AppBundle\Form\FormManager;
 use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\AppBundle\Storage\Storage;
 use AppGear\AppBundle\View\ViewManager;
-use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Model\ModelManager;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -31,11 +29,6 @@ class FormController extends AbstractController
     protected $formManager;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * CrudController constructor.
      *
      * @param Storage         $storage         Storage
@@ -43,20 +36,17 @@ class FormController extends AbstractController
      * @param ViewManager     $viewManager     View manager
      * @param SecurityManager $securityManager Security manager
      * @param FormManager     $formManager     Form builder for model
-     * @param LoggerInterface $logger          Logger
      */
     public function __construct(
         Storage $storage,
         ModelManager $modelManager,
         ViewManager $viewManager,
         SecurityManager $securityManager,
-        FormManager $formManager,
-        LoggerInterface $logger
+        FormManager $formManager
     ) {
         parent::__construct($storage, $modelManager, $viewManager, $securityManager);
 
         $this->formManager = $formManager;
-        $this->logger      = $logger;
     }
 
     /**
@@ -75,26 +65,21 @@ class FormController extends AbstractController
         $model  = $this->modelManager->get($model);
         $entity = ($id === null) ? $repository->create() : $repository->find($id);
 
-        $this->checkAccess((string) $model, $id);
+        $this->checkAccess((string)$model, $id);
 
-        $formBuilder = $this->formManager->getBuilder($model, $entity);
-        $form        = $formBuilder->getForm();
+        $this->formManager->build($model, $entity)->getSymfonyFormBuilder();
+        $submitResult = $this->formManager->submit($request, $model);
 
-        if ($this->formManager->submit($formBuilder, $form, $request, $model)) {
+        if ($submitResult->isSubmitted && $submitResult->isValid) {
             $this->storage->getRepository($model)->save($entity);
 
-
             return $this->response($request, $model, $entity);
-        }
-
-        if (!$form->isValid()) {
-            $this->logger->error((string) $form->getErrors(true));
         }
 
         /** @var View $view */
         $view = $this->initialize($request, $this->requireAttribute($request, 'view'));
 
-        return $this->viewResponse($view, ['form' => $form->createView()]);
+        return $this->viewResponse($view, ['form' => $this->formManager->createView()]);
     }
 
     /**
