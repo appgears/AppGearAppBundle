@@ -56,6 +56,9 @@
     {{ _value|date('Y-m-d H:i:s') }}
 {% endblock %}
 
+{% block widget_field_markdown %}
+    {{ _value|markdown }}
+{% endblock %}
 
 {# Widgets #}
 
