@@ -1,79 +1,21 @@
-{% form_theme filtersFormView '@app/form/custom_layout.html.twig' %}
-{% use "@app/widgets.html.twig" %}
-{% use "@app/misc/widget_text_max_lines.html.twig" %}
+{% extends '@app/list.html.twig' %}
 
-{% if filtersFormView.children | length %}
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <form method="GET" class="appgear-list-filters">
-                {{ form_start(filtersFormView, {'method': 'GET'}) }}
+{% block listBody %}
 
-                {% for child in filtersFormView.children|keys %}
-                    {% if '_negative' not in child %}
-                        {% set formField = attribute(filtersFormView.children, child) %}
-                        {% set childNegative = child ~ '_negative' %}
-                        {% set formFieldNegativeField = attribute(filtersFormView.children, childNegative) %}
-
-                        <div class="form-group">
-                            {{ form_label(formField) }}
-
-                            <div class="input-group">
-                                {{ form_widget(formField) }}
-                                <span class="input-group-addon">
-                                        {#{{ form_widget(formFieldNegativeField) }}#}
-                                    <input type="checkbox" name="{{ formFieldNegativeField.vars.full_name }}" value="{{ formFieldNegativeField.vars.value }}"{% if formFieldNegativeField.vars.data %} checked{% endif %}>
-                                </span>
-                            </div>
-                        </div>
+    {% for entity in data %}
+        <div class="table-responsive padding-bottom-10">
+            <table class="table table-hover table-bordered{% if loop.index is odd %} odd{% endif %}" data-toggle="table">
+                {% for field in fields %}
+                    {# skip empty fields - may be configured as view option #}
+                    {% if entity is defined and entity|property_accessor(field.mapping) is not empty %}
+                        <tr>
+                            <td width="15%"><strong>{{ field.field.name|humanize }}</strong></td>
+                            <td>{{ block('widget_field') }}</td>
+                        </tr>
                     {% endif %}
                 {% endfor %}
-
-                <input type="submit" value="Apply" class="btn-default btn">
-                <input type="reset" value="Reset" class="btn-default btn">
-                {{ form_end(filtersFormView, {'render_rest': false}) }}
-            </form>
+            </table>
         </div>
-    </div>
-{% endif %}
+    {% endfor %}
 
-<div class="panel panel-default app-list-feed">
-    
-    {% if data | length %}
-        {% if (view.top | length) or (view.showCount) %}
-            <div class="panel-heading">
-                {% if view.showCount %}
-                    <div class="pull-right">
-                        Count: {{ data | length }}
-                    </div>
-                {% endif %}
-                
-                <div class="pull-right" style="padding-right: 20px">
-                    {% for field in (view.top | view_fields(data[0], false)) %}
-                        <strong>{{ field.field.name|humanize }}</strong>
-                        {{ block('widget_field') }}
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-        
-        {% set fields = (view.fields | view_fields(data[0])) %}
-        
-        <div class="panel-body padding-30">
-            {% for entity in data %}
-                <div class="table-responsive padding-bottom-10">
-                    <table class="table table-hover table-bordered{% if loop.index is odd %} odd{% endif %}" data-toggle="table">
-                        {% for field in fields %}
-                            {# skip empty fields - may be configured as view option #}
-                            {% if entity is defined and entity|property_accessor(field.mapping) is not empty %}
-                                <tr>
-                                    <td width="15%"><strong>{{ field.field.name|humanize }}</strong></td>
-                                    <td>{{ block('widget_field') }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </table>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
+{% endblock %}

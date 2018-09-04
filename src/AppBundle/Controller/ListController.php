@@ -46,11 +46,15 @@ class ListController extends AbstractController
 
         $viewParameters = $this->requireAttribute($request, 'view');
         if (is_scalar($viewParameters)) {
-            /** @var View $view */
+            /** @var ListView $view */
             $view = $this->storage->find('app.view.list_view', $viewParameters);
         } else {
             /** @var View $view */
             $view = $this->initialize($request, $viewParameters);
+        }
+
+        if ($view->getModel() === null) {
+            $view->setModel($model);
         }
 
         $expression = $request->get('data[expression]', null, true);

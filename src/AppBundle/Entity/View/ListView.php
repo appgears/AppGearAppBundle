@@ -37,6 +37,11 @@ class ListView extends View
     protected $showCount = false;
     
     /**
+     * ShowCreateButton
+     */
+    protected $showCreateButton = false;
+    
+    /**
      * Set title
      */
     public function setTitle($title)
@@ -136,5 +141,22 @@ class ListView extends View
     public function getShowCount()
     {
         return $this->showCount;
+    }
+    
+    /**
+     * Set showCreateButton
+     */
+    public function setShowCreateButton($showCreateButton)
+    {
+        $this->showCreateButton = $showCreateButton;
+        return $this;
+    }
+    
+    /**
+     * Get showCreateButton
+     */
+    public function getShowCreateButton()
+    {
+        return $this->showCreateButton;
     }
 }

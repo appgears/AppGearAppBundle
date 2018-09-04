@@ -64,8 +64,12 @@ class SecurityManager
      *
      * @return bool
      */
-    public function check(string $permission, string $model, $id = null, $field = null): bool
+    public function check(string $permission, string $model = null, $id = null, $field = null): bool
     {
+        if (null === $model) {
+            return false;
+        }
+
         $fqcn = $this->modelManager->fullClassName($model);
         $id   = $id ?? self::CLASS_SCOPE_OBJECT_IDENTIFIER_VALUE;
 

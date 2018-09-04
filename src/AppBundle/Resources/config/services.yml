@@ -8,6 +8,12 @@ services:
     class: AppGear\AppBundle\View\ViewManager
     arguments:
       - @twig
+      - @appgear.view.handler.list
+
+  appgear.view.handler.list:
+    class: AppGear\AppBundle\View\Handler\ListHandler
+    arguments:
+    - @appgear.security.manager
 
   appgear.twig.common_extension:
       class: AppGear\AppBundle\Twig\CommonExtension

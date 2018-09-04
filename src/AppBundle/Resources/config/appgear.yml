@@ -124,6 +124,10 @@ models:
         field:
           type: core.property.field.boolean_type
           defaultValue: false
+      showCreateButton:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
 
   app.view.list_view.filter:
     properties:
