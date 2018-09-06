@@ -1,8 +1,8 @@
-{% form_theme filtersFormView '@app/form/custom_layout.html.twig' %}
+{#{% form_theme filtersFormView '@app/form/custom_layout.html.twig' %}#}
 {% use "@app/widgets.html.twig" %}
 {% use "@app/misc/widget_text_max_lines.html.twig" %}
 
-{% if filtersFormView.children | length %}
+{% if filtersFormView is defined and filtersFormView.children | length %}
     <div class="panel panel-default">
         <div class="panel-body">
             <form method="GET" class="appgear-list-filters">
