@@ -3,10 +3,12 @@
 namespace AppGear\AppBundle\EntityService\Property\Field;
 
 use AppGear\AppBundle\Form\FormFieldTypeServiceInterface;
+use AppGear\AppBundle\Form\ViewFieldInterface;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
+use DateTime;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class DateTimeTypeService implements FormFieldTypeServiceInterface, MysqlFieldTypeServiceInterface
+class DateTimeTypeService implements FormFieldTypeServiceInterface, MysqlFieldTypeServiceInterface, ViewFieldInterface
 {
     /**
      * {@inheritdoc}
@@ -33,5 +35,18 @@ class DateTimeTypeService implements FormFieldTypeServiceInterface, MysqlFieldTy
     public function getMysqlFieldType()
     {
         return 'datetime';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getViewValue($value)
+    {
+        /** @var DateTime $value */
+        if (is_a($value, DateTime::class)) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        return null;
     }
 }
