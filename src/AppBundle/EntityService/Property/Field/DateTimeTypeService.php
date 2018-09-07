@@ -3,7 +3,7 @@
 namespace AppGear\AppBundle\EntityService\Property\Field;
 
 use AppGear\AppBundle\Form\FormFieldTypeServiceInterface;
-use AppGear\AppBundle\Form\ViewFieldInterface;
+use AppGear\AppBundle\View\ViewFieldInterface;
 use AppGear\AppBundle\Storage\Platform\MysqlFieldTypeServiceInterface;
 use DateTime;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;

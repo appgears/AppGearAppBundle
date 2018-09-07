@@ -1,6 +1,6 @@
 <?php
 
-namespace AppGear\AppBundle\Form;
+namespace AppGear\AppBundle\View;
 
 interface ViewFieldInterface
 {
