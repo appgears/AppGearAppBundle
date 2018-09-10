@@ -38,38 +38,46 @@
 
 <div class="panel panel-default">
     
-    {% if data | length %}
-        {% if view.showCreateButton or view.showCount or view.top|length %}
-            <div class="panel-heading">
-                
-                {% if view.showCreateButton %}
-                    <div class="pull-left">
-                        <a href="{{ path('admin.create', {model: model}) }}" class="btn btn-primary btn-xs white"><i class="fa fa-plus"></i> Create</a>
-                    </div>
-                {% endif %}
-                
-                {% if view.showCount %}
-                    <div class="pull-right">
-                        Count: {{ data | length }}
-                    </div>
-                {% endif %}
-                
+    {% if view.showCreateButton or view.showCount or view.top|length or view.title|length %}
+        <div class="panel-heading">
+            
+            {% if view.title|length %}
+                <strong>{{ view.title }}</strong>
+            {% endif %}
+            
+            {% if view.showCreateButton %}
+                <div class="pull-left">
+                    <a href="{{ path('admin.create', {model: model}) }}" class="btn btn-primary btn-xs white"><i class="fa fa-plus"></i> Create</a>
+                </div>
+            {% endif %}
+            
+            {% if view.showCount %}
+                <div class="pull-right">
+                    Count: {{ data | length }}
+                </div>
+            {% endif %}
+            
+            {% if data | length %}
                 <div class="pull-right" style="padding-right: 20px">
                     {% for field in (view.top | view_fields(data[0], false)) %}
                         <strong>{{ field.field.name|humanize }}</strong>
                         {{ block('widget_field') }}
                     {% endfor %}
                 </div>
-            </div>
-        {% endif %}
-        
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% if data | length %}
         {% set fields = (view.fields | view_fields(data[0])) %}
         
         <div class="panel-body padding-30">
             {% block listBody %}{% endblock %}
         </div>
     {% else %}
-        {% block listBodyEmpty %}{% endblock %}
+        <div class="panel-body padding-30">
+            {% block listBodyEmpty %}{% endblock %}
+        </div>
     {% endif %}
     
     {% include '@app/misc/pagination.html.twig' %}
