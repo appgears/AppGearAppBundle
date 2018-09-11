@@ -168,6 +168,13 @@ models:
       exclude:
         field:
           type: core.property.field.string_type
+      # todo: временное решение
+      # нужно кэшировать список полей на которых выдавался доступ
+      # и принимать решение о проверке проверяя этот список
+      checkAccess:
+        field:
+          type: core.property.field.boolean_type
+          defaultValue: false
 
   app.view.field.group:
     properties:

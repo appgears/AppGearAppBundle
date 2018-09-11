@@ -41,6 +41,11 @@ class Field
     protected $exclude;
     
     /**
+     * CheckAccess
+     */
+    protected $checkAccess = false;
+    
+    /**
      * Set name
      */
     public function setName($name)
@@ -157,5 +162,22 @@ class Field
     public function getExclude()
     {
         return $this->exclude;
+    }
+    
+    /**
+     * Set checkAccess
+     */
+    public function setCheckAccess($checkAccess)
+    {
+        $this->checkAccess = $checkAccess;
+        return $this;
+    }
+    
+    /**
+     * Get checkAccess
+     */
+    public function getCheckAccess()
+    {
+        return $this->checkAccess;
     }
 }

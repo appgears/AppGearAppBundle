@@ -30,5 +30,6 @@ services:
       arguments:
           - @service_container
           - @app_gear.core.model.manager
+          - @appgear.security.manager
       tags:
           - { name: twig.extension }

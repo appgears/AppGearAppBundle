@@ -3,6 +3,7 @@
 namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
+use AppGear\AppBundle\Security\SecurityManager;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
@@ -10,6 +11,7 @@ use Embera\Embera;
 use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Twig_Extension;
 use Twig_SimpleFilter;
 
@@ -33,15 +35,25 @@ class ViewExtension extends Twig_Extension
     private $modelManager;
 
     /**
+     * @var SecurityManager
+     */
+    private $securityManager;
+
+    /**
      * ViewExtension constructor.
      *
-     * @param ContainerInterface $container    Service container
-     * @param ModelManager       $modelManager Model manager
+     * @param ContainerInterface $container       Service container
+     * @param ModelManager       $modelManager    Model manager
+     * @param SecurityManager    $securityManager Security manager
      */
-    public function __construct(ContainerInterface $container, ModelManager $modelManager)
-    {
-        $this->container    = $container;
-        $this->modelManager = $modelManager;
+    public function __construct(
+        ContainerInterface $container,
+        ModelManager $modelManager,
+        SecurityManager $securityManager
+    ) {
+        $this->container       = $container;
+        $this->modelManager    = $modelManager;
+        $this->securityManager = $securityManager;
     }
 
     /**
@@ -168,6 +180,18 @@ class ViewExtension extends Twig_Extension
                 }
 
                 return !$el->evaluate($field->getExclude(), compact('entity'));
+            }
+        );
+
+        $fields = array_filter(
+            $fields,
+            function ($field) use ($model) {
+                /** @var View\Field $field */
+                if (!$field->getCheckAccess()) {
+                    return true;
+                }
+
+                return $this->securityManager->check(BasicPermissionMap::PERMISSION_VIEW, $model, null, $field->getName());
             }
         );
 
