@@ -28,6 +28,8 @@ class ViewController extends AbstractController
             $view = $this->initialize($request, $viewParameters);
         }
 
+        $model = null;
+
         if (null !== $data = $request->get('data')) {
 
             $model = $data['model'] ?? null;
@@ -51,6 +53,10 @@ class ViewController extends AbstractController
             }
         }
 
-        return $this->viewResponse($view, compact('data'));
+        if ($model !== null) {
+            $model = $this->modelManager->get($model);
+        }
+
+        return $this->viewResponse($view, compact('data', 'model'));
     }
 }

@@ -66,7 +66,8 @@ class ViewExtension extends Twig_Extension
             new Twig_SimpleFilter('markdown', array($this, 'markdown'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('render', array($this, 'render')),
             new Twig_SimpleFilter('model', array($this, 'model')),
-            new Twig_SimpleFilter('view_fields', array($this, 'viewFields')),
+            new Twig_SimpleFilter('view_fields_from_model', array($this, 'getViewFieldsFromModel')),
+            new Twig_SimpleFilter('view_fields_prepare', array($this, 'prepareViewFields')),
         );
     }
 
@@ -153,33 +154,25 @@ class ViewExtension extends Twig_Extension
     }
 
     /**
-     * Get view fields
+     * Prepare view fields
      *
      * @param array  $fields
-     * @param object $entity
-     * @param bool   $getFromModelIfNoFields
+     * @param object $data
      *
      * @return array
      */
-    public function viewFields(array $fields, $entity, $getFromModelIfNoFields = true)
+    public function prepareViewFields(array $fields, $model = null, $data = null)
     {
-        $isModel = $this->modelManager->isModel($entity);
-        $model   = $isModel ? $this->modelManager->getByInstance($entity) : null;
-
-        if (count($fields) === 0 && $getFromModelIfNoFields && $isModel) {
-            $fields = $this->getFieldsFromModel($model);
-        }
-
         $el = new ExpressionLanguage();
 
         $fields = array_filter(
             $fields,
-            function ($field) use ($el, $entity) {
+            function ($field) use ($el, $data) {
                 if ($field->getExclude() === null) {
                     return true;
                 }
 
-                return !$el->evaluate($field->getExclude(), compact('entity'));
+                return !$el->evaluate($field->getExclude(), compact('data'));
             }
         );
 
@@ -213,10 +206,16 @@ class ViewExtension extends Twig_Extension
     }
 
     /**
+     * @param Model|null $model
+     *
      * @return array
      */
-    private function getFieldsFromModel(Model $model)
+    public function getViewFieldsFromModel(Model $model = null)
     {
+        if ($model === null) {
+            return [];
+        }
+
         return array_map(
             function ($property) {
                 $viewField = new View\Field();

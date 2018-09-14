@@ -13,7 +13,7 @@
         
         {% if view.top | length %}
             <div class="panel-heading">
-                {% for field in (view.top | view_fields(entity, false)) %}
+                {% for field in (view.top | view_fields_prepare(model, data)) %}
                     {% if last_group != field.field.group and loop.index0 != 0 %}
                         |
                     {% endif %}
@@ -30,7 +30,7 @@
         <div class="panel-body padding-30">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered table-striped" data-toggle="table">
-                    {% for field in (view.fields | view_fields(entity)) %}
+                    {% for field in (view.fields | default(model|view_fields_from_model) | view_fields_prepare(model, data)) %}
                         {% block row %}
                             <tr>
                                 <td width="15%">
@@ -49,7 +49,7 @@
                         <tr>
                             <td colspan="2"><b>{{ group.name|default(' ')|upper }}</b></td>
                         </tr>
-                        {% for field in (group.fields | view_fields(entity)) %}
+                        {% for field in (group.fields | view_fields_prepare(model, data)) %}
                            {{ block('row') }}
                         {% endfor %}
                     {% endfor %}
@@ -58,7 +58,7 @@
         </div>
     </div>
     
-    {% for field in (view.embedded | view_fields(entity, false)) %}
+    {% for field in (view.embedded | view_fields_prepare(model, data)) %}
         {{ block('widget_field') }}
     {% endfor %}
 {% endblock %}
