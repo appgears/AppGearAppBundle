@@ -65,6 +65,7 @@ class ViewExtension extends Twig_Extension
             new Twig_SimpleFilter('embed', array($this, 'embed'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('markdown', array($this, 'markdown'), array('is_safe' => array('html'))),
             new Twig_SimpleFilter('render', array($this, 'render')),
+            new Twig_SimpleFilter('render_list', array($this, 'renderList')),
             new Twig_SimpleFilter('model', array($this, 'model')),
             new Twig_SimpleFilter('view_fields_from_model', array($this, 'getViewFieldsFromModel')),
             new Twig_SimpleFilter('view_fields_prepare', array($this, 'prepareViewFields')),
@@ -95,6 +96,20 @@ class ViewExtension extends Twig_Extension
         $viewManager = $this->container->get('appgear.view.manager');
 
         return $viewManager->render($view, ['data' => $data]);
+    }
+
+    /**
+     * @param View\ListView $view
+     * @param               $data
+     *
+     * @return string
+     */
+    public function renderList(View\ListView $view, $data)
+    {
+        // Avoid circular reference problem
+        $viewManager = $this->container->get('appgear.view.manager');
+
+        return $viewManager->renderList($view, ['data' => $data]);
     }
 
     /**
