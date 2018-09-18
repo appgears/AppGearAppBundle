@@ -42,12 +42,14 @@
         <div class="panel-heading">
             
             {% if view.title|length %}
-                <strong>{{ view.title }}</strong>
+                <div style="display: inline-block; padding-right: 15px">
+                    <strong>{{ view.title }}</strong>
+                </div>
             {% endif %}
             
             {% if view.showCreateButton %}
-                <div class="pull-left">
-                    <a href="{{ path('admin.create', {model: model}) }}" class="btn btn-primary btn-xs white"><i class="fa fa-plus"></i> Create</a>
+                <div style="display: inline-block;">
+                    <a href="{{ path('admin.create', {model: view.model}) }}" class="btn btn-primary btn-xs btn-block white"><i class="fa fa-plus"></i> Create</a>
                 </div>
             {% endif %}
             
