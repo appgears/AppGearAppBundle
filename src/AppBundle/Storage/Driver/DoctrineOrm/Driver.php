@@ -10,14 +10,12 @@ use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Entity\Property;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
-use Commerce\PlatformBundle\Entity\Shop\Order;
 use Cosmologist\Gears\StringType;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria as DoctrineCriteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use RuntimeException;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class Driver implements DriverInterface
 {

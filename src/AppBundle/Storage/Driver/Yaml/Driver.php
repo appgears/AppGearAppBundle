@@ -20,6 +20,7 @@ class Driver implements DriverInterface
      * @var HydratorFactory
      */
     private $hydratorFactory;
+
     /**
      * @var Container
      */
