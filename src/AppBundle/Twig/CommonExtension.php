@@ -59,17 +59,17 @@ class CommonExtension extends Twig_Extension
      * Evaluate expression language expression with entity as context
      *
      * @param string $expression Expression language expression
-     * @param object $entity     Entity
-     * @param string $value      Entity value
+     * @param mixed  $data       Data
+     * @param mixed  $value      Value
      *
      * @return string
      */
-    public function expression($expression, $entity, $value = null)
+    public function expression($expression, $data, $value = null)
     {
         $language = new ExpressionLanguage();
 
         try {
-            return $language->evaluate($expression, ['entity' => $entity, 'value' => $value]);
+            return $language->evaluate($expression, ['data' => $data, 'value' => $value]);
         } catch (Exception $e) {
         }
 
