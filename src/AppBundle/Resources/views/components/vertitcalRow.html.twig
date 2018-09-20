@@ -1,0 +1,16 @@
+{% use "@app/widgets.html.twig" %}
+
+{# skip empty fields - may be configured as view option #}
+{% if entity is defined and entity|property_accessor(field.mapping) is not empty %}
+    <tr>
+        <td width="15%">
+            <div class="th-inner">
+                {{ field.field.name|humanize|ucwords }}
+            </div>
+        </td>
+        <td>
+            {{ block('widget_field') }}
+        </td>
+    </tr>
+{% endif %}
+            
