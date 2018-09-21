@@ -9,10 +9,18 @@
     <div class="panel panel-default">
         
         {% set entity = data %}
+        {% if model is not defined %}{% set model = null %}{% endif %}
         {% set last_group = null %}
         
-        {% if view.top | length %}
+        {% if (view.top | length) or true %}
             <div class="panel-heading">
+                
+                {% if model is defined and entity.id is defined %}
+                    <div style="display: inline-block;">
+                        <a href="{{ path('admin.edit', {model: model, id: entity.id}) }}" class="btn btn-primary btn-xs btn-block white"><i class="fa fa-edit"></i> Edit</a>
+                    </div>
+                {% endif %}
+                
                 {% for field in (view.top | view_fields_prepare(model, data)) %}
                     {% if last_group != field.field.group and loop.index0 != 0 %}
                         |
@@ -30,7 +38,7 @@
         <div class="panel-body padding-30">
             <div class="table-responsive">
                 <table class="table table-hover table-bordered table-striped" data-toggle="table">
-    
+                    
                     {% for field in (view.fields | default(model|view_fields_from_model) | view_fields_prepare(model, data)) %}
                         {% include '@app/components/vertitcalRow.html.twig' %}
                     {% endfor %}
