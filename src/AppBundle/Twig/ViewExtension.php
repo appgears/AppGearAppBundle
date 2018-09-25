@@ -100,11 +100,15 @@ class ViewExtension extends Twig_Extension
 
     /**
      * @param View\ListView $view
-     * @param               $data
+     * @param mixed         $data
+     * @param array         $initiator   Initiator of rendering
+     *                                   If initiator is another entity detail view then array contains the items:
+     *                                   - entity - detail view entity [object]
+     *                                   - relationship - toMany entity relationship [Property\Relationship]
      *
      * @return string
      */
-    public function renderList(View\ListView $view, $data)
+    public function renderList(View\ListView $view, $data, array $initiator = [])
     {
         // Avoid circular reference problem
         $viewManager = $this->container->get('appgear.view.manager');

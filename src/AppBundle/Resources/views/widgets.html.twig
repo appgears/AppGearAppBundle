@@ -190,7 +190,9 @@
 {% endblock %}
 
 {% block widget_view_list %}
-    {{ _widget.view | render_list( _value) | raw }}
+    {% set _parent = {entity:entity, relationship: field.property, value: _value} %}
+    
+    {{ _widget.view | render_list( _value, _parent) | raw }}
 {% endblock %}
 
 {% block widget_phone %}
