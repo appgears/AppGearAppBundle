@@ -48,8 +48,21 @@
             {% endif %}
             
             {% if view.showCreateButton %}
+                {% set _createButtonRouteParameters = {model: view.model} %}
+                {% set _createButtonHasExtraParameters = extra.createButton.parameters is defined %}
+                
+                {% if _createButtonHasExtraParameters %}
+                    {% set _createButtonRouteParameters = _createButtonRouteParameters|merge(extra.createButton.parameters) %}
+                {% endif %}
+                
+                {% set createButtonAttributes = {
+                    href: path('admin.create', _createButtonRouteParameters),
+                    class: "btn btn-primary btn-xs btn-block white",
+                    target: _createButtonHasExtraParameters ? '_blank' : '_self'
+                } %}
+                
                 <div style="display: inline-block;">
-                    <a href="{{ path('admin.create', {model: view.model}) }}" class="btn btn-primary btn-xs btn-block white"><i class="fa fa-plus"></i> Create</a>
+                    <a{{ createButtonAttributes|htmlAttributes }}><i class="fa fa-plus"></i> Create</a>
                 </div>
             {% endif %}
             

@@ -4,6 +4,7 @@ namespace AppGear\AppBundle\Twig;
 
 use AppGear\AppBundle\Entity\View;
 use AppGear\AppBundle\Security\SecurityManager;
+use AppGear\AppBundle\View\Dto\ViewContextDto;
 use AppGear\CoreBundle\Entity\Model;
 use AppGear\CoreBundle\Helper\ModelHelper;
 use AppGear\CoreBundle\Model\ModelManager;
@@ -101,19 +102,29 @@ class ViewExtension extends Twig_Extension
     /**
      * @param View\ListView $view
      * @param mixed         $data
-     * @param array         $initiator   Initiator of rendering
-     *                                   If initiator is another entity detail view then array contains the items:
-     *                                   - entity - detail view entity [object]
-     *                                   - relationship - toMany entity relationship [Property\Relationship]
+     * @param array         $parentViewContext Context of parent-view - initiator of rendering
+     *
+     *                                     $parentContext = [
+     *                                          'entity' => (object)                      Detail view entity,
+     *                                          'relationship' => (Property\Relationship) toMany entity relationship
+     *                                     ]
      *
      * @return string
      */
-    public function renderList(View\ListView $view, $data, array $initiator = [])
+    public function renderList(View\ListView $view, $data, array $parentViewContext = [])
     {
         // Avoid circular reference problem
         $viewManager = $this->container->get('appgear.view.manager');
 
-        return $viewManager->renderList($view, ['data' => $data]);
+        if (array_key_exists('entity', $parentViewContext) && array_key_exists('relationship', $parentViewContext)) {
+            $parentViewContextDto               = new ViewContextDto();
+            $parentViewContextDto->entity       = $parentViewContext['entity'];
+            $parentViewContextDto->relationship = $parentViewContext['relationship'];
+        } else {
+            $parentViewContextDto = null;
+        }
+
+        return $viewManager->renderList($view, ['data' => $data], $parentViewContextDto);
     }
 
     /**
@@ -203,7 +214,8 @@ class ViewExtension extends Twig_Extension
                     return true;
                 }
 
-                return $this->securityManager->check(BasicPermissionMap::PERMISSION_VIEW, $model, null, $field->getName());
+                return $this->securityManager->check(BasicPermissionMap::PERMISSION_VIEW, $model, null,
+                    $field->getName());
             }
         );
 

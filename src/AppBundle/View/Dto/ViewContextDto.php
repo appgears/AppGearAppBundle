@@ -3,13 +3,11 @@
 namespace AppGear\AppBundle\View\Dto;
 
 use AppGear\CoreBundle\Entity\Property\Relationship;
-use Doctrine\Common\Collections\Collection;
-use Traversable;
 
 /**
- * Dto-инициатора рендеринга списка
+ * Dto для передачи контекста родительского view при рендере дочернего view
  */
-class RenderListInitiatorDto
+class ViewContextDto
 {
     /**
      * Сущность которая ссылается (relation) на коллекцию, для которой рендерится список

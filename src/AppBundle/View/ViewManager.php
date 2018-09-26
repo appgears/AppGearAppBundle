@@ -2,6 +2,8 @@
 
 namespace AppGear\AppBundle\View;
 
+use AppGear\AppBundle\Helper\StorageHelper;
+use AppGear\AppBundle\View\Dto\ViewContextDto;
 use AppGear\AppBundle\View\Handler\ListHandler;
 use AppGear\AppBundle\Entity\View;
 use Twig_Environment;
@@ -46,29 +48,44 @@ class ViewManager
     }
 
     /**
-     * @param View  $view
-     * @param array $data
+     * @param View                $view
+     * @param array               $data
+     *
+     * @param ViewContextDto|null $parentViewContext
      *
      * @return string
      */
-    public function renderView(View $view, array $data = []): string
+    public function renderView(View $view, array $data = [], ViewContextDto $parentViewContext = null): string
     {
-        $data['view'] = $view;
+        $data['view']          = $view;
+        $data['parentContext'] = $parentViewContext;
 
         return $this->twig->render($view->getTemplate(), $data);
     }
 
     /**
-     * @param View\ListView $listView
-     * @param array         $data
+     * @param View\ListView       $listView
+     * @param array               $data
+     *
+     * @param ViewContextDto|null $parentViewContext
      *
      * @return string
      */
-    public function renderList(View\ListView $listView, array $data = []): string
+    public function renderList(View\ListView $listView, array $data = [], ViewContextDto $parentViewContext = null): string
     {
         $this->listHandler->prepareView($listView);
 
-        return $this->renderView($listView, $data);
+        if ($parentViewContext !== null && $parentViewContext->relationship !== null && $parentViewContext->entity !== null) {
+            $backsideProperty = StorageHelper::getBacksideProperty($parentViewContext->relationship);
+
+            if ($backsideProperty !== null) {
+                $data['extra']['createButton']['parameters'] = [
+                    $backsideProperty->getName() => $parentViewContext->entity->getId()
+                ];
+            }
+        }
+
+        return $this->renderView($listView, $data, $parentViewContext);
     }
 
     /**
