@@ -98,16 +98,17 @@ class FormManager
      * @param Model $model
      * @param null  $entity
      * @param array $properties
+     * @param array $excludeProperties
      * @param array $formOptions
      *
      * @return $this
      */
-    public function build(Model $model, $entity = null, array $properties = [], array $formOptions = [])
+    public function build(Model $model, $entity = null, array $properties = [], array $excludeProperties = [], array $formOptions = [])
     {
         $this->form = null;
 
         $this->symfonyFormBuilder = $this->appFormBuilder->create($entity, $formOptions);
-        $this->symfonyFormBuilder = $this->appFormBuilder->buildByModel($this->symfonyFormBuilder, $model, $properties);
+        $this->symfonyFormBuilder = $this->appFormBuilder->buildByModel($this->symfonyFormBuilder, $model, $properties, $excludeProperties);
 
         $this->initFileFields($entity);
 

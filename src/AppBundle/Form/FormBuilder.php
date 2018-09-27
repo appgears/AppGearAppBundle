@@ -19,8 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FormBuilder
 {
@@ -55,20 +53,21 @@ class FormBuilder
     /**
      * FormBuilder constructor.
      *
-     * @param FormFactoryInterface $formFactory      Form factory
-     * @param ModelManager         $modelManager     Model manager
-     * @param TaggedManager        $taggedManager    Tagged services manager
-     * @param Storage              $storage          Storage
+     * @param FormFactoryInterface $formFactory   Form factory
+     * @param ModelManager         $modelManager  Model manager
+     * @param TaggedManager        $taggedManager Tagged services manager
+     * @param Storage              $storage       Storage
      */
-    public function __construct(FormFactoryInterface $formFactory,
-                                ModelManager $modelManager,
-                                TaggedManager $taggedManager,
-                                Storage $storage)
-    {
-        $this->formFactory      = $formFactory;
-        $this->modelManager     = $modelManager;
-        $this->taggedManager    = $taggedManager;
-        $this->storage          = $storage;
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        ModelManager $modelManager,
+        TaggedManager $taggedManager,
+        Storage $storage
+    ) {
+        $this->formFactory   = $formFactory;
+        $this->modelManager  = $modelManager;
+        $this->taggedManager = $taggedManager;
+        $this->storage       = $storage;
     }
 
     /**
@@ -89,14 +88,18 @@ class FormBuilder
      *
      * @param FormBuilderInterface $formBuilder       Form builder
      * @param Model                $model             Model
-     * @param array                $allowedProperties [Optional] Add form fields only for passed properties
+     * @param array                $allowedProperties [Optional] Add form fields names only for passed properties
+     * @param array                $excludeProperties [Optional] Skip passed fields
      *
      * @return FormBuilderInterface
      */
-    public function buildByModel(FormBuilderInterface $formBuilder, Model $model, array $allowedProperties = [])
+    public function buildByModel(FormBuilderInterface $formBuilder, Model $model, array $allowedProperties = [], array $excludeProperties = [])
     {
         $properties = Collection::create(ModelHelper::getProperties($model))
-            ->filter([StorageHelper::class, 'isIdentifierProperty']);
+            ->filter([StorageHelper::class, 'isIdentifierProperty'])
+            ->filter(function (Property $property) use ($excludeProperties) {
+                return in_array($property->getName(), $excludeProperties);
+            });
 
         return $this->buildByProperties($formBuilder, $properties, $allowedProperties);
     }
@@ -110,7 +113,7 @@ class FormBuilder
      *
      * @return FormBuilderInterface
      */
-    public function buildByProperties(FormBuilderInterface $formBuilder, Collection $propertiesCollection, array $allowedProperties = [])
+    public function buildByProperties(FormBuilderInterface $formBuilder, Collection $propertiesCollection, array $allowedProperties = [], array $excludeProperties = [])
     {
         $propertiesCollection->filter([$this, 'isPropertyAllowed']);
 
