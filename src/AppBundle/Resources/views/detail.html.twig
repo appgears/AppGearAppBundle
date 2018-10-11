@@ -20,7 +20,7 @@
                         <a href="{{ path('admin.edit', {model: model, id: entity.id}) }}" class="btn btn-primary btn-xs btn-block white"><i class="fa fa-edit"></i> Edit</a>
                     </div>
                     <div style="display: inline-block;">
-                        <a href="{{ path('appgear.remove', {model: model, id: entity.id}) }}" class="btn btn-primary btn-xs btn-block white"><i class="fa fa-trash-alt"></i> Remove</a>
+                        <a href="{{ path('appgear.remove', {model: model, id: entity.id}) }}" class="btn btn-primary btn-xs btn-block white appgear-widget-action" data-appgear-widget-action-ajax="1" data-appgear-widget-action-post="1"><i class="fa fa-trash-alt"></i> Remove</a>
                     </div>
                 {% endif %}
                 

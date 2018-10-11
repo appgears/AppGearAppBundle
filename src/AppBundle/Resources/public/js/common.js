@@ -27,7 +27,7 @@ $(document).ready(function () {
             $.ajax({
                 url: this.href,
                 method: method,
-                data: JSON.parse(dataset.appgearWidgetActionPostParameters),
+                data: JSON.parse(dataset.appgearWidgetActionPostParameters || '[]'),
                 statusCode: {
                     200: function (data) {
                         var message = data || 'Successfully';
