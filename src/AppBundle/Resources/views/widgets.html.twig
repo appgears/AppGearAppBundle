@@ -181,6 +181,11 @@
 {% endblock %}
 
 {% block widget_view %}
+    {% if _widget.dataProvider is not empty %}
+        {# todo: fix data argument - should be common for list and detail #}
+        {% set _value = widget_view_data(data, _widget) %}
+    {% endif %}
+    
     {% set _block = block('widget_view_' ~ (_widget.view|class|replace({'View': ''})|lower)) %}
     {%- if _block is not empty %}
         {{ _block|raw }}

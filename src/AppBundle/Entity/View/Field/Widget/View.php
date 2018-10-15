@@ -12,6 +12,11 @@ class View extends Widget
     protected $view;
     
     /**
+     * DataProvider
+     */
+    protected $dataProvider;
+    
+    /**
      * Set view
      */
     public function setView($view)
@@ -26,5 +31,22 @@ class View extends Widget
     public function getView()
     {
         return $this->view;
+    }
+    
+    /**
+     * Set dataProvider
+     */
+    public function setDataProvider($dataProvider)
+    {
+        $this->dataProvider = $dataProvider;
+        return $this;
+    }
+    
+    /**
+     * Get dataProvider
+     */
+    public function getDataProvider()
+    {
+        return $this->dataProvider;
     }
 }

@@ -80,6 +80,7 @@ class ViewExtension extends Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('widget_service', array($this, 'renderWidgetService')),
+            new \Twig_SimpleFunction('widget_view_data', array($this, 'widgetViewLoadData')),
         );
     }
 
@@ -181,6 +182,20 @@ class ViewExtension extends Twig_Extension
         }
 
         return null;
+    }
+
+    /**
+     * @param                        $entity
+     * @param View\Field\Widget\View $widget
+     *
+     * @return mixed
+     */
+    public function widgetViewLoadData($entity, View\Field\Widget\View $widget)
+    {
+        list($id, $method) = explode('::', $widget->getDataProvider());
+        $service = $this->container->get($id);
+
+        return $service->$method($entity);
     }
 
     /**

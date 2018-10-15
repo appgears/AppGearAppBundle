@@ -278,6 +278,9 @@ models:
         relationship:
           type: core.property.relationship.toOne
           target: app.view
+      dataProvider:
+        field:
+          type: core.property.field.string_type
 
   app.view.field.widget.phone:
     parent: app.view.field.widget
