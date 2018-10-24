@@ -28,31 +28,24 @@ $(document).ready(function () {
                 url: this.href,
                 method: method,
                 data: JSON.parse(dataset.appgearWidgetActionPostParameters || '[]'),
-                statusCode: {
-                    200: function (data) {
-                        var message = data || 'Successfully';
-                        $(loadingToast).closest('.toast').remove();
+                success: function (data, textStatus, xhr) {
+                    var message = data || textStatus.capitalize();
+                    $(loadingToast).closest('.toast').remove();
 
-                        switch (dataset.appgearWidgetActionPayload) {
-                            case 'reload':
-                                location.reload();
-                                break;
-                            default:
-                                toastr.success(message, null, {timeOut: 5000, closeButton: true})
-                        }
-                    },
-                    403: function () {
-                        $(loadingToast).closest('.toast').remove();
-                        toastr.warning('Access Denied!', null, {timeOut: 2000, closeButton: true})
-                    },
-                    404: function () {
-                        $(loadingToast).closest('.toast').remove();
-                        toastr.warning('Not Found!', null, {timeOut: 2000, closeButton: true})
-                    },
-                    422: function (data) {
-                        $(loadingToast).closest('.toast').remove();
-                        toastr.warning(data.responseText, null, {timeOut: 3000, closeButton: true})
+                    switch (dataset.appgearWidgetActionPayload) {
+                        case 'reload':
+                            location.reload();
+                            break;
+                        case 'alert':
+                            alert(message);
+                            break;
+                        default:
+                            toastr.success(message, null, {timeOut: 5000, closeButton: true})
                     }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $(loadingToast).closest('.toast').remove();
+                    toastr.error(errorThrown, null, {timeOut: 2500, closeButton: true})
                 }
             });
 
@@ -91,3 +84,7 @@ $(document).ready(function () {
         dropdownParent: "body"
     });
 });
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

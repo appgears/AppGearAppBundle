@@ -164,11 +164,11 @@
     {% endif %}
     {% if _widget.method == 'ajax' %}
         {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-ajax': '1'}) %}
-        
-        {% if _widget.payload %}
-            {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-payload': _widget.payload}) %}
-        {% endif %}
-    {% elseif _widget.newWindow %}
+    {% endif %}
+    {% if _widget.payload %}
+        {% set widgetAttrs = widgetAttrs|merge({'data-appgear-widget-action-payload': _widget.payload}) %}
+    {% endif %}
+    {% if _widget.newWindow %}
         {% set widgetAttrs = widgetAttrs|merge({'target': '_blank'}) %}
     {% endif %}
     
